@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/testmodel/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/testmodel/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vcampus-client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vcampus-client/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vcampus-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vcampus-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vcampus-database/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vcampus-database/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vcampus-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vcampus-server/src/main/resources" charset="UTF-8" />
+  </component>
+</project>
