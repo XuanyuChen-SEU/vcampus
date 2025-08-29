@@ -127,6 +127,95 @@ vcampus/
 - Maven 3.6+
 - MySQL 8.0.33
 - IntelliJ IDEA（推荐）或其他Java IDE
+## 本项目Maven简介
+- 本项目采用Maven进行依赖管理和项目构建
+- 父工程 `vcampus` 管理子模块 `vcampus-common`、`vcampus-server`、`vcampus-client`、`vcampus-database`
+- 每个子模块有自己的 `pom.xml` 配置文件，声明依赖和插件
+### 父工程（只挑重点，有的没复制）
+这部分是基础配置，其他子模块都继承自这个父工程
+重点看groupId、artifactId，注意packaging务必pom，原因请询问ai
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.vcampus</groupId>
+    <artifactId>vcampus</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+```
+modules表明了子模块
+```
+    <modules>
+        <module>vcampus-common</module>
+        <module>vcampus-server</module>
+        <module>vcampus-client</module>
+        <module>vcampus-database</module>
+    </modules>
+```
+properties表明了一些全局变量，通过`${变量名}`引用
+```
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+```
+dependencyManagement表明了依赖管理，子模块可以引用这里的依赖，这里只保留一个作为示例
+```
+    <dependencyManagement>
+        <dependencies>
+            <!-- JavaFX -->
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>${javafx.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
+```
+### 子模块
+这里以`vcampus-common`为例
+继承一定要和父工程的groupId、artifactId，version一致
+```
+    <parent>
+        <groupId>com.vcampus</groupId>
+        <artifactId>vcampus</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+```
+这里artifactId自己起名，如果`vcampus-server`需要用到这个`common`模块就需要加入
+```
+<dependency>
+            <groupId>com.vcampus</groupId>
+            <artifactId>vcampus-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+```
+    <artifactId>vcampus-common</artifactId>
+    <dependencies>
+        <!-- MyBatis -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+
+```
+本项目如果想增加maven依赖，需要在父工程的dependencyManagement中添加，子模块就可以引用了
+
+## 测试
+单元测试：使用 JUnit 5 编写测试用例，验证业务逻辑的正确性。
+具体方法是在IDEA安装JUnit 5 Mockito Code Generator插件，按`alt+insert`，对你要测试的Java文件点击测试生成即可。
+JUnit测试的语法上网查询，当然ai生成就可以。
+当然你是付费版不用这个插件，右键应该是自带的，点击Generate Test即可。
+整体测试是在命令行输入`mvn test`，不妨试试。
 
 ## 开发流程
 从0开始开发 `vcampus` 项目，按照**“基础层→核心层→交互层→应用层”**的顺序逐步推进，确保每个阶段的成果可验证、可复用。

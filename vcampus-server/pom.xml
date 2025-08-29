@@ -16,5 +16,11 @@
             <artifactId>vcampus-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- 继承父模块的 JUnit 依赖 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

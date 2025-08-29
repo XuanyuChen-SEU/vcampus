@@ -26,6 +26,9 @@ public class User implements Serializable {
     // 加密后的密码（传输和存储均为密文）
     private String password;
 
+    // 手机号
+    private String phone;
+
     // 用户身份
     private Role role;
 
@@ -33,13 +36,19 @@ public class User implements Serializable {
     public User() {}
 
     // 正常构造方法
-    public User(String userId, String password, Role role) {
-        // 校验用户ID合法性
-        if (userId == null || userId.length() != 7) {
-            throw new IllegalArgumentException("用户ID必须为7位字符串");
+    public User(String userId, String password, String phone, Role role) {
+        // 校验用户ID合法性（7位纯数字）
+        if (userId == null || !userId.matches("\\d{7}")) {
+            throw new IllegalArgumentException("用户ID必须为7位纯数字字符串");
+        }
+
+// 校验手机号合法性（11位纯数字）
+        if (phone == null || !phone.matches("\\d{11}")) {
+            throw new IllegalArgumentException("手机号必须为11位纯数字字符串");
         }
         this.userId = userId;
         this.password = password;
+        this.phone = phone;
         this.role = role;
     }
 
@@ -50,10 +59,10 @@ public class User implements Serializable {
 
     public void setUserId(String userId) {
         // 简单校验
-        if (userId != null && userId.length() == 7) {
+        if (userId != null && userId.matches("\\d{7}")) {
             this.userId = userId;
         } else {
-            throw new IllegalArgumentException("用户ID必须为7位字符串");
+            throw new IllegalArgumentException("用户ID必须为7位纯数字字符串");
         }
     }
 
@@ -64,6 +73,18 @@ public class User implements Serializable {
     // 注意，这里密码是密文，不是明文
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        if (phone != null && phone.matches("\\d{11}")) {
+            this.phone = phone;
+        } else {
+            throw new IllegalArgumentException("手机号必须为11位纯数字字符串");
+        }
     }
 
     public Role getRole() {

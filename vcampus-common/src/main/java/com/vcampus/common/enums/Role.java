@@ -22,7 +22,12 @@ public enum Role {
         this.desc = desc;
     }
 
-    // 根据编码获取枚举实例
+    /**
+     * 根据数据库编码获取枚举实例
+     * @param code 数据库存储的角色编码
+     * @return 对应的角色枚举
+     * @throws IllegalArgumentException 当编码无效时抛出
+     */
     public static Role fromCode(int code) {
         for (Role role : values()) {
             if (role.code == code) {
