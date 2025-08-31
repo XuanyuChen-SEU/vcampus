@@ -53,5 +53,6 @@ public class DbHelper {
      * @return 连接是否成功
      */
     public static boolean testConnection() {
+        return false;
     }
 }
