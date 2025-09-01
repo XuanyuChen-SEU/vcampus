@@ -1,6 +1,9 @@
 package com.vcampus.client.controller;
 
 import com.vcampus.client.service.LoginService;
+import com.vcampus.common.dto.Message;
+
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -10,12 +13,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 /**
- * 登录界面控制器
- * 专注于处理登录界面的用户交互逻辑
- * 网络通信逻辑委托给LoginService处理
+ * 客户端登录控制器
+ * 处理登录相关的响应消息和前端交互
+ * 编写人：谌宣羽
  */
 public class LoginController {
     
+    // 前端UI组件
     @FXML
     private TextField usernameField;
     
@@ -46,38 +50,20 @@ public class LoginController {
         // 设置状态标签初始文本
         statusLabel.setText("请输入用户名和密码");
         
-        // 设置登录服务回调
-        setupLoginCallback();
+        // 将自己注册到MessageController
+        registerToMessageController();
     }
     
     /**
-     * 设置登录服务回调
+     * 注册到MessageController
      */
-    private void setupLoginCallback() {
-        loginService.setLoginCallback(new LoginService.LoginCallback() {
-            @Override
-            public void onLoginSuccess(String message) {
-                showSuccess("登录成功", message);
-                statusLabel.setText("登录成功，欢迎使用VCampus系统");
-                passwordField.clear();
-                
-                // TODO: 这里可以跳转到主界面
-                // switchToMainView();
-            }
-            
-            @Override
-            public void onLoginFailure(String error) {
-                showError("登录失败: " + error);
-                statusLabel.setText("登录失败，请检查用户名和密码");
-                passwordField.clear();
-            }
-            
-            @Override
-            public void onConnectionError(String error) {
-                showError(error);
-                statusLabel.setText("网络连接错误");
-            }
-        });
+    private void registerToMessageController() {
+        // 获取全局SocketClient中的MessageController
+        com.vcampus.client.controller.MessageController messageController = 
+            loginService.getGlobalSocketClient().getMessageController();
+        if (messageController != null) {
+            messageController.setLoginController(this);
+        }
     }
     
     /**
@@ -97,7 +83,38 @@ public class LoginController {
         statusLabel.setText("正在发送登录请求...");
         
         // 委托给登录服务处理网络通信
+        // 注意：这里不直接处理结果，而是等待MessageController调用handleLoginResponse
         loginService.login(username, password);
+    }
+    
+    /**
+     * 处理登录响应（从MessageController调用）
+     * @param message 登录响应消息
+     */
+    public void handleLoginResponse(Message message) {
+        // 在JavaFX应用线程中处理UI更新
+        Platform.runLater(() -> {
+            handleLoginResult(message);
+        });
+    }
+    
+    /**
+     * 处理登录结果
+     * @param result 登录结果消息
+     */
+    private void handleLoginResult(Message result) {
+        if (result.isSuccess()) {
+            showSuccess("登录成功", result.getMessage());
+            statusLabel.setText("登录成功，欢迎使用VCampus系统");
+            passwordField.clear();
+            
+            // TODO: 这里可以跳转到主界面
+            // switchToMainView();
+        } else {
+            showError("登录失败: " + result.getMessage());
+            statusLabel.setText("登录失败，请检查用户名和密码");
+            passwordField.clear();
+        }
     }
     
     /**

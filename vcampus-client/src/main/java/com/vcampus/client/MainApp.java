@@ -1,6 +1,7 @@
 package com.vcampus.client;
 
 import com.vcampus.client.net.SocketClient;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -52,23 +53,8 @@ public class MainApp extends Application {
     private void initializeGlobalNetworkConnection() {
         try {
             globalSocketClient = new SocketClient();
-            
-            // 在后台线程中建立连接
-            new Thread(() -> {
-                try {
-                    System.out.println("正在连接服务端...");
-                    boolean connected = globalSocketClient.connect();
-                    
-                    if (connected) {
-                        System.out.println("全局网络连接已建立");
-                    } else {
-                        System.err.println("全局网络连接失败");
-                    }
-                } catch (Exception e) {
-                    System.err.println("建立全局网络连接时发生错误: " + e.getMessage());
-                }
-            }).start();
-            
+            System.out.println("全局网络连接已创建");
+            globalSocketClient.connect();
         } catch (Exception e) {
             System.err.println("初始化全局网络连接失败: " + e.getMessage());
         }

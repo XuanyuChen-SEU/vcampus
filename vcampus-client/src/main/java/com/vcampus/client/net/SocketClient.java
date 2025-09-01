@@ -1,17 +1,16 @@
 package com.vcampus.client.net;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
 import com.vcampus.common.dto.Message;
 
-import java.io.*;
-import java.net.Socket;
-import java.net.SocketException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
- * 客户端Socket连接实现类
- * 实现IMessageClientSrv接口，提供双线程网络通信功能
+ * 简化的Socket客户端
+ * 采用类似服务端的同步处理模式，去掉复杂的异步设计
  * 编写人：谌宣羽
  */
 public class SocketClient implements IMessageClientSrv {
@@ -26,21 +25,11 @@ public class SocketClient implements IMessageClientSrv {
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
+    private com.vcampus.client.controller.MessageController messageController;
     
-    // 双线程相关
-    private Thread sendThread;      // 发送线程
-    private Thread receiveThread;   // 接收线程
-    private AtomicBoolean running;  // 线程运行状态
-    private BlockingQueue<Message> sendQueue;  // 发送消息队列
-    private MessageListener messageListener;   // 消息监听器
-    
-    /**
-     * 消息监听器接口
-     */
-    public interface MessageListener {
-        void onMessageReceived(Message message);
-        void onConnectionLost();
-    }
+    // 异步接收相关
+    private Thread receiveThread;
+    private volatile boolean running = false;
     
     /**
      * 使用默认配置创建Socket客户端
@@ -57,16 +46,7 @@ public class SocketClient implements IMessageClientSrv {
     public SocketClient(String host, int port) {
         this.host = host;
         this.port = port;
-        this.running = new AtomicBoolean(false);
-        this.sendQueue = new LinkedBlockingQueue<>();
-    }
-    
-    /**
-     * 设置消息监听器
-     * @param listener 消息监听器
-     */
-    public void setMessageListener(MessageListener listener) {
-        this.messageListener = listener;
+        this.messageController = new com.vcampus.client.controller.MessageController();
     }
     
     @Override
@@ -83,8 +63,8 @@ public class SocketClient implements IMessageClientSrv {
             
             System.out.println("成功连接到服务端: " + host + ":" + port);
             
-            // 启动双线程
-            startThreads();
+            // 启动异步接收线程
+            startReceiveThread();
             
             return true;
             
@@ -96,100 +76,51 @@ public class SocketClient implements IMessageClientSrv {
     }
     
     /**
-     * 启动发送和接收线程
+     * 启动异步接收线程
      */
-    private void startThreads() {
-        running.set(true);
-        
-        // 启动发送线程
-        sendThread = new Thread(this::sendLoop, "SendThread");
-        sendThread.setDaemon(true);
-        sendThread.start();
-        
-        // 启动接收线程
+    private void startReceiveThread() {
+        running = true;
         receiveThread = new Thread(this::receiveLoop, "ReceiveThread");
         receiveThread.setDaemon(true);
         receiveThread.start();
-        
-        System.out.println("双线程已启动");
+        System.out.println("异步接收线程已启动");
     }
     
     /**
-     * 发送线程循环
-     */
-    private void sendLoop() {
-        while (running.get() && isConnected()) {
-            try {
-                // 从队列中获取消息，如果没有消息就一直等待
-                Message message = sendQueue.take();
-                if (message != null) {
-                    // 发送消息
-                    out.writeObject(message);
-                    out.flush();
-                    System.out.println("已发送消息: " + message);
-                }
-            } catch (InterruptedException e) {
-                // 线程被中断，退出循环
-                Thread.currentThread().interrupt();
-                break;
-            } catch (Exception e) {
-                System.err.println("发送消息失败: " + e.getMessage());
-                handleConnectionLost();
-                break;
-            }
-        }
-    }
-    
-    /**
-     * 接收线程循环
+     * 接收循环
      */
     private void receiveLoop() {
-        while (running.get() && isConnected()) {
+        while (running && isConnected()) {
             try {
                 // 接收消息
                 Object obj = in.readObject();
                 if (obj instanceof Message) {
                     Message message = (Message) obj;
-                    System.out.println("已接收消息: " + message);
+                    System.out.println("接收到消息: " + message);
                     
-                    // 使用全局消息分发器分发消息
-                    MessageDispatcher.getInstance().dispatchMessage(message);
-                    
-                    // 同时通知监听器（保持向后兼容）
-                    if (messageListener != null) {
-                        messageListener.onMessageReceived(message);
-                    }
+                    // 使用MessageController处理消息
+                    messageController.handleMessage(message);
                 } else {
                     System.err.println("接收到无效的消息类型: " + obj.getClass());
                 }
             } catch (Exception e) {
-                System.err.println("接收消息失败: " + e.getMessage());
-                handleConnectionLost();
-                break;
+                if (running) {
+                    System.err.println("接收消息失败: " + e.getMessage());
+                    // 如果是连接断开，退出循环
+                    if (e instanceof java.net.SocketException || e instanceof EOFException) {
+                        break;
+                    }
+                }
             }
         }
-    }
-    
-    /**
-     * 处理连接丢失
-     */
-    private void handleConnectionLost() {
-        running.set(false);
-        if (messageListener != null) {
-            messageListener.onConnectionLost();
-        }
-        disconnect();
+        System.out.println("接收线程已停止");
     }
     
     @Override
     public void disconnect() {
-        // 停止线程
-        running.set(false);
+        // 停止接收线程
+        running = false;
         
-        // 等待线程结束
-        if (sendThread != null && sendThread.isAlive()) {
-            sendThread.interrupt();
-        }
         if (receiveThread != null && receiveThread.isAlive()) {
             receiveThread.interrupt();
         }
@@ -219,19 +150,25 @@ public class SocketClient implements IMessageClientSrv {
             return Message.failure(message.getAction(), "网络连接未建立");
         }
         
-        // 将消息加入发送队列
         try {
-            sendQueue.put(message);
-            return Message.success(message.getAction(), "消息已加入发送队列");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return Message.failure(message.getAction(), "发送被中断");
+            // 发送消息
+            out.writeObject(message);
+            out.flush();
+            System.out.println("已发送消息: " + message);
+            
+            // 返回成功消息，响应会由异步接收线程处理
+            return Message.success(message.getAction(), "消息已发送");
+            
+        } catch (Exception e) {
+            System.err.println("发送消息失败: " + e.getMessage());
+            disconnect();
+            return Message.failure(message.getAction(), "发送消息失败: " + e.getMessage());
         }
     }
     
     @Override
     public boolean isConnected() {
-        return socket != null && socket.isConnected() && !socket.isClosed() && running.get();
+        return socket != null && socket.isConnected() && !socket.isClosed();
     }
     
     public String getHost() {
@@ -244,9 +181,17 @@ public class SocketClient implements IMessageClientSrv {
     
     public String getConnectionInfo() {
         if (isConnected()) {
-            return String.format("已连接到 %s:%d (发送队列: %d)", host, port, sendQueue.size());
+            return String.format("已连接到 %s:%d", host, port);
         } else {
             return "未连接";
         }
+    }
+    
+    /**
+     * 获取MessageController实例
+     * @return MessageController实例
+     */
+    public com.vcampus.client.controller.MessageController getMessageController() {
+        return messageController;
     }
 }

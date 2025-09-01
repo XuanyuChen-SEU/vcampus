@@ -8,7 +8,10 @@ package com.vcampus.common.enums;
 public enum ActionType {
     LOGIN("登录"),
     LOGOUT("登出"),
-    REGISTER("注册");
+    REGISTER("注册"),
+    GLOBAL_NOTIFICATION("全局通知"),
+    SYSTEM_BROADCAST("系统广播"),
+    EMERGENCY_NOTIFICATION("紧急通知");
 
     private final String description;
 
