@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.vcampus.client.controller.LoginController"
+            prefWidth="500.0" prefHeight="400.0" styleClass="login-background">
+    
+    <!-- 主容器 -->
+    <VBox alignment="CENTER" spacing="25.0" AnchorPane.topAnchor="50.0" AnchorPane.bottomAnchor="50.0" 
+          AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
+        
+        <!-- 标题区域 -->
+        <VBox alignment="CENTER" spacing="10.0">
+            <Label text="VCampus" styleClass="app-title">
+                <font>
+                    <Font name="System Bold" size="32.0" />
+                </font>
+            </Label>
+            <Label text="虚拟校园管理系统" styleClass="app-subtitle">
+                <font>
+                    <Font size="14.0" />
+                </font>
+            </Label>
+        </VBox>
+        
+        <!-- 登录表单区域 -->
+        <VBox spacing="15.0" styleClass="login-form">
+            <padding>
+                <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+            </padding>
+            
+            <!-- 用户名输入框 -->
+            <VBox spacing="5.0">
+                <Label text="用户名" styleClass="field-label" />
+                <TextField fx:id="usernameField" promptText="请输入用户名" styleClass="input-field" />
+            </VBox>
+            
+            <!-- 密码输入框 -->
+            <VBox spacing="5.0">
+                <Label text="密码" styleClass="field-label" />
+                <PasswordField fx:id="passwordField" promptText="请输入密码" styleClass="input-field" />
+            </VBox>
+            
+
+            
+            <!-- 登录按钮 -->
+            <Button fx:id="loginButton" text="登录" styleClass="login-button" maxWidth="Infinity" prefHeight="40.0">
+                <font>
+                    <Font name="System Bold" size="14.0" />
+                </font>
+            </Button>
+            
+            <!-- 状态信息 -->
+            <Label fx:id="statusLabel" text="" styleClass="status-label" alignment="CENTER" />
+        </VBox>
+        
+        <!-- 底部提示信息 -->
+        <VBox alignment="CENTER" spacing="5.0">
+            <Label text="演示账号：admin/123456 (管理员)" styleClass="demo-info" />
+            <Label text="student/123456 (学生) | teacher/123456 (教师)" styleClass="demo-info" />
+        </VBox>
+        
+    </VBox>
+</AnchorPane>

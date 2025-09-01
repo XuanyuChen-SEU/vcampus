@@ -1,5 +1,6 @@
 package com.vcampus.client;
 
+import com.vcampus.client.net.SocketClient;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,92 +21,75 @@ public class MainApp extends Application {
     private Stage primaryStage;
     private static MainApp instance;
     
+    // 全局网络连接实例
+    private static SocketClient globalSocketClient;
+    
     @Override
     public void start(Stage primaryStage) throws Exception {
         instance = this;
         this.primaryStage = primaryStage;
         
-        // 设置窗口标题
+        // 初始化全局网络连接
+        initializeGlobalNetworkConnection();
+        
+        // 加载登录界面FXML
+        Parent root = FXMLLoader.load(getClass().getResource(LOGIN_FXML));
+        Scene scene = new Scene(root);
+        
+        // 应用CSS样式
+        scene.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
+        
         primaryStage.setTitle(APP_TITLE);
-        
-        // 设置窗口不可调整大小
+        primaryStage.setScene(scene);
         primaryStage.setResizable(false);
-        
-        // 加载登录界面
-        showLoginView();
-        
-        // 显示主窗口
+        primaryStage.centerOnScreen();
         primaryStage.show();
-        
-        System.out.println("=== VCampus 客户端启动成功 ===");
     }
     
     /**
-     * 显示登录界面
+     * 初始化全局网络连接
      */
-    public void showLoginView() {
+    private void initializeGlobalNetworkConnection() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(LOGIN_FXML));
-            Parent root = loader.load();
+            globalSocketClient = new SocketClient();
             
-            Scene scene = new Scene(root);
-            primaryStage.setScene(scene);
-            
-            // 设置窗口居中显示
-            primaryStage.centerOnScreen();
+            // 在后台线程中建立连接
+            new Thread(() -> {
+                try {
+                    System.out.println("正在连接服务端...");
+                    boolean connected = globalSocketClient.connect();
+                    
+                    if (connected) {
+                        System.out.println("全局网络连接已建立");
+                    } else {
+                        System.err.println("全局网络连接失败");
+                    }
+                } catch (Exception e) {
+                    System.err.println("建立全局网络连接时发生错误: " + e.getMessage());
+                }
+            }).start();
             
         } catch (Exception e) {
-            System.err.println("加载登录界面失败: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("初始化全局网络连接失败: " + e.getMessage());
         }
     }
     
     /**
-     * 显示主界面
+     * 获取全局网络连接实例
+     * @return SocketClient实例
      */
-    public void showMainView() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(MAIN_FXML));
-            Parent root = loader.load();
-            
-            Scene scene = new Scene(root);
-            primaryStage.setScene(scene);
-            
-            // 设置窗口居中显示
-            primaryStage.centerOnScreen();
-            
-        } catch (Exception e) {
-            System.err.println("加载主界面失败: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * 获取主窗口
-     * @return 主窗口Stage
-     */
-    public Stage getPrimaryStage() {
-        return primaryStage;
+    public static SocketClient getGlobalSocketClient() {
+        return globalSocketClient;
     }
     
     /**
      * 获取应用程序实例
-     * @return 应用程序实例
+     * @return MainApp实例
      */
     public static MainApp getInstance() {
         return instance;
     }
-    
-    /**
-     * 关闭应用程序
-     */
-    public void closeApp() {
-        if (primaryStage != null) {
-            primaryStage.close();
-        }
-        System.exit(0);
-    }
-    
+
     /**
      * 应用程序启动方法
      * @param args 命令行参数

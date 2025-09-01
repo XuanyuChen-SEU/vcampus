@@ -1,7 +1,6 @@
 package com.vcampus.common.dto;
 
 import java.io.Serializable;
-import com.vcampus.common.enums.Role;
 
 /**
  * 用户数据传输对象（DTO）
@@ -23,33 +22,16 @@ public class User implements Serializable {
     // 七位用户ID（使用String避免首位0丢失）
     private String userId;
 
-    // 加密后的密码（传输和存储均为密文）
+    // 加密后的密码（传输为明文和存储为密文）
     private String password;
 
-    // 手机号
-    private String phone;
-
-    // 用户身份
-    private Role role;
 
     // 默认构造方法（反序列化必需）
     public User() {}
 
-    // 正常构造方法
-    public User(String userId, String password, String phone, Role role) {
-        // 校验用户ID合法性（7位纯数字）
-        if (userId == null || !userId.matches("\\d{7}")) {
-            throw new IllegalArgumentException("用户ID必须为7位纯数字字符串");
-        }
-
-// 校验手机号合法性（11位纯数字）
-        if (phone == null || !phone.matches("\\d{11}")) {
-            throw new IllegalArgumentException("手机号必须为11位纯数字字符串");
-        }
+    public User(String userId, String password) {
         this.userId = userId;
         this.password = password;
-        this.phone = phone;
-        this.role = role;
     }
 
     // Getter & Setter
@@ -70,29 +52,9 @@ public class User implements Serializable {
         return password;
     }
 
-    // 注意，这里密码是密文，不是明文
+    // 注意，这里密码是明文
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        if (phone != null && phone.matches("\\d{11}")) {
-            this.phone = phone;
-        } else {
-            throw new IllegalArgumentException("手机号必须为11位纯数字字符串");
-        }
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 
 }

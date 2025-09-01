@@ -16,6 +16,11 @@
             <artifactId>vcampus-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- MySQL JDBC驱动 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
         <!-- 继承父模块的 JUnit 依赖 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

@@ -7,7 +7,8 @@ package com.vcampus.common.enums;
  */
 public enum ActionType {
     LOGIN("登录"),
-    LOGOUT("登出");
+    LOGOUT("登出"),
+    REGISTER("注册");
 
     private final String description;
 

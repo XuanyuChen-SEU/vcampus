@@ -1,162 +1,252 @@
 package com.vcampus.client.net;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.vcampus.common.dto.Message;
 
+import java.io.*;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
- * 客户端Socket连接类
- * 负责与服务端建立连接并进行消息传输
+ * 客户端Socket连接实现类
+ * 实现IMessageClientSrv接口，提供双线程网络通信功能
  * 编写人：谌宣羽
  */
 public class SocketClient implements IMessageClientSrv {
     
     private static final String DEFAULT_HOST = "localhost";
     private static final int DEFAULT_PORT = 9090;
-    private static final int DEFAULT_TIMEOUT = 5000;
+    private static final int CONNECTION_TIMEOUT = 5000; // 5秒连接超时
+    private static final int READ_TIMEOUT = 10000; // 10秒读取超时
     
-    private final String host;
-    private final int port;
-    private final int timeout;
+    private String host;
+    private int port;
     private Socket socket;
-    private ObjectInputStream inputStream;
-    private ObjectOutputStream outputStream;
-    private final AtomicBoolean isConnected;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
     
+    // 双线程相关
+    private Thread sendThread;      // 发送线程
+    private Thread receiveThread;   // 接收线程
+    private AtomicBoolean running;  // 线程运行状态
+    private BlockingQueue<Message> sendQueue;  // 发送消息队列
+    private MessageListener messageListener;   // 消息监听器
+    
+    /**
+     * 消息监听器接口
+     */
+    public interface MessageListener {
+        void onMessageReceived(Message message);
+        void onConnectionLost();
+    }
+    
+    /**
+     * 使用默认配置创建Socket客户端
+     */
     public SocketClient() {
-        this(DEFAULT_HOST, DEFAULT_PORT, DEFAULT_TIMEOUT);
+        this(DEFAULT_HOST, DEFAULT_PORT);
     }
     
+    /**
+     * 使用指定配置创建Socket客户端
+     * @param host 服务端地址
+     * @param port 服务端端口
+     */
     public SocketClient(String host, int port) {
-        this(host, port, DEFAULT_TIMEOUT);
-    }
-    
-    public SocketClient(String host, int port, int timeout) {
         this.host = host;
         this.port = port;
-        this.timeout = timeout;
-        this.isConnected = new AtomicBoolean(false);
+        this.running = new AtomicBoolean(false);
+        this.sendQueue = new LinkedBlockingQueue<>();
+    }
+    
+    /**
+     * 设置消息监听器
+     * @param listener 消息监听器
+     */
+    public void setMessageListener(MessageListener listener) {
+        this.messageListener = listener;
     }
     
     @Override
     public boolean connect() {
-        if (isConnected.get()) {
+        try {
+            // 创建Socket连接
+            socket = new Socket();
+            socket.connect(new java.net.InetSocketAddress(host, port), CONNECTION_TIMEOUT);
+            socket.setSoTimeout(READ_TIMEOUT);
+            
+            // 创建输入输出流
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+            
+            System.out.println("成功连接到服务端: " + host + ":" + port);
+            
+            // 启动双线程
+            startThreads();
+            
             return true;
+            
+        } catch (Exception e) {
+            System.err.println("连接服务端失败: " + e.getMessage());
+            disconnect();
+            return false;
+        }
+    }
+    
+    /**
+     * 启动发送和接收线程
+     */
+    private void startThreads() {
+        running.set(true);
+        
+        // 启动发送线程
+        sendThread = new Thread(this::sendLoop, "SendThread");
+        sendThread.setDaemon(true);
+        sendThread.start();
+        
+        // 启动接收线程
+        receiveThread = new Thread(this::receiveLoop, "ReceiveThread");
+        receiveThread.setDaemon(true);
+        receiveThread.start();
+        
+        System.out.println("双线程已启动");
+    }
+    
+    /**
+     * 发送线程循环
+     */
+    private void sendLoop() {
+        while (running.get() && isConnected()) {
+            try {
+                // 从队列中获取消息，如果没有消息就一直等待
+                Message message = sendQueue.take();
+                if (message != null) {
+                    // 发送消息
+                    out.writeObject(message);
+                    out.flush();
+                    System.out.println("已发送消息: " + message);
+                }
+            } catch (InterruptedException e) {
+                // 线程被中断，退出循环
+                Thread.currentThread().interrupt();
+                break;
+            } catch (Exception e) {
+                System.err.println("发送消息失败: " + e.getMessage());
+                handleConnectionLost();
+                break;
+            }
+        }
+    }
+    
+    /**
+     * 接收线程循环
+     */
+    private void receiveLoop() {
+        while (running.get() && isConnected()) {
+            try {
+                // 接收消息
+                Object obj = in.readObject();
+                if (obj instanceof Message) {
+                    Message message = (Message) obj;
+                    System.out.println("已接收消息: " + message);
+                    
+                    // 使用全局消息分发器分发消息
+                    MessageDispatcher.getInstance().dispatchMessage(message);
+                    
+                    // 同时通知监听器（保持向后兼容）
+                    if (messageListener != null) {
+                        messageListener.onMessageReceived(message);
+                    }
+                } else {
+                    System.err.println("接收到无效的消息类型: " + obj.getClass());
+                }
+            } catch (Exception e) {
+                System.err.println("接收消息失败: " + e.getMessage());
+                handleConnectionLost();
+                break;
+            }
+        }
+    }
+    
+    /**
+     * 处理连接丢失
+     */
+    private void handleConnectionLost() {
+        running.set(false);
+        if (messageListener != null) {
+            messageListener.onConnectionLost();
+        }
+        disconnect();
+    }
+    
+    @Override
+    public void disconnect() {
+        // 停止线程
+        running.set(false);
+        
+        // 等待线程结束
+        if (sendThread != null && sendThread.isAlive()) {
+            sendThread.interrupt();
+        }
+        if (receiveThread != null && receiveThread.isAlive()) {
+            receiveThread.interrupt();
         }
         
         try {
-            // 创建Socket连接
-            socket = new Socket(host, port);
-            socket.setSoTimeout(timeout);
-            
-            // 创建输入输出流
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            
-            // 设置连接状态
-            isConnected.set(true);
-            
-            // 读取连接成功消息
-            Message welcomeMessage = (Message) inputStream.readObject();
-            
-            return true;
-            
+            if (out != null) {
+                out.close();
+                out = null;
+            }
+            if (in != null) {
+                in.close();
+                in = null;
+            }
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+                socket = null;
+            }
+            System.out.println("已断开与服务端的连接");
         } catch (IOException e) {
-            cleanup();
-            return false;
-        } catch (ClassNotFoundException e) {
-            cleanup();
-            return false;
+            System.err.println("断开连接时发生错误: " + e.getMessage());
         }
     }
     
     @Override
     public Message sendMessage(Message message) {
-        if (!isConnected.get()) {
-            return Message.failure(message.getAction(), "未连接到服务端");
+        if (!isConnected()) {
+            return Message.failure(message.getAction(), "网络连接未建立");
         }
         
+        // 将消息加入发送队列
         try {
-            // 发送消息
-            outputStream.writeObject(message);
-            outputStream.flush();
-            
-            // 接收响应
-            Message response = (Message) inputStream.readObject();
-            
-            return response;
-            
-        } catch (IOException e) {
-            isConnected.set(false);
-            return Message.failure(message.getAction(), "网络连接异常");
-        } catch (ClassNotFoundException e) {
-            return Message.failure(message.getAction(), "响应格式错误");
+            sendQueue.put(message);
+            return Message.success(message.getAction(), "消息已加入发送队列");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Message.failure(message.getAction(), "发送被中断");
         }
-    }
-    
-    @Override
-    public void disconnect() {
-        if (!isConnected.get()) {
-            return;
-        }
-        
-        isConnected.set(false);
-        cleanup();
     }
     
     @Override
     public boolean isConnected() {
-        return isConnected.get() && socket != null && !socket.isClosed();
+        return socket != null && socket.isConnected() && !socket.isClosed() && running.get();
     }
     
-    /**
-     * 清理资源
-     */
-    private void cleanup() {
-        try {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            if (outputStream != null) {
-                outputStream.close();
-            }
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
-            }
-        } catch (IOException e) {
-            // 清理资源异常
-        } finally {
-            inputStream = null;
-            outputStream = null;
-            socket = null;
-        }
-    }
-    
-    /**
-     * 获取连接的主机地址
-     * @return 主机地址
-     */
     public String getHost() {
         return host;
     }
     
-    /**
-     * 获取连接端口
-     * @return 端口号
-     */
     public int getPort() {
         return port;
     }
     
-    /**
-     * 获取连接超时时间
-     * @return 超时时间（毫秒）
-     */
-    public int getTimeout() {
-        return timeout;
+    public String getConnectionInfo() {
+        if (isConnected()) {
+            return String.format("已连接到 %s:%d (发送队列: %d)", host, port, sendQueue.size());
+        } else {
+            return "未连接";
+        }
     }
 }
