@@ -2,7 +2,6 @@ package com.vcampus.server.controller;
 
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.enums.ActionType;
-import com.vcampus.server.controller.LoginController;
 /**
  * 消息控制器
  * 负责消息路由和参数验证

@@ -17,7 +17,7 @@ import javafx.scene.control.TextField;
  * 处理登录相关的响应消息和前端交互
  * 编写人：谌宣羽
  */
-public class LoginController {
+public class LoginController implements IClientController {
     
     // 前端UI组件
     @FXML
@@ -57,7 +57,8 @@ public class LoginController {
     /**
      * 注册到MessageController
      */
-    private void registerToMessageController() {
+    @Override
+    public void registerToMessageController() {
         // 获取全局SocketClient中的MessageController
         com.vcampus.client.controller.MessageController messageController = 
             loginService.getGlobalSocketClient().getMessageController();
