@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -32,8 +33,17 @@ public class LoginController implements IClientController {
     @FXML
     private Label statusLabel;
     
+    @FXML
+    private Hyperlink forgotPasswordLink;
+    
+    @FXML
+    private Label passwordLabel;
+    
     // 登录服务实例
     private final LoginService loginService = new LoginService();
+    
+    // 当前模式：true为忘记密码模式，false为登录模式
+    private boolean isForgotPasswordMode = false;
     
     /**
      * 初始化方法，在FXML加载完成后自动调用
@@ -46,6 +56,9 @@ public class LoginController implements IClientController {
         // 为输入框添加回车键事件
         usernameField.setOnAction(event -> handleLogin());
         passwordField.setOnAction(event -> handleLogin());
+        
+        // 为忘记密码链接添加点击事件
+        forgotPasswordLink.setOnAction(event -> handleForgotPassword());
         
         // 设置状态标签初始文本
         statusLabel.setText("请输入用户名和密码");
@@ -71,6 +84,12 @@ public class LoginController implements IClientController {
      * 处理登录按钮点击事件
      */
     private void handleLogin() {
+        if (isForgotPasswordMode) {
+            // 在忘记密码模式下，调用密码重置逻辑
+            handlePasswordReset();
+            return;
+        }
+        
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
         
@@ -86,6 +105,101 @@ public class LoginController implements IClientController {
         // 委托给登录服务处理网络通信
         // 注意：这里不直接处理结果，而是等待MessageController调用handleLoginResponse
         loginService.login(username, password);
+    }
+    
+    /**
+     * 处理忘记密码链接点击事件
+     */
+    private void handleForgotPassword() {
+        if (!isForgotPasswordMode) {
+            // 切换到忘记密码模式
+            switchToForgotPasswordMode();
+        } else {
+            // 切换回登录模式
+            switchToLoginMode();
+        }
+    }
+    
+    /**
+     * 切换到忘记密码模式
+     */
+    private void switchToForgotPasswordMode() {
+        isForgotPasswordMode = true;
+        
+        // 更新UI显示
+        passwordLabel.setText("新密码");
+        passwordField.setPromptText("请输入新密码");
+        loginButton.setText("提交申请");
+        forgotPasswordLink.setText("返回登录");
+        statusLabel.setText("请输入账号、和新密码");
+        
+        // 清空输入框
+        passwordField.clear();
+    }
+    
+    /**
+     * 切换到登录模式
+     */
+    private void switchToLoginMode() {
+        isForgotPasswordMode = false;
+        
+        // 更新UI显示
+        passwordLabel.setText("密码");
+        passwordField.setPromptText("请输入密码");
+        loginButton.setText("登录");
+        forgotPasswordLink.setText("忘记密码？");
+        statusLabel.setText("请输入用户名和密码");
+        
+        // 清空输入框
+        passwordField.clear();
+    }
+    
+    /**
+     * 处理密码重置申请
+     */
+    private void handlePasswordReset() {
+        String username = usernameField.getText().trim();
+        String oldPassword = passwordField.getText().trim();
+        
+        // 验证输入
+        if (username.isEmpty() || oldPassword.isEmpty()) {
+            showError("请填写完整信息");
+            return;
+        }
+        
+        // 更新状态标签
+        statusLabel.setText("正在提交密码重置申请...");
+        
+        // 调用LoginService的密码重置方法
+        loginService.submitPasswordResetRequest(username, oldPassword);
+    }
+    
+    /**
+     * 处理密码重置响应（从MessageController调用）
+     * @param message 密码重置响应消息
+     */
+    public void handleForgetPasswordResponse(Message message) {
+        // 在JavaFX应用线程中处理UI更新
+        Platform.runLater(() -> {
+            handlePasswordResetResult(message);
+        });
+    }
+    
+    /**
+     * 处理密码重置结果
+     * @param result 密码重置结果消息
+     */
+    private void handlePasswordResetResult(Message result) {
+        if (result.isSuccess()) {
+            showSuccess("密码重置申请", result.getMessage());
+            statusLabel.setText("密码重置申请已提交，请等待管理员审核");
+            // 清空输入框并切换回登录模式
+            clearFields();
+            switchToLoginMode();
+        } else {
+            showError("密码重置申请失败: " + result.getMessage());
+            statusLabel.setText("密码重置申请失败，请检查输入信息");
+        }
     }
     
     /**
@@ -141,6 +255,17 @@ public class LoginController implements IClientController {
     }
     
     /**
+     * 显示信息提示
+     */
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText("提示");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    /**
      * 获取用户名（供外部调用）
      */
     public String getUsername() {
@@ -161,5 +286,10 @@ public class LoginController implements IClientController {
         usernameField.clear();
         passwordField.clear();
         statusLabel.setText("请输入用户名和密码");
+        
+        // 确保回到登录模式
+        if (isForgotPasswordMode) {
+            switchToLoginMode();
+        }
     }
 }

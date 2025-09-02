@@ -41,9 +41,14 @@
             
             <!-- 密码输入框 -->
             <VBox spacing="5.0">
-                <Label text="密码" styleClass="field-label" />
+                <Label fx:id="passwordLabel" text="密码" styleClass="field-label" />
                 <PasswordField fx:id="passwordField" promptText="请输入密码" styleClass="input-field" />
             </VBox>
+            
+            <!-- 忘记密码链接 -->
+            <HBox alignment="CENTER_RIGHT">
+                <Hyperlink fx:id="forgotPasswordLink" text="忘记密码？" styleClass="forgot-password-link" />
+            </HBox>
             
 
             

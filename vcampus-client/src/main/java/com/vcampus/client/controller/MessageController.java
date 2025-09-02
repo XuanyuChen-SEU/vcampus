@@ -40,6 +40,13 @@ public class MessageController {
                         System.err.println("LoginController未设置，无法处理登录响应");
                     }
                     break;
+                case FORGET_PASSWORD:
+                    if (loginController != null) {
+                        loginController.handleForgetPasswordResponse(message);
+                    } else {
+                        System.err.println("LoginController未设置，无法处理密码重置响应");
+                    }
+                    break;
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
                     break;

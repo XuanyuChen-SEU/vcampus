@@ -7,6 +7,7 @@ package com.vcampus.common.enums;
  */
 public enum ActionType {
     LOGIN("登录"),
+    FORGET_PASSWORD("忘记密码"),
     LOGOUT("登出"),
     REGISTER("注册"),
     GLOBAL_NOTIFICATION("全局通知"),

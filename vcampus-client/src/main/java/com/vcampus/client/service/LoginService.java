@@ -7,9 +7,8 @@ import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.ActionType;
 
 /**
- * 简化的登录服务类
- * 使用同步模式，去掉复杂的回调机制
- * 编写人：cursor
+ * 登录服务类
+ * 编写人：谌宣羽
  */
 public class LoginService {
     
@@ -55,6 +54,35 @@ public class LoginService {
         
         // 发送登录请求，响应会由SocketClient中的MessageController自动处理
         Message response = socketClient.sendMessage(loginMessage);
+        
+        return response;
+    }
+    
+    /**
+     * 提交密码重置申请
+     * @param username 用户名
+     * @param oldPassword 原密码
+     * @return 密码重置结果消息
+     */
+    public Message submitPasswordResetRequest(String username, String oldPassword) {
+        // 基础验证
+        if (!validateInputFormat(username, oldPassword)) {
+            return Message.failure(ActionType.FORGET_PASSWORD, "用户名和原密码不能为空");
+        }
+        
+        // 检查连接状态
+        if (!socketClient.isConnected()) {
+            return Message.failure(ActionType.FORGET_PASSWORD, "网络连接未建立");
+        }
+        
+        // 创建用户对象
+        User resetUser = new User(username, oldPassword);
+        
+        // 创建密码重置消息
+        Message resetMessage = new Message(ActionType.FORGET_PASSWORD, resetUser);
+        
+        // 发送密码重置请求，响应会由SocketClient中的MessageController自动处理
+        Message response = socketClient.sendMessage(resetMessage);
         
         return response;
     }

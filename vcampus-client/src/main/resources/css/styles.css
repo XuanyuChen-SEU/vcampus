@@ -88,6 +88,23 @@
     -fx-font-size: 11px;
 }
 
+/* 忘记密码链接样式 */
+.forgot-password-link {
+    -fx-text-fill: #667eea;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-underline: false;
+}
+
+.forgot-password-link:hover {
+    -fx-text-fill: #5a6fd8;
+    -fx-underline: true;
+}
+
+.forgot-password-link:pressed {
+    -fx-text-fill: #4e5bc6;
+}
+
 /* 滚动条样式优化 */
 .scroll-bar {
     -fx-background-color: transparent;
