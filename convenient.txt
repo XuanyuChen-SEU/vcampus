@@ -1,3 +1,0 @@
-cd vcampus-server
-mvn exec:java
-

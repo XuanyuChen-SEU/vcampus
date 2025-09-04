@@ -9,6 +9,7 @@ import com.vcampus.common.enums.Role;
  */
 public class UserService {
     
+
     // 固定的测试账号密码
     private static final String TEST_USER_ID = "1000000";
     private static final String TEST_PASSWORD = "1000000";
@@ -33,11 +34,7 @@ public class UserService {
                 return new LoginResult(false, "用户ID格式错误，必须为7位数字", null);
             }
             
-            // 3. 验证固定的测试账号密码
-            if (!TEST_USER_ID.equals(userId)) {
-                return new LoginResult(false, "用户不存在", null);
-            }
-            
+
             // 4. 验证密码
             if (!TEST_PASSWORD.equals(plainPassword)) {
                 return new LoginResult(false, "密码错误", null);
