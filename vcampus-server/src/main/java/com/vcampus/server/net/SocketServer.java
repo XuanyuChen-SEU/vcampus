@@ -28,8 +28,8 @@ public class SocketServer {
     private ExecutorService connectionPool;  // 接收连接的线程池
     private ExecutorService workerPool;      // 处理消息的线程池
     private volatile boolean isRunning = false;
-
     private final MessageController messageController;
+    // 客户端连接列表（用CopyOnWriteArrayList保证并发安全，适合频繁遍历+修改的场景）
     private final List<ClientConnection> clientConnections;
 
     public SocketServer() {
@@ -48,13 +48,14 @@ public class SocketServer {
      */
     public void start() {
         try {
+            // 绑定端口并启动服务器Socket
             serverSocket = new ServerSocket(PORT);
             isRunning = true;
             System.out.println("服务器启动成功，监听端口: " + PORT);
 
             // 接受客户端连接
             while (isRunning) {
-                Socket clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();// 等待客户端连接
                 System.out.println("客户端连接: " + clientSocket.getInetAddress().getHostAddress());
 
                 // 交给连接线程池

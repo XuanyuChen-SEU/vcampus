@@ -25,7 +25,7 @@ public class MainApp extends Application {
     // 全局网络连接实例
     private static SocketClient globalSocketClient;
     
-    @Override
+    @Override//默认的启动方法
     public void start(Stage primaryStage) throws Exception {
         instance = this;
         this.primaryStage = primaryStage;
