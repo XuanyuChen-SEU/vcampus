@@ -1013,47 +1013,100 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <AutoIntrospectionLevel>3</AutoIntrospectionLevel>
       <Current>1</Current>
       <LastIntrospectionLevel>3</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2025-09-02.15:39:15</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2025-09-04.13:42:16</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb3_general_ci</CollationName>
     </schema>
-    <user id="294" parent="1" name="mysql.infoschema">
+    <schema id="294" parent="1" name="test2">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="295" parent="1" name="vcampus">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <user id="296" parent="1" name="mysql.infoschema">
       <CanLogin>0</CanLogin>
       <Host>localhost</Host>
       <Plugin>caching_sha2_password</Plugin>
     </user>
-    <user id="295" parent="1" name="mysql.session">
+    <user id="297" parent="1" name="mysql.session">
       <CanLogin>0</CanLogin>
       <Host>localhost</Host>
       <Plugin>caching_sha2_password</Plugin>
     </user>
-    <user id="296" parent="1" name="mysql.sys">
+    <user id="298" parent="1" name="mysql.sys">
       <CanLogin>0</CanLogin>
       <Host>localhost</Host>
       <Plugin>caching_sha2_password</Plugin>
     </user>
-    <user id="297" parent="1" name="root">
+    <user id="299" parent="1" name="root">
       <Host>localhost</Host>
       <Plugin>caching_sha2_password</Plugin>
     </user>
-    <table id="298" parent="293" name="emp">
+    <table id="300" parent="293" name="dept">
       <DetailsLevel>3</DetailsLevel>
       <Engine>InnoDB</Engine>
       <CollationName>utf8mb3_general_ci</CollationName>
     </table>
-    <column id="299" parent="298" name="Name">
+    <table id="301" parent="293" name="emp">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb3_general_ci</CollationName>
+    </table>
+    <table id="302" parent="293" name="user">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb3_general_ci</CollationName>
+    </table>
+    <column id="303" parent="300" name="DeptName">
+      <Position>1</Position>
+      <StoredType>varchar(20)|0s</StoredType>
+    </column>
+    <column id="304" parent="300" name="Count">
+      <Position>2</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="305" parent="301" name="Name">
       <Comment>姓名</Comment>
       <Position>1</Position>
       <StoredType>varchar(10)|0s</StoredType>
     </column>
-    <column id="300" parent="298" name="Sex">
+    <column id="306" parent="301" name="Sex">
       <Comment>性别</Comment>
       <Position>2</Position>
       <StoredType>varchar(2)|0s</StoredType>
     </column>
-    <column id="301" parent="298" name="Age">
+    <column id="307" parent="301" name="Age">
       <Comment>年龄</Comment>
       <Position>3</Position>
       <StoredType>int|0s</StoredType>
     </column>
+    <column id="308" parent="301" name="Department">
+      <Position>4</Position>
+      <StoredType>varchar(20)|0s</StoredType>
+    </column>
+    <column id="309" parent="301" name="studentid">
+      <DefaultExpression>80</DefaultExpression>
+      <Position>5</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="310" parent="302" name="userId">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="311" parent="302" name="password">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <index id="312" parent="302" name="PRIMARY">
+      <ColNames>userId</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="313" parent="302" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
   </database-model>
 </dataSource>

@@ -1,67 +1,223 @@
 package com.vcampus.server.service;
 import com.vcampus.database.service.BaseDBManager;
-
+import com.vcampus.common.dto.User;
+import java.util.ArrayList;
+//import java.util.Collections;
+import java.util.List;
 import java.sql.*;
 import java.util.*;
 
 import static com.vcampus.database.service.Test_DBManager.deleteRecordInteractive;
 
 public class DBService {
-    private BaseDBManager<Map<String, Object>> dbManager;
+    public BaseDBManager<Map<String, Object>> dbManager;
     //这个是测试样例  可以试一试
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//        try {
+//            DBService dbService = new DBService();
+//            dbService.initialize();
+//            // 传入dbManager参数
+//            showInteractiveMenu(dbService.dbManager);
+//        } catch (RuntimeException e) {
+//            System.err.println("系统启动失败：" + e.getMessage());
+//        }
+//    }
+// 需在DBService中新增的initialize重载方法（用于指定数据库名）
+//public void initialize(String dbName) {
+//    String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?useSSL=false&serverTimezone=UTC";
+//    String dbUser = "root";
+//    String dbPwd = "Abcd0410";
+//    String initialTable = "";
+//    Map<String, String> dbConfig = initializeDatabase(dbUrl, dbUser, dbPwd, initialTable);
+//    this.dbManager = new BaseDBManager<>(
+//            dbUrl, dbUser, dbPwd,
+//            initialTable,
+//            rs -> {
+//                try {
+//                    Map<String, Object> record = new HashMap<>();
+//                    ResultSetMetaData metaData = rs.getMetaData();
+//                    int columnCount = metaData.getColumnCount();
+//                    for (int i = 1; i <= columnCount; i++) {
+//                        String columnName = metaData.getColumnName(i);
+//                        Object value = rs.getObject(i);
+//                        record.put(columnName, value);
+//                    }
+//                    return record;
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                    return null;
+//                }
+//            }
+//    );
+//}
+public void initialize() {
+    // 1. 定义数据库配置参数（保持硬编码，与你的需求一致）
+    String dbUrl = "jdbc:mysql://localhost:3306/vcampus?useSSL=false&serverTimezone=UTC";
+    String dbUser = "root";
+    String dbPwd = "Abcd0410";
+    String initialTable = "user";
+
+    // 2. 调用initializeDatabase()，执行“创建数据库→创建表→插入初始数据”的一条龙操作
+    // （如果数据库/表已存在，会自动跳过创建，仅连接）
+    Map<String, String> dbConfig = initializeDatabase(dbUrl, dbUser, dbPwd, initialTable);
+
+    // 3. 使用验证后的配置创建数据库管理实例（确保使用的是实际生效的配置）
+    this.dbManager = new BaseDBManager<>(
+            dbConfig.get("dbUrl"),   // 从配置中获取URL（与传入一致，但经过验证）
+            dbConfig.get("dbUser"),  // 从配置中获取用户名
+            dbConfig.get("dbPwd"),   // 从配置中获取密码
+            dbConfig.get("initialTable"),  // 从配置中获取表名
+            // 结果集转换器（保持原有逻辑不变）
+            rs -> {
+                try {
+                    Map<String, Object> record = new HashMap<>();
+                    ResultSetMetaData metaData = rs.getMetaData();
+                    int columnCount = metaData.getColumnCount();
+
+                    for (int i = 1; i <= columnCount; i++) {
+                        String columnName = metaData.getColumnName(i);
+                        Object value = rs.getObject(i);
+                        record.put(columnName, value);
+                    }
+                    return record;
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+    );
+
+    System.out.println("✅ 初始化完成，已连接到数据库：" + dbConfig.get("dbUrl"));
+}
+    private static Map<String, String> initializeDatabase(
+            String dbUrl,        // 数据库URL（如jdbc:mysql://localhost:3306/test...）
+            String dbUser,       // 用户名
+            String dbPwd,        // 密码
+            String initialTable  // 初始表名
+    ) {
+        Map<String, String> dbConfig = new HashMap<>();
+
         try {
-            DBService dbService = new DBService();
-            dbService.initialize();
-            // 传入dbManager参数
-            showInteractiveMenu(dbService.dbManager);
-        } catch (RuntimeException e) {
-            System.err.println("系统启动失败：" + e.getMessage());
+            // 1. 提取数据库名（从URL中解析）
+            String dbName = extractDatabaseName(dbUrl);
+
+            if (dbName == null || dbName.isEmpty()) {
+                throw new IllegalArgumentException("数据库URL格式错误，无法提取数据库名");
+            }
+
+            // 2. 先连接到MySQL服务器（不指定数据库），用于创建数据库
+            String serverUrl = dbUrl.replace("/" + dbName, ""); // 去除URL中的数据库名部分
+            BaseDBManager<Map<String, Object>> serverManager = new BaseDBManager<>(
+                    serverUrl,
+                    dbUser,
+                    (dbPwd != null) ? dbPwd : "",
+                    "", // 临时表名（无意义）
+                    rs -> new HashMap<>()
+            );
+
+            // 3. 创建数据库（如果不存在）
+            try (Connection serverConn = serverManager.getConnection()) {
+                String createDbSql = "CREATE DATABASE IF NOT EXISTS " + dbName;
+                try (Statement stmt = serverConn.createStatement()) {
+                    stmt.execute(createDbSql);
+                    System.out.println("✅ 数据库【" + dbName + "】检查/创建完成");
+                }
+            }
+
+            // 4. 连接到目标数据库，检查并创建表
+            BaseDBManager<Map<String, Object>> TestingManager = new BaseDBManager<>(
+                    dbUrl,
+                    dbUser,
+                    (dbPwd != null) ? dbPwd : "",
+                    initialTable,
+                    rs -> new HashMap<>()
+            );
+
+            try (Connection conn = TestingManager.getConnection()) {
+                // 5. 检查并创建表（仅包含userId和password字段）
+                if (!isTableExists(TestingManager, initialTable)) {
+                    String createTableSql = getCreateTableSql(initialTable);
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.execute(createTableSql);
+                        System.out.println("✅ 表【" + initialTable + "】创建完成（仅包含userId和password字段）");
+
+                        // 6. 插入初始数据（只包含userId和password）
+                        insertInitialData(conn, initialTable);
+                        System.out.println("✅ 初始数据插入完成");
+                    }
+                } else {
+                    System.out.println("✅ 表【" + initialTable + "】已存在，无需创建");
+                }
+
+                // 7. 保存配置
+                dbConfig.put("dbUrl", dbUrl);
+                dbConfig.put("dbUser", dbUser);
+                dbConfig.put("dbPwd", (dbPwd != null) ? dbPwd : "");
+                dbConfig.put("initialTable", initialTable);
+                System.out.println("✅ 数据库初始化完成");
+            }
+
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ 配置参数错误：" + e.getMessage());
+            throw e;
+        } catch (SQLException e) {
+            System.err.println("❌ 数据库操作失败：" + e.getMessage());
+            throw new RuntimeException("数据库初始化失败", e);
+        }
+
+        return dbConfig;
+    }
+
+    // 辅助方法：从URL中提取数据库名（不变）
+    private static String extractDatabaseName(String dbUrl) {
+        // 例如从"jdbc:mysql://localhost:3306/test?..."中提取"test"
+
+        String[] parts = dbUrl.split("/");
+
+        for (String part : parts) {
+            if (part.contains("?")) {
+                return part.split("\\?")[0];
+            }
+            // 新增：空字符串直接跳过，继续下一次循环
+            if (part.isEmpty()) {
+                continue;
+            }
+            if (!part.startsWith("jdbc:mysql:") && !part.contains(":")) {
+                return part;
+            }
+        }
+        return null;
+    }
+
+    // 辅助方法：检查表是否存在（不变）
+    private static boolean isTableExists(BaseDBManager<Map<String, Object>> dbManager, String tableName) throws SQLException
+    {
+        List<String> allTables = dbManager.getAllTableNames();
+        return allTables.stream().anyMatch(table -> table.equalsIgnoreCase(tableName));
+    }
+
+    // 辅助方法：获取创建表的SQL（简化为只包含userId和password）
+    private static String getCreateTableSql(String tableName) {
+        // 表结构仅包含：userId（唯一）、password
+        return "CREATE TABLE " + tableName + " (" +
+                "userId VARCHAR(20) NOT NULL PRIMARY KEY COMMENT '用户唯一标识（主键）'," +  // 用户ID作为主键（唯一不可重复）
+                "password VARCHAR(50) NOT NULL COMMENT '用户密码'" +  // 密码字段
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";  // 字符集设置
+    }
+
+    // 辅助方法：插入初始数据（只包含userId和password）
+    private static void insertInitialData(Connection conn, String tableName) throws SQLException {
+        // 仅插入userId和password两个字段的值
+        String insertSql = "INSERT INTO " + tableName + " (userId, password) VALUES " +
+                "('1234321', '1234567')," +  // 管理员账号
+                "('4321123', '1234568')," +  // 学生账号
+                "('2132131', '1234569')";  // 教师账号
+
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute(insertSql);
         }
     }
-
-    private void initialize() {
-        // 1. 调用初始化函数获取配置
-        Map<String, String> dbConfig = initializeDatabase();
-
-        // 2. 从配置中提取连接信息
-        String dbUrl = dbConfig.get("dbUrl");
-        String dbUser = dbConfig.get("dbUser");
-        String dbPwd = dbConfig.get("dbPwd");
-        String initialTable = dbConfig.get("initialTable");
-
-        // 3. 创建数据库管理实例并赋值给实例变量
-        this.dbManager = new BaseDBManager<>(
-                dbUrl, dbUser, dbPwd,
-                initialTable,
-                // 结果集转换器
-                rs -> {
-                    try {
-                        Map<String, Object> record = new HashMap<>();
-                        ResultSetMetaData metaData = rs.getMetaData();
-                        int columnCount = metaData.getColumnCount();
-
-                        for (int i = 1; i <= columnCount; i++) {
-                            String columnName = metaData.getColumnName(i);
-                            Object value = rs.getObject(i);
-                            record.put(columnName, value);
-                        }
-                        return record;
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
-        );
-
-        // 4. 显示初始化信息
-        System.out.println("=== 数据库管理系统（支持多表操作）===");
-        System.out.println("当前连接：" + dbUrl);
-        System.out.println("当前操作表：" + initialTable + "\n");
-        dbManager.printTableStructure();
-    }
-
     /**
      * /**
      * 初始化数据库配置：循环获取用户输入，验证连接和表存在性，直到成功
@@ -132,7 +288,164 @@ public class DBService {
         //scanner.close();
         return dbConfig;
     }
+    public static User searchRecordByField(
+            BaseDBManager<Map<String, Object>> dbManager,
+            String targetField,
+            Object fieldValue) {
 
+        try {
+            List<String> columnNames = getColumnNames(dbManager);
+            if (columnNames.isEmpty()) {
+                System.out.println("❌ 表结构为空，无法搜索！");
+                return null;
+            }
+
+            // 1. 验证字段是否存在
+            String finalTargetField = columnNames.stream()
+                    .filter(col -> col.equalsIgnoreCase(targetField))
+                    .findFirst()
+                    .orElse(null);
+            if (finalTargetField == null) {
+                System.out.println("❌ 字段名不存在！可用字段：" + String.join("、", columnNames));
+                return null;
+            }
+
+            // 2. 打印搜索信息
+            String fieldType = getColumnType(dbManager, finalTargetField);
+            System.out.printf("搜索字段：%s（类型：%s），搜索值：%s%n",
+                    finalTargetField, fieldType, fieldValue);
+
+            // 3. 执行查询
+            String sql = String.format(
+                    "SELECT * FROM `%s` WHERE `%s` = ?",
+                    dbManager.getTableName(),
+                    finalTargetField
+            );
+            Object[] params = {fieldValue};
+            List<Map<String, Object>> results = dbManager.getEntityList(sql, params);
+
+            // 4. 处理结果并转换为User对象
+            if (results.isEmpty()) {
+                System.out.println("❌ 未找到匹配的记录！");
+                return null;
+            } else {
+
+                // 取第一条记录（若有多个结果，按业务需求选择，这里默认取第一条）
+                Map<String, Object> firstRecord = results.get(0);
+
+                // 从数据库记录中提取userId和password（注意：数据库字段名需与这里的key一致）
+                // 例如：若数据库字段是user_id，则需改为firstRecord.get("user_id")
+                String userIdFromDB = firstRecord.get("userId") != null ? firstRecord.get("userId").toString() : null;
+                String passwordFromDB = firstRecord.get("password") != null ? firstRecord.get("password").toString() : null;
+
+                // 校验并创建User对象（处理userId格式校验异常）
+                try {
+                    User user = new User();
+                    // 设置userId（会触发7位数字校验）
+                    if (userIdFromDB != null) {
+                        user.setUserId(userIdFromDB);
+                    }
+                    // 设置密码（注意：数据库中应存储密文，这里直接赋值）
+                    user.setPassword(passwordFromDB);
+                    return user;
+                } catch (IllegalArgumentException e) {
+                    System.err.println("❌ 用户ID格式错误：" + e.getMessage());
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ 搜索失败：" + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            System.err.println("❌ 操作出错：" + e.getMessage());
+            return null;
+        }
+    }
+    /**
+     * 根据指定条件字段修改目标字段的内容
+     * @param dbManager 数据库管理器实例
+     * @param targetField 要修改的目标字段名
+     * @param newValueStr 目标字段的新值（字符串形式，将自动转换类型）
+     * @param conditionField 条件字段名（用于定位要修改的记录）
+     * @param conditionValueStr 条件字段的值（字符串形式，将自动转换类型）
+     * @return 是否修改成功
+     */
+    public static boolean updateRecordByField(
+            BaseDBManager<Map<String, Object>> dbManager,
+            String targetField,
+            String newValueStr,
+            String conditionField,
+            String conditionValueStr) {
+
+        try {
+            // 1. 获取表结构字段列表
+            List<String> columnNames = getColumnNames(dbManager);
+            if (columnNames.isEmpty()) {
+                System.out.println("❌ 表结构为空，无法执行修改操作！");
+                return false;
+            }
+
+            // 2. 验证目标字段是否存在
+            String finalTargetField = columnNames.stream()
+                    .filter(col -> col.equalsIgnoreCase(targetField))
+                    .findFirst()
+                    .orElse(null);
+            if (finalTargetField == null) {
+                System.out.println("❌ 目标字段不存在！可用字段：" + String.join("、", columnNames));
+                return false;
+            }
+
+            // 3. 验证条件字段是否存在
+            String finalConditionField = columnNames.stream()
+                    .filter(col -> col.equalsIgnoreCase(conditionField))
+                    .findFirst()
+                    .orElse(null);
+            if (finalConditionField == null) {
+                System.out.println("❌ 条件字段不存在！可用字段：" + String.join("、", columnNames));
+                return false;
+            }
+
+            // 4. 转换值类型（根据字段类型进行转换）
+            Object newValue;
+            Object conditionValue;
+            try {
+                newValue = convertValueByColumnType(dbManager, finalTargetField, newValueStr);
+                conditionValue = convertValueByColumnType(dbManager, finalConditionField, conditionValueStr);
+            } catch (IllegalArgumentException e) {
+                System.out.println("❌ 数值转换失败：" + e.getMessage());
+                return false;
+            }
+
+            // 5. 构建更新SQL
+            String sql = String.format(
+                    "UPDATE `%s` SET `%s` = ? WHERE `%s` = ?",
+                    dbManager.getTableName(),
+                    finalTargetField,
+                    finalConditionField
+            );
+            Object[] params = {newValue, conditionValue};
+
+            // 6. 执行更新操作
+            boolean isSuccess = dbManager.updateEntity(sql, params);
+
+            // 7. 输出结果信息
+            if (isSuccess) {
+                System.out.printf("✅ 成功将字段【%s】的值修改为【%s】（条件：%s = %s）%n",
+                        finalTargetField, newValue, finalConditionField, conditionValue);
+            } else {
+                System.out.printf("❌ 修改失败，未找到匹配条件【%s = %s】的记录或未发生变更%n",
+                        finalConditionField, conditionValue);
+            }
+            return isSuccess;
+
+        } catch (SQLException e) {
+            System.err.println("❌ 修改操作失败：" + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("❌ 操作出错：" + e.getMessage());
+            return false;
+        }
+    }
     /**
      * 显示交互式菜单（支持所有操作）
      */
@@ -719,4 +1032,265 @@ public class DBService {
         // 其他类型（如日期）可根据实际需求添加转换逻辑
         return valueStr;
     }
+
+    //------------------------------------------------------------------
+    /**
+     * 创建指定名称的数据库（若不存在）
+     * @param dbUrl 数据库连接基础URL（如：jdbc:mysql://localhost:3306/）
+     * @param username 数据库用户名
+     * @param password 数据库密码
+     * @param dbName 要创建的数据库名称
+     * @return 是否创建成功
+     */
+    public static boolean createDatabase(String dbUrl, String username, String password, String dbName) {
+        if (dbName == null || dbName.trim().isEmpty()) {
+            System.out.println("❌ 数据库名称不能为空！");
+            return false;
+        }
+        // 移除URL中可能包含的数据库名，连接到默认数据库（如mysql）
+        String baseUrl = dbUrl.replaceAll("/[^/]+\\?", "?"); // 处理格式：jdbc:mysql://host:port/db?params → jdbc:mysql://host:port/?params
+        if (!baseUrl.contains("?")) {
+            baseUrl += "/";
+        }
+
+        // 临时连接管理器（用于执行创建数据库操作）
+        BaseDBManager<Map<String, Object>> tempManager = new BaseDBManager<>(
+                baseUrl, username, password,
+                "", // 无需指定表名
+                rs -> new HashMap<>()
+        );
+
+        try (Connection conn = tempManager.getConnection()) {
+            // 执行创建数据库SQL（避免重复创建）
+            String sql = String.format("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci", dbName);
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute(sql);
+                System.out.printf("✅ 数据库【%s】创建成功（或已存在）%n", dbName);
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.printf("❌ 创建数据库【%s】失败：%s%n", dbName, e.getMessage());
+            return false;
+        }
+    }
+    /**
+     * 在指定数据库中创建表（需先切换到目标数据库）
+     * @param dbManager 数据库管理器（需已连接到目标数据库）
+     * @param tableName 表名
+     * @param columns 字段定义列表（格式："字段名 类型 约束"，如："id INT PRIMARY KEY AUTO_INCREMENT", "name VARCHAR(50) NOT NULL"）
+     * @return 是否创建成功
+     */
+    public static boolean createTable(BaseDBManager<Map<String, Object>> dbManager, String tableName, List<String> columns) {
+        if (tableName == null || tableName.trim().isEmpty()) {
+            System.out.println("❌ 表名不能为空！");
+            return false;
+        }
+        if (columns == null || columns.isEmpty()) {
+            System.out.println("❌ 字段定义不能为空！");
+            return false;
+        }
+
+        try {
+            // 检查表是否已存在
+            List<String> allTables = dbManager.getAllTableNames();
+            if (allTables.stream().anyMatch(t -> t.equalsIgnoreCase(tableName))) {
+                System.out.printf("⚠️ 表【%s】已存在，无需重复创建%n", tableName);
+                return true;
+            }
+
+            // 构建CREATE TABLE语句
+            String columnsSql = String.join(", ", columns);
+            String sql = String.format("CREATE TABLE `%s` (%s)", tableName, columnsSql);
+
+            try (Connection conn = dbManager.getConnection();
+                 Statement stmt = conn.createStatement()) {
+                stmt.execute(sql);
+                System.out.printf("✅ 表【%s】创建成功%n", tableName);
+                // 切换当前管理器的操作表
+                dbManager.setTableName(tableName);
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.printf("❌ 创建表【%s】失败：%s%n", tableName, e.getMessage());
+            return false;
+        }
+    }
+    /**
+     * 批量插入记录
+     * @param dbManager 数据库管理器实例
+     * @param batchData 批量数据（外层List为多条记录，内层List为单条记录的字段值）
+     * @return 成功插入的记录数
+     */
+    public static int batchInsertRecords(
+            BaseDBManager<Map<String, Object>> dbManager,
+            List<List<String>> batchData) {
+
+        if (batchData == null || batchData.isEmpty()) {
+            System.out.println("❌ 批量数据为空，无需插入！");
+            return 0;
+        }
+
+        try {
+            // 1. 获取表字段列表（排除自增主键）
+            List<String> columns = new ArrayList<>();
+            List<String> allColumns = dbManager.getTableColumns();
+            String primaryKey = dbManager.getPrimaryKey();
+
+            for (String column : allColumns) {
+                // 跳过自增主键（假设INT类型主键为自增）
+                if (column.equalsIgnoreCase(primaryKey) &&
+                        "INT".equalsIgnoreCase(getColumnType(dbManager, column))) {
+                    System.out.println("跳过自增主键：" + column);
+                    continue;
+                }
+                columns.add(column);
+            }
+
+            if (columns.isEmpty()) {
+                System.out.println("❌ 表中无可用插入字段（可能全为自增主键）！");
+                return 0;
+            }
+
+            // 2. 校验每条记录的字段数量是否匹配
+            int fieldCount = columns.size();
+            for (int i = 0; i < batchData.size(); i++) {
+                if (batchData.get(i).size() != fieldCount) {
+                    throw new IllegalArgumentException(
+                            "第" + (i + 1) + "条记录字段数不匹配（预期：" + fieldCount + "，实际：" + batchData.get(i).size() + "）");
+                }
+            }
+
+            // 3. 构建批量插入SQL
+            StringBuilder columnsSql = new StringBuilder();
+            StringBuilder valuesSql = new StringBuilder();
+            for (int i = 0; i < columns.size(); i++) {
+                if (i > 0) {
+                    columnsSql.append(", ");
+                    valuesSql.append(", ");
+                }
+                columnsSql.append("`").append(columns.get(i)).append("`");
+                valuesSql.append("?");
+            }
+
+            String sql = String.format(
+                    "INSERT INTO `%s` (%s) VALUES (%s)",
+                    dbManager.getTableName(),
+                    columnsSql.toString(),
+                    valuesSql.toString()
+            );
+
+            // 4. 执行批量插入（使用PreparedStatement批处理）
+            try (Connection conn = dbManager.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                // 关闭自动提交，手动控制事务
+                conn.setAutoCommit(false);
+
+                // 添加批量参数
+                for (List<String> record : batchData) {
+                    for (int i = 0; i < record.size(); i++) {
+                        String column = columns.get(i);
+                        String valueStr = record.get(i).trim();
+
+                        // 转换值类型（参考addRecordInteractive的逻辑）
+                        Object value;
+                        if (valueStr.equalsIgnoreCase("null")) {
+                            value = null;
+                        } else {
+                            String columnType = getColumnType(dbManager, column);
+                            if (columnType != null && columnType.contains("INT")) {
+                                try {
+                                    value = Integer.parseInt(valueStr);
+                                } catch (NumberFormatException e) {
+                                    System.out.println("⚠️ 第" + (batchData.indexOf(record) + 1) + "条记录的" + column + "不是整数，按字符串处理");
+                                    value = valueStr;
+                                }
+                            } else if (columnType != null && (columnType.contains("DECIMAL") || columnType.contains("DOUBLE") || columnType.contains("FLOAT"))) {
+                                try {
+                                    value = Double.parseDouble(valueStr);
+                                } catch (NumberFormatException e) {
+                                    System.out.println("⚠️ 第" + (batchData.indexOf(record) + 1) + "条记录的" + column + "不是数字，按字符串处理");
+                                    value = valueStr;
+                                }
+                            } else {
+                                value = valueStr;
+                            }
+                        }
+
+                        pstmt.setObject(i + 1, value);
+                    }
+                    pstmt.addBatch(); // 添加到批处理
+                }
+
+                // 执行批处理并获取结果
+                int[] results = pstmt.executeBatch();
+                conn.commit(); // 提交事务
+
+                // 统计成功插入的记录数
+                int successCount = 0;
+                for (int result : results) {
+                    if (result > 0) {
+                        successCount++;
+                    }
+                }
+
+                System.out.printf("✅ 批量插入完成，共处理%d条记录，成功%d条%n", batchData.size(), successCount);
+                return successCount;
+
+            } catch (SQLException e) {
+                System.err.println("❌ 批量插入失败：" + e.getMessage());
+                throw e;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ 表结构获取失败：" + e.getMessage());
+            return 0;
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ 数据校验失败：" + e.getMessage());
+            return 0;
+        } catch (Exception e) {
+            System.err.println("❌ 批量插入出错：" + e.getMessage());
+            return 0;
+        }
+    }
+
+//    // 补充getColumnType方法（现有代码中可能未显式实现，用于获取字段类型）
+//    private static String getColumnType(BaseDBManager<Map<String, Object>> dbManager, String columnName) throws SQLException {
+//        String sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS " +
+//                "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?";
+//        Object[] params = {dbManager.getTableName(), columnName};
+//        Map<String, Object> result = dbManager.getEntity(sql, params);
+//        return result != null ? result.get("DATA_TYPE").toString() : null;
+//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+

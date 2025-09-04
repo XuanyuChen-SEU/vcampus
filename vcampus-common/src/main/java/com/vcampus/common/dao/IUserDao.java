@@ -4,6 +4,12 @@ import com.vcampus.common.dto.User;
 
 public interface IUserDao {
     /*
+        设置数据库;
+     */
+    void IUDInit();
+
+
+    /*
      * @param id 用户ID
      * @return 用户信息
      * 如果不存在，返回空值User，都是null

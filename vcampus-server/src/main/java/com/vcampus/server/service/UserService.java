@@ -1,7 +1,7 @@
 package com.vcampus.server.service;
 import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.Role;
-
+import com.vcampus.server.dao.impl.UserDao;
 /**
  * 用户服务类
  * 负责用户相关的业务逻辑，包括登录、忘记密码、重置密码等
@@ -12,7 +12,11 @@ public class UserService {
     // 固定的测试账号密码
     private static final String TEST_USER_ID = "1000000";
     private static final String TEST_PASSWORD = "1000000";
-    
+    private final UserDao userDao ;
+    public UserService()
+    {
+        userDao = new UserDao();
+    }
     /**
      * 验证用户登录
      * @param loginUser 登录用户信息
@@ -27,7 +31,13 @@ public class UserService {
             
             String userId = loginUser.getUserId();
             String plainPassword = loginUser.getPassword();
-            
+
+            userDao.IUDInit();
+            User user=userDao.getUserById(loginUser.getUserId());
+            String id="1234321";
+            String pass="7654321";
+            User u=new User(id,pass);
+            userDao.updateUser(u);
             // 2. 验证用户ID格式
             if (!userId.matches("\\d{7}")) {
                 return new LoginResult(false, "用户ID格式错误，必须为7位数字", null);
