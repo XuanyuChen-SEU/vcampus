@@ -13,7 +13,7 @@ import com.vcampus.common.dto.Message;
 /**
  * 线程安全的 Socket 客户端
  * 采用同步发送 + 独立接收线程的模式
- * 编写人：谌宣羽（改进：线程安全处理）
+ * 编写人：谌宣羽,周蔚钺
  */
 public class SocketClient implements IMessageClientSrv {
 

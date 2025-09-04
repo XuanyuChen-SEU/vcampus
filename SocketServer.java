@@ -1,28 +1,24 @@
 package com.vcampus.server.net;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import com.vcampus.common.dto.Message;
 import com.vcampus.server.controller.MessageController;
+
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 
 /**
  * Socket服务器类（双线程池版本）
  * 连接池 + 工作池
- * 编写人：谌宣羽、周蔚钺
  */
 public class SocketServer {
 
     private static final int PORT = 9090;
     private static final int MAX_CONNECTIONS = 50;   // 最大同时连接数
+    private static final int MAX_WORKERS = 200;      // 最大工作线程数
 
     private ServerSocket serverSocket;
     private ExecutorService connectionPool;  // 接收连接的线程池

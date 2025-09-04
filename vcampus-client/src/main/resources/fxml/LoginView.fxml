@@ -50,7 +50,6 @@
                 <Hyperlink fx:id="forgotPasswordLink" text="忘记密码？" styleClass="forgot-password-link" />
             </HBox>
             
-
             
             <!-- 登录按钮 -->
             <Button fx:id="loginButton" text="登录" styleClass="login-button" maxWidth="Infinity" prefHeight="40.0">
