@@ -17,20 +17,25 @@ import java.util.List;
  * 编写人：cursor
  */
 public class SocketServer {
-    
+    //监听指定端口
     private static final int PORT = 9090;
+    //最大支持的客户端连接数（100）
     private static final int MAX_CLIENTS = 100;
-    
+    // 服务器Socket（用于监听客户端连接）
     private ServerSocket serverSocket;
+    // 线程池（管理客户端处理线程，避免频繁创建线程的开销）
     private ExecutorService threadPool;
+    // 服务器运行状态标志
     private boolean isRunning = false;
+    // 消息控制器（负责具体的消息逻辑处理，解耦网络层与业务层）
     private final MessageController messageController;
+    // 客户端连接列表（用CopyOnWriteArrayList保证并发安全，适合频繁遍历+修改的场景）
     private final List<ClientConnection> clientConnections;
     
     public SocketServer() {
-        this.threadPool = Executors.newFixedThreadPool(MAX_CLIENTS);
-        this.messageController = new MessageController();
-        this.clientConnections = new CopyOnWriteArrayList<>();
+        this.threadPool = Executors.newFixedThreadPool(MAX_CLIENTS);// 初始化固定大小的线程池
+        this.messageController = new MessageController();// 创建消息处理器
+        this.clientConnections = new CopyOnWriteArrayList<>();// 初始化并发安全的连接列表
     }
     
     /**
@@ -38,16 +43,17 @@ public class SocketServer {
      */
     public void start() {
         try {
+            // 绑定端口并启动服务器Socket
             serverSocket = new ServerSocket(PORT);
             isRunning = true;
             System.out.println("服务器启动成功，监听端口: " + PORT);
-            
-            // 接受客户端连接
+
+            // 循环接受客户端连接（阻塞式，直到服务器停止）
             while (isRunning) {
-                Socket clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();// 等待客户端连接
                 System.out.println("客户端连接: " + clientSocket.getInetAddress().getHostAddress());
-                
-                // 为每个客户端创建独立的处理线程
+
+                // 提交客户端处理任务到线程池（每个客户端一个独立线程）
                 threadPool.submit(() -> handleClient(clientSocket));
             }
             
