@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.StudentController">
+
+    <!-- 顶部搜索栏 -->
+    <top>
+        <HBox spacing="10" padding="10">
+            <Label text="学号:"/>
+            <TextField fx:id="studentIdField" promptText="输入学号"/>
+            <Label text="姓名:"/>
+            <TextField fx:id="nameField" promptText="输入姓名"/>
+            <Button text="查询" onAction="#handleSearch"/>
+            <Button text="新增学生" onAction="#handleAdd"/>
+        </HBox>
+    </top>
+
+    <!-- 中间表格 -->
+    <center>
+        <TableView fx:id="studentTable" prefHeight="500" prefWidth="1000">
+            <columns>
+                <TableColumn fx:id="userIdColumn" text="用户ID" prefWidth="100"/>
+                <TableColumn fx:id="studentIdColumn" text="学号" prefWidth="100"/>
+                <TableColumn fx:id="cardIdColumn" text="一卡通号" prefWidth="120"/>
+                <TableColumn fx:id="nameColumn" text="姓名" prefWidth="100"/>
+                <TableColumn fx:id="genderColumn" text="性别" prefWidth="80"/>
+                <TableColumn fx:id="collegeColumn" text="学院" prefWidth="150"/>
+                <TableColumn fx:id="majorColumn" text="专业" prefWidth="150"/>
+                <TableColumn fx:id="gradeColumn" text="年级" prefWidth="80"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <!-- 底部操作按钮 -->
+    <bottom>
+        <HBox spacing="10" padding="10">
+            <Button text="编辑" onAction="#handleEdit"/>
+            <Button text="删除" onAction="#handleDelete"/>
+        </HBox>
+    </bottom>
+</BorderPane>

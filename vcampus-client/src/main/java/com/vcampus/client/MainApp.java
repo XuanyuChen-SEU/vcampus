@@ -87,3 +87,20 @@ public class MainApp extends Application {
         launch(args);
     }
 }
+
+public void switchScene(String fxmlPath, String title) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
+
+        primaryStge.setTitle(title);
+        primaryStage.setScene(scene);
+        primaryStage.centerOnScreen();
+        primaryStage.show();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
