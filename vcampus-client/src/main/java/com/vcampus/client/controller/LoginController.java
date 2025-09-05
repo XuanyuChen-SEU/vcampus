@@ -3,6 +3,7 @@ package com.vcampus.client.controller;
 import com.vcampus.client.service.LoginService;
 import com.vcampus.common.dto.Message;
 
+import javafx.stage.Stage;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -12,6 +13,10 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.Scene;
+import javafx.fxml.FXMLLoader;
+import java.net.URL;
+import java.io.IOException;
 
 /**
  * 客户端登录控制器
@@ -223,8 +228,7 @@ public class LoginController implements IClientController {
             statusLabel.setText("登录成功，欢迎使用VCampus系统");
             passwordField.clear();
             
-            // TODO: 这里可以跳转到主界面
-            // switchToMainView();
+            switchToMainView();
         } else {
             showError("登录失败: " + result.getMessage());
             statusLabel.setText("登录失败，请检查用户名和密码");
@@ -253,16 +257,41 @@ public class LoginController implements IClientController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
-    /**
-     * 显示信息提示
-     */
-    private void showInfo(String title, String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText("提示");
-        alert.setContentText(message);
-        alert.showAndWait();
+
+    private void switchToMainView() {
+        try {
+            // 1. 关闭当前的登录窗口
+            Stage currentStage = (Stage) loginButton.getScene().getWindow();
+            currentStage.close();
+
+            // 2. 创建一个新的 Stage 用于主界面
+            Stage mainStage = new Stage();
+
+            // 3. 加载主界面的 FXML 文件
+            URL fxmlLocation = getClass().getResource("/fxml/MainView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("严重错误: 找不到主界面 FXML 文件 /fxml/MainView.fxml");
+                showError("无法加载应用程序主界面，请联系管理员。");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Scene scene = new Scene(loader.load());
+
+            // 4. (可选但推荐) 为主界面加载 CSS
+            URL cssLocation = getClass().getResource("/css/styles.css");
+            if(cssLocation != null) {
+                scene.getStylesheets().add(cssLocation.toExternalForm());
+            }
+
+            // 5. 设置并显示主界面窗口
+            mainStage.setTitle("VCampus 虚拟校园系统");
+            mainStage.setScene(scene);
+            mainStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("加载主界面时发生严重错误: " + e.getMessage());
+        }
     }
     
     /**

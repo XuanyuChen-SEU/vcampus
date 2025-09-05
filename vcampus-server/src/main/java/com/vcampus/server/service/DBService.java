@@ -55,7 +55,7 @@ public void initialize() {
     // 1. 定义数据库配置参数（保持硬编码，与你的需求一致）
     String dbUrl = "jdbc:mysql://localhost:3306/vcampus?useSSL=false&serverTimezone=UTC";
     String dbUser = "root";
-    String dbPwd = "Abcd0410";
+    String dbPwd = "1ssyzjkl";
     String initialTable = "user";
 
     // 2. 调用initializeDatabase()，执行“创建数据库→创建表→插入初始数据”的一条龙操作

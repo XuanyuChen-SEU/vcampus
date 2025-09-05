@@ -18,7 +18,6 @@ public class UserDao implements IUserDao {
     public void IUDInit()
     {
         dbService= new DBService();
-
         dbService.initialize();
     }
     @Override

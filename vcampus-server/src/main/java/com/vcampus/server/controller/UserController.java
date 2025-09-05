@@ -29,10 +29,10 @@ public class UserController {
             User loginUser = (User) message.getData();
             
             // 调用用户服务进行登录验证
-            UserService.LoginResult result = userService.validateLogin(loginUser);
+            Message result = userService.validateLogin(loginUser);
             
             if (result.isSuccess()) {
-                return Message.success(ActionType.LOGIN, result.getUser(), result.getMessage());
+                return Message.success(ActionType.LOGIN, result.getData(), result.getMessage());
             } else {
                 return Message.failure(ActionType.LOGIN, result.getMessage());
             }
@@ -54,7 +54,7 @@ public class UserController {
             User user = (User) message.getData();
             
             // 调用用户服务处理忘记密码申请
-            UserService.ForgetPasswordResult result = userService.handleForgetPassword(user);
+            Message result = userService.handleForgetPassword(user);
             
             if (result.isSuccess()) {
                 return Message.success(ActionType.FORGET_PASSWORD, result.getMessage());
