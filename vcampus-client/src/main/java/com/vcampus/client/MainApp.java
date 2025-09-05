@@ -1,6 +1,7 @@
 package com.vcampus.client;
 
 import com.vcampus.client.net.SocketClient;
+import com.vcampus.client.session.UserSession;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -66,6 +67,14 @@ public class MainApp extends Application {
      */
     public static SocketClient getGlobalSocketClient() {
         return globalSocketClient;
+    }
+    
+    /**
+     * 获取全局用户会话实例
+     * @return UserSession实例
+     */
+    public static UserSession getGlobalUserSession() {
+        return UserSession.getInstance();
     }
     
     /**

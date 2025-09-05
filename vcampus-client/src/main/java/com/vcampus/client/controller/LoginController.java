@@ -1,11 +1,16 @@
 package com.vcampus.client.controller;
 
+import java.io.IOException;
+import java.net.URL;
+
 import com.vcampus.client.service.LoginService;
+import com.vcampus.client.session.UserSession;
 import com.vcampus.common.dto.Message;
 
-import javafx.stage.Stage;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -13,10 +18,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
-import java.net.URL;
-import java.io.IOException;
+import javafx.stage.Stage;
 
 /**
  * 客户端登录控制器
@@ -254,6 +256,10 @@ public class LoginController implements IClientController {
      */
     private void handleLoginResult(Message result) {
         if (result.isSuccess()) {
+            // 获取用户名并保存到全局会话
+            String username = usernameField.getText().trim();
+            UserSession.getInstance().setCurrentUser(username);
+            
             showSuccess("登录成功", result.getMessage());
             statusLabel.setText("登录成功，欢迎使用VCampus系统");
             passwordField.clear();
@@ -307,7 +313,7 @@ public class LoginController implements IClientController {
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Scene scene = new Scene(loader.load());
 
-            // 4. (可选但推荐) 为主界面加载 CSS
+            // 4. 为主界面加载 CSS
             URL cssLocation = getClass().getResource("/css/styles.css");
             if(cssLocation != null) {
                 scene.getStylesheets().add(cssLocation.toExternalForm());
