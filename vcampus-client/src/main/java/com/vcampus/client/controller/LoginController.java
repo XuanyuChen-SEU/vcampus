@@ -44,6 +44,15 @@ public class LoginController implements IClientController {
     @FXML
     private Label passwordLabel;
     
+    @FXML
+    private javafx.scene.layout.VBox confirmPasswordContainer;
+    
+    @FXML
+    private Label confirmPasswordLabel;
+    
+    @FXML
+    private PasswordField confirmPasswordField;
+    
     // 登录服务实例
     private final LoginService loginService = new LoginService();
     
@@ -61,6 +70,7 @@ public class LoginController implements IClientController {
         // 为输入框添加回车键事件
         usernameField.setOnAction(event -> handleLogin());
         passwordField.setOnAction(event -> handleLogin());
+        confirmPasswordField.setOnAction(event -> handleLogin());
         
         // 为忘记密码链接添加点击事件
         forgotPasswordLink.setOnAction(event -> handleForgotPassword());
@@ -134,12 +144,19 @@ public class LoginController implements IClientController {
         // 更新UI显示
         passwordLabel.setText("新密码");
         passwordField.setPromptText("请输入新密码");
+        confirmPasswordLabel.setText("确认密码");
+        confirmPasswordField.setPromptText("请再次输入新密码");
         loginButton.setText("提交申请");
         forgotPasswordLink.setText("返回登录");
-        statusLabel.setText("请输入账号、和新密码");
+        statusLabel.setText("请输入账号、新密码并确认密码");
+        
+        // 显示确认密码输入框
+        confirmPasswordContainer.setVisible(true);
+        confirmPasswordContainer.setManaged(true);
         
         // 清空输入框
         passwordField.clear();
+        confirmPasswordField.clear();
     }
     
     /**
@@ -155,8 +172,13 @@ public class LoginController implements IClientController {
         forgotPasswordLink.setText("忘记密码？");
         statusLabel.setText("请输入用户名和密码");
         
+        // 隐藏确认密码输入框
+        confirmPasswordContainer.setVisible(false);
+        confirmPasswordContainer.setManaged(false);
+        
         // 清空输入框
         passwordField.clear();
+        confirmPasswordField.clear();
     }
     
     /**
@@ -164,11 +186,19 @@ public class LoginController implements IClientController {
      */
     private void handlePasswordReset() {
         String username = usernameField.getText().trim();
-        String oldPassword = passwordField.getText().trim();
+        String newPassword = passwordField.getText().trim();
+        String confirmPassword = confirmPasswordField.getText().trim();
         
         // 验证输入
-        if (username.isEmpty() || oldPassword.isEmpty()) {
+        if (username.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
             showError("请填写完整信息");
+            return;
+        }
+        
+        // 验证密码是否一致
+        if (!newPassword.equals(confirmPassword)) {
+            showError("两次输入的密码不一致，请重新输入");
+            confirmPasswordField.clear();
             return;
         }
         
@@ -176,7 +206,7 @@ public class LoginController implements IClientController {
         statusLabel.setText("正在提交密码重置申请...");
         
         // 调用LoginService的密码重置方法
-        loginService.submitPasswordResetRequest(username, oldPassword);
+        loginService.submitPasswordResetRequest(username, newPassword);
     }
     
     /**
@@ -314,6 +344,7 @@ public class LoginController implements IClientController {
     public void clearFields() {
         usernameField.clear();
         passwordField.clear();
+        confirmPasswordField.clear();
         statusLabel.setText("请输入用户名和密码");
         
         // 确保回到登录模式
