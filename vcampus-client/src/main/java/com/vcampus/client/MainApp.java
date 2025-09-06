@@ -25,12 +25,12 @@ public class MainApp extends Application {
     // 全局网络连接实例
     private static SocketClient globalSocketClient;
     
-    @Override//默认的启动方法
+    @Override//默认的启动方法（lauch)
     public void start(Stage primaryStage) throws Exception {
         instance = this;
         this.primaryStage = primaryStage;
         
-        // 初始化全局网络连接
+        // 初始化全局网络连接(用的都是一个socket)
         initializeGlobalNetworkConnection();
         
         // 加载登录界面FXML
@@ -83,7 +83,7 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         System.out.println("=== VCampus 客户端启动中 ===");
         
-        // 启动JavaFX应用程序
+        // 启动JavaFX应用程序（入口）
         launch(args);
     }
 }

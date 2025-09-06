@@ -19,13 +19,6 @@ public class MainServer {
     }
 
     public static void main(String[] args) {
-        // 设置控制台输出编码
-        try {
-            System.setOut(new java.io.PrintStream(System.out, true, "UTF-8"));
-            System.setErr(new java.io.PrintStream(System.err, true, "UTF-8"));
-        } catch (Exception e) {
-            // 如果设置失败，继续运行
-        }        
         System.out.println("=== VCampus 服务器启动 ===");
         instance = new MainServer();
         // 创建并启动Socket服务器

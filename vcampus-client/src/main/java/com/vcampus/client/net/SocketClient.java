@@ -47,6 +47,7 @@ public class SocketClient implements IMessageClientSrv {
         this.host = host;
         this.port = port;
         this.messageController = new com.vcampus.client.controller.MessageController();
+        //公共messageController(全局唯一）
     }
     
     @Override

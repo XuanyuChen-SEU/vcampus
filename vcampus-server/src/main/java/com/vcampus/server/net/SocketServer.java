@@ -115,6 +115,7 @@ public class SocketServer {
                     workerPool.submit(() -> {
                         try {
                             System.out.println("收到客户端消息: " + request);
+                            // 处理消息
                             Message response = messageController.handleMessage(request);
 
                             synchronized (out) { // 确保同一客户端的输出流不乱序
