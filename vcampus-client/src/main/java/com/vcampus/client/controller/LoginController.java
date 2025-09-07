@@ -1,11 +1,16 @@
 package com.vcampus.client.controller;
 
+import java.io.IOException;
+import java.net.URL;
+
 import com.vcampus.client.service.LoginService;
+import com.vcampus.client.session.UserSession;
 import com.vcampus.common.dto.Message;
 
-import javafx.stage.Stage;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -13,10 +18,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
-import java.net.URL;
-import java.io.IOException;
+import javafx.stage.Stage;
 
 /**
  * 客户端登录控制器
@@ -44,6 +46,15 @@ public class LoginController implements IClientController {
     @FXML
     private Label passwordLabel;
     
+    @FXML
+    private javafx.scene.layout.VBox confirmPasswordContainer;
+    
+    @FXML
+    private Label confirmPasswordLabel;
+    
+    @FXML
+    private PasswordField confirmPasswordField;
+    
     // 登录服务实例
     private final LoginService loginService = new LoginService();
     
@@ -60,10 +71,11 @@ public class LoginController implements IClientController {
         
         // 为输入框添加回车键事件
         usernameField.setOnAction(event -> handleLogin());
-        passwordField.setOnAction(event -> handleLogin());//handlelogin得自己搞
+        passwordField.setOnAction(event -> handleLogin());
+        confirmPasswordField.setOnAction(event -> handleLogin());
         
         // 为忘记密码链接添加点击事件
-        forgotPasswordLink.setOnAction(event -> handleForgotPassword());//setonaction是自带的
+        forgotPasswordLink.setOnAction(event -> handleForgotPassword());
         
         // 设置状态标签初始文本
         statusLabel.setText("请输入用户名和密码");
@@ -79,8 +91,7 @@ public class LoginController implements IClientController {
     public void registerToMessageController() {
         // 获取全局SocketClient中的MessageController
         com.vcampus.client.controller.MessageController messageController = 
-            loginService.getGlobalSocketClient().getMessageController();//get方法是为了全局唯一
-        //controller不发送网络信息
+            loginService.getGlobalSocketClient().getMessageController();
         if (messageController != null) {
             messageController.setLoginController(this);
         }
@@ -135,12 +146,19 @@ public class LoginController implements IClientController {
         // 更新UI显示
         passwordLabel.setText("新密码");
         passwordField.setPromptText("请输入新密码");
+        confirmPasswordLabel.setText("确认密码");
+        confirmPasswordField.setPromptText("请再次输入新密码");
         loginButton.setText("提交申请");
         forgotPasswordLink.setText("返回登录");
-        statusLabel.setText("请输入账号、和新密码");
+        statusLabel.setText("请输入账号、新密码并确认密码");
+        
+        // 显示确认密码输入框
+        confirmPasswordContainer.setVisible(true);
+        confirmPasswordContainer.setManaged(true);
         
         // 清空输入框
         passwordField.clear();
+        confirmPasswordField.clear();
     }
     
     /**
@@ -156,8 +174,13 @@ public class LoginController implements IClientController {
         forgotPasswordLink.setText("忘记密码？");
         statusLabel.setText("请输入用户名和密码");
         
+        // 隐藏确认密码输入框
+        confirmPasswordContainer.setVisible(false);
+        confirmPasswordContainer.setManaged(false);
+        
         // 清空输入框
         passwordField.clear();
+        confirmPasswordField.clear();
     }
     
     /**
@@ -165,11 +188,19 @@ public class LoginController implements IClientController {
      */
     private void handlePasswordReset() {
         String username = usernameField.getText().trim();
-        String oldPassword = passwordField.getText().trim();
+        String newPassword = passwordField.getText().trim();
+        String confirmPassword = confirmPasswordField.getText().trim();
         
         // 验证输入
-        if (username.isEmpty() || oldPassword.isEmpty()) {
+        if (username.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
             showError("请填写完整信息");
+            return;
+        }
+        
+        // 验证密码是否一致
+        if (!newPassword.equals(confirmPassword)) {
+            showError("两次输入的密码不一致，请重新输入");
+            confirmPasswordField.clear();
             return;
         }
         
@@ -177,7 +208,7 @@ public class LoginController implements IClientController {
         statusLabel.setText("正在提交密码重置申请...");
         
         // 调用LoginService的密码重置方法
-        loginService.submitPasswordResetRequest(username, oldPassword);
+        loginService.submitPasswordResetRequest(username, newPassword);
     }
     
     /**
@@ -225,6 +256,10 @@ public class LoginController implements IClientController {
      */
     private void handleLoginResult(Message result) {
         if (result.isSuccess()) {
+            // 获取用户名并保存到全局会话
+            String username = usernameField.getText().trim();
+            UserSession.getInstance().setCurrentUser(username);
+            
             showSuccess("登录成功", result.getMessage());
             statusLabel.setText("登录成功，欢迎使用VCampus系统");
             passwordField.clear();
@@ -278,7 +313,7 @@ public class LoginController implements IClientController {
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Scene scene = new Scene(loader.load());
 
-            // 4. (可选但推荐) 为主界面加载 CSS
+            // 4. 为主界面加载 CSS
             URL cssLocation = getClass().getResource("/css/styles.css");
             if(cssLocation != null) {
                 scene.getStylesheets().add(cssLocation.toExternalForm());
@@ -315,6 +350,7 @@ public class LoginController implements IClientController {
     public void clearFields() {
         usernameField.clear();
         passwordField.clear();
+        confirmPasswordField.clear();
         statusLabel.setText("请输入用户名和密码");
         
         // 确保回到登录模式

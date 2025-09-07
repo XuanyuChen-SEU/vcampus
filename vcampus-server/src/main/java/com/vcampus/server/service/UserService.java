@@ -54,23 +54,9 @@ public class UserService implements AutoCloseable{
      */
     public Message handleForgetPassword(User user) {
         try {
-            // 1. 验证输入参数
-            if (user == null || user.getUserId() == null) {
-                return Message.failure(ActionType.FORGET_PASSWORD, "用户信息不完整");
+            if (user.getUserId().equals("")) {
+                return Message.failure(ActionType.LOGIN, "用户不存在");
             }
-            
-            String userId = user.getUserId();
-            
-            // 2. 验证用户ID格式
-            if (!userId.matches("\\d{7}")) {
-                return Message.failure(ActionType.FORGET_PASSWORD, "用户ID格式错误，必须为7位数字");
-            }
-            
-            // 3. 验证用户是否存在
-            if (!user.getUserId().equals(userId)) {
-                return Message.failure(ActionType.FORGET_PASSWORD, "用户不存在");
-            }
-            
             
             // 5. 创建密码重置申请（模拟成功）
             // TODO: 这里可以添加数据库操作，记录密码重置申请
