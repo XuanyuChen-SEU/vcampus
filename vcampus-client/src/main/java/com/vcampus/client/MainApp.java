@@ -13,25 +13,25 @@ import javafx.stage.Stage;
  * JavaFX应用程序的入口点
  * 编写人：cursorcursor
  */
-public class MainApp extends Application {
+public class MainApp extends Application {//继承自Application类
     
     private static final String APP_TITLE = "VCampus 客户端";
     private static final String LOGIN_FXML = "/fxml/LoginView.fxml";
     private static final String MAIN_FXML = "/fxml/MainView.fxml";
     
     private Stage primaryStage;
-    private static MainApp instance;
+    private static MainApp instance;//保证用的都是一个
     
     // 全局网络连接实例
-    private static SocketClient globalSocketClient;
+    private static SocketClient globalSocketClient;//共用一个
     
     @Override//默认的启动方法
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws Exception {//launch默认启动start
         instance = this;
         this.primaryStage = primaryStage;
         
         // 初始化全局网络连接
-        initializeGlobalNetworkConnection();
+        initializeGlobalNetworkConnection();//为了保证都是一个socket  保证后面用的都是这个socket（初始化全局）
         
         // 加载登录界面FXML
         Parent root = FXMLLoader.load(getClass().getResource(LOGIN_FXML));
@@ -52,9 +52,9 @@ public class MainApp extends Application {
      */
     private void initializeGlobalNetworkConnection() {
         try {
-            globalSocketClient = new SocketClient();
+            globalSocketClient = new SocketClient();//自己创建（来自net）
             System.out.println("全局网络连接已创建");
-            globalSocketClient.connect();
+            globalSocketClient.connect();//全局网络连接起来//后面封装的不用关心
         } catch (Exception e) {
             System.err.println("初始化全局网络连接失败: " + e.getMessage());
         }
@@ -74,7 +74,7 @@ public class MainApp extends Application {
      */
     public static MainApp getInstance() {
         return instance;
-    }
+    }//
 
     /**
      * 应用程序启动方法
@@ -82,8 +82,8 @@ public class MainApp extends Application {
      */
     public static void main(String[] args) {
         System.out.println("=== VCampus 客户端启动中 ===");
-        
+        //
         // 启动JavaFX应用程序
-        launch(args);
+        launch(args);//入口程序
     }
 }

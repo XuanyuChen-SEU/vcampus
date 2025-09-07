@@ -124,6 +124,7 @@
 }
 
 /* 登录按钮样式 */
+/* .开始表明这个类的开始*/
 .login-button {
     -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
     -fx-text-fill: white;
@@ -131,7 +132,7 @@
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
 }
-
+/*hover  鼠标移动到那边之后的效果 */
 .login-button:hover {
     -fx-background-color: linear-gradient(to right, #5a6fd8, #6a4190);
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);

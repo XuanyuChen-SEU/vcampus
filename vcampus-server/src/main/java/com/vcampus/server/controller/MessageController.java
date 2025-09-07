@@ -13,7 +13,7 @@ public class MessageController {
     private final UserController userController;
     
     public MessageController() {
-        this.userController = new UserController();
+        this.userController = new UserController();//自上而下  连续的好几个构造方法    client不用是因为  （小问题）
     }
     
     /**
@@ -29,7 +29,7 @@ public class MessageController {
             }
             
             // 根据ActionType调用对应的控制器
-            switch (request.getAction()) {
+            switch (request.getAction()) {//需要什么服务  自己加上）
                 case LOGIN:
                     return userController.handleLogin(request);
                 case FORGET_PASSWORD:

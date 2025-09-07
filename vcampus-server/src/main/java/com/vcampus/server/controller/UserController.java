@@ -5,6 +5,7 @@ import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.UserService;
 
+
 /**
  * 用户控制器
  * 处理用户相关的请求，包括登录、忘记密码、重置密码等
@@ -14,7 +15,7 @@ public class UserController {
     
     private final UserService userService;
     
-    public UserController() {
+    public UserController()  {
         this.userService = new UserService();
     }
     

@@ -55,7 +55,7 @@ public class LoginService {
         // 发送登录请求，响应会由SocketClient中的MessageController自动处理
         Message response = socketClient.sendMessage(loginMessage);
         
-        return response;
+        return response;///sendmassage只是返回有没有成功发送信息出去  这个response只是客户端内部的  来确认有没有成功发出去
     }
     
     /**

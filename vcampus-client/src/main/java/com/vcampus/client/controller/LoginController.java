@@ -60,10 +60,10 @@ public class LoginController implements IClientController {
         
         // 为输入框添加回车键事件
         usernameField.setOnAction(event -> handleLogin());
-        passwordField.setOnAction(event -> handleLogin());
+        passwordField.setOnAction(event -> handleLogin());//handlelogin得自己搞
         
         // 为忘记密码链接添加点击事件
-        forgotPasswordLink.setOnAction(event -> handleForgotPassword());
+        forgotPasswordLink.setOnAction(event -> handleForgotPassword());//setonaction是自带的
         
         // 设置状态标签初始文本
         statusLabel.setText("请输入用户名和密码");
@@ -79,7 +79,8 @@ public class LoginController implements IClientController {
     public void registerToMessageController() {
         // 获取全局SocketClient中的MessageController
         com.vcampus.client.controller.MessageController messageController = 
-            loginService.getGlobalSocketClient().getMessageController();
+            loginService.getGlobalSocketClient().getMessageController();//get方法是为了全局唯一
+        //controller不发送网络信息
         if (messageController != null) {
             messageController.setLoginController(this);
         }

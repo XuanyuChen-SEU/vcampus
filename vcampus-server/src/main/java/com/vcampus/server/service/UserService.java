@@ -5,16 +5,17 @@ import com.vcampus.common.enums.ActionType;
 import com.vcampus.common.enums.Role;
 import com.vcampus.server.dao.impl.UserDao;
 
+import java.io.IOException;
+
 /**
  * 用户服务类
  * 负责用户相关的业务逻辑，包括登录、忘记密码、重置密码等
  * 编写人：谌宣羽
  */
-public class UserService {
+public class UserService implements AutoCloseable{
     private final UserDao userDao;
 
-    public UserService()
-    {
+    public UserService()  {
         userDao = new UserDao();
     }
 
@@ -25,7 +26,9 @@ public class UserService {
      */
     public Message validateLogin(User loginUser) {
         try {
+
             User user = userDao.getUserById(loginUser.getUserId());
+
             if (user.getUserId().equals("")) {
                 return Message.failure(ActionType.LOGIN, "用户不存在");
             }
@@ -83,5 +86,13 @@ public class UserService {
             System.err.println("处理忘记密码申请时发生异常: " + e.getMessage());
             return Message.failure(ActionType.FORGET_PASSWORD, "服务器内部错误");
         }
+    }
+    // 实现AutoCloseable接口的close方法，关闭UserDao
+    @Override
+    public void close() throws IOException {
+        if (userDao != null) {
+            userDao.UDClose(); // 调用UserDao的close方法释放资源
+        }
+        System.out.println("UserService已关闭，关联的UserDao资源已释放");
     }
 }
