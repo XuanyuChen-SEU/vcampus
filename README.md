@@ -1,9 +1,11 @@
 # VCampus 虚拟校园管理系统
 
 ## 项目概述
+
 VCampus 是一个基于 Java 开发的虚拟校园管理系统，采用模块化设计，包含客户端、服务端、公共模块和数据库脚本四个主要部分。系统实现了用户登录、全局通知、网络通信等核心功能，采用类似服务端的简洁架构设计。
 
 ## 技术栈
+
 - **基础框架**：Java 17
 - **构建工具**：Maven
 - **数据库**：MySQL 8.0.33（搭配 HikariCP 连接池）
@@ -116,23 +118,30 @@ vcampus/
 ```
 
 ## 模块说明
+
 1. **vcampus-common**：公共模块，包含客户端和服务端共享的DTO、DAO接口、工具类等，减少代码冗余
 2. **vcampus-server**：服务端模块，负责处理客户端请求、业务逻辑处理和数据访问
 3. **vcampus-client**：客户端模块，基于JavaFX实现图形用户界面，负责与用户交互和服务端通信
 4. **vcampus-database**：数据库模块，包含数据库表结构和初始数据脚本
 
 ## 开发环境配置
+
 - JDK 17
 - Maven 3.6+
 - MySQL 8.0.33
 - IntelliJ IDEA（推荐）或其他Java IDE
+
 ## 本项目Maven简介
+
 - 本项目采用Maven进行依赖管理和项目构建
 - 父工程 `vcampus` 管理子模块 `vcampus-common`、`vcampus-server`、`vcampus-client`、`vcampus-database`
 - 每个子模块有自己的 `pom.xml` 配置文件，声明依赖和插件
+
 ### 父工程（只挑重点，有的没复制）
+
 这部分是基础配置，其他子模块都继承自这个父工程
 重点看groupId、artifactId，注意packaging务必pom，原因请询问ai
+
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -145,7 +154,9 @@ vcampus/
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 ```
+
 modules表明了子模块
+
 ```
     <modules>
         <module>vcampus-common</module>
@@ -154,7 +165,9 @@ modules表明了子模块
         <module>vcampus-database</module>
     </modules>
 ```
-properties表明了一些全局变量，通过`${变量名}`引用
+
+properties表明了一些全局变量，通过 `${变量名}`引用
+
 ```
     <properties>
         <java.version>17</java.version>
@@ -163,7 +176,9 @@ properties表明了一些全局变量，通过`${变量名}`引用
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 ```
+
 dependencyManagement表明了依赖管理，子模块可以引用这里的依赖，这里只保留一个作为示例
+
 ```
     <dependencyManagement>
         <dependencies>
@@ -177,9 +192,12 @@ dependencyManagement表明了依赖管理，子模块可以引用这里的依赖
     </dependencyManagement>
 </project>
 ```
+
 ### 子模块
-这里以`vcampus-common`为例
+
+这里以 `vcampus-common`为例
 继承一定要和父工程的groupId、artifactId，version一致
+
 ```
     <parent>
         <groupId>com.vcampus</groupId>
@@ -187,7 +205,9 @@ dependencyManagement表明了依赖管理，子模块可以引用这里的依赖
         <version>1.0-SNAPSHOT</version>
     </parent>
 ```
-这里artifactId自己起名，如果`vcampus-server`需要用到这个`common`模块就需要加入
+
+这里artifactId自己起名，如果 `vcampus-server`需要用到这个 `common`模块就需要加入
+
 ```
 <dependency>
             <groupId>com.vcampus</groupId>
@@ -195,6 +215,7 @@ dependencyManagement表明了依赖管理，子模块可以引用这里的依赖
             <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
+
 ```
     <artifactId>vcampus-common</artifactId>
     <dependencies>
@@ -206,33 +227,40 @@ dependencyManagement表明了依赖管理，子模块可以引用这里的依赖
     </dependencies>
 </project>
 ```
+
 本项目如果想增加maven依赖，需要在父工程的dependencyManagement中添加，子模块就可以引用了
 
 ## 测试
+
 单元测试：使用 JUnit 5 编写测试用例，验证业务逻辑的正确性。
-具体方法是在IDEA安装JUnit 5 Mockito Code Generator插件，按`alt+insert`，对你要测试的Java文件点击测试生成即可。
+具体方法是在IDEA安装JUnit 5 Mockito Code Generator插件，按 `alt+insert`，对你要测试的Java文件点击测试生成即可。
 JUnit测试的语法上网查询，当然ai生成就可以。
 当然你是付费版不用这个插件，右键应该是自带的，点击Generate Test即可。
-整体测试是在命令行输入`mvn test`，不妨试试。
+整体测试是在命令行输入 `mvn test`，不妨试试。
 
 ## 核心功能
+
 ### **网络通信架构**
+
 - **同步发送**：客户端发送消息后立即返回结果
 - **异步接收**：客户端持续监听服务器消息，支持全局通知
 - **消息路由**：MessageController根据ActionType自动路由到对应处理器
 
 ### **登录功能**
+
 - 用户名密码验证
 - 登录状态管理
 - 错误提示和成功跳转
 
 ### **全局通知系统**
+
 - 支持服务器发送全局通知
 - 支持系统广播
 - 支持紧急通知
 - 自动弹出对话框显示
 
 ### **架构特点**
+
 - **简化设计**：去除了复杂的双线程、消息队列等设计
 - **类似服务端**：客户端架构风格与服务端保持一致
 - **易于扩展**：添加新功能只需在MessageController中添加case分支
@@ -240,30 +268,29 @@ JUnit测试的语法上网查询，当然ai生成就可以。
 ## 快速开始
 
 ### **1. 启动服务端**
+
 ```bash
 cd vcampus-server
 mvn exec:java
 ```
 
 ### **2. 启动客户端**
+
 ```bash
 cd vcampus-client
 mvn javafx:run
 ```
 
-### **3. 测试登录**
-- 用户名：1000000
-- 密码：1000000
-其余的可以输入试试
-
 ## 测试
 
 ### **单元测试**
+
 - 使用 JUnit 5 编写测试用例
 - 在IDEA中右键Java文件 → Generate Test
 - 运行测试：`mvn test`
 
 ### **功能测试**
+
 - **登录测试**：验证用户名密码验证功能
 - **全局信号测试**：运行 `TestGlobalSignal` 类测试全局通知接收
 - **网络通信测试**：验证客户端与服务端的消息传输
@@ -271,6 +298,7 @@ mvn javafx:run
 ## 已实现功能
 
 ### **✅ 已完成**
+
 - **项目架构**：Maven多模块项目结构
 - **网络通信**：基于Socket的客户端服务端通信
 - **登录功能**：用户名密码验证
@@ -279,12 +307,14 @@ mvn javafx:run
 - **UI界面**：JavaFX登录界面
 
 ### **🔄 当前状态**
+
 - 客户端网络连接已简化，采用类似服务端的架构
 - 支持异步接收全局信号
 - 登录功能完整可用
 - 编码问题已解决（UTF-8）
 
 ### **📋 待扩展功能**
+
 - 学籍管理
 - 课程管理
 - 图书管理
@@ -294,20 +324,26 @@ mvn javafx:run
 ## 常见问题
 
 ### **编码问题**
+
 如果遇到中文乱码，请确保：
+
 1. 控制台编码设置为UTF-8：`chcp 65001`
 2. Maven配置中包含编码参数：`-Dfile.encoding=UTF-8`
 3. 项目文件编码为UTF-8
 
 ### **端口占用**
+
 如果9090端口被占用：
+
 ```bash
 netstat -ano | findstr :9090
 taskkill /PID <进程ID> /F
 ```
 
 ### **构建问题**
+
 确保先编译再运行：
+
 ```bash
 mvn compile
 mvn exec:java
