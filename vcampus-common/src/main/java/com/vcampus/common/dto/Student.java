@@ -28,6 +28,10 @@ public class Student implements Serializable {
     private String college;    // 学院
     private String major;      // 专业
     private int grade;         // 年级（如 2023）
+    private String birth_date; // 出生日期
+    private String native_place; //籍贯
+    private String politics_status;   //政治面貌
+    private String student_status;  //学籍状态
 
     // 默认构造方法（反序列化必需）
     public Student() {}
@@ -121,4 +125,40 @@ public class Student implements Serializable {
     public void setGrade(int grade) {
         this.grade = grade;
     }
+
+    public String getBirth_date() {
+        return birth_date;
+    }
+
+    public void setBirth_date(String birth_date) {
+        this.birth_date = birth_date;
+    }
+
+    // native_place
+    public String getNative_place() {
+        return native_place;
+    }
+
+    public void setNative_place(String native_place) {
+        this.native_place = native_place;
+    }
+
+    // politics_status
+    public String getPolitics_status() {
+        return politics_status;
+    }
+
+    public void setPolitics_status(String politics_status) {
+        this.politics_status = politics_status;
+    }
+
+    // student_status
+    public String getStudent_status() {
+        return student_status;
+    }
+
+    public void setStudent_status(String student_status) {
+        this.student_status = student_status;
+    }
+
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<!-- fx:controller 属性将此视图与 StoreController 类绑定 -->
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.StoreController">
+    <children>
+        <Label text="商店模块" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+
+        <!--
+          【模块内容区】
+          所有商店模块的UI控件 (如商品列表、购物车) 都应放置在这个 Pane 内部。
+          使用 fx:id="contentPane" 可以在控制器中引用此 Pane。
+        -->
+        <Pane fx:id="contentPane" layoutX="20.0" layoutY="60.0" prefHeight="520.0" prefWidth="760.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0">
+
+            <!-- 示例: <TableView fx:id="productTable" prefHeight="520.0" prefWidth="760.0" /> -->
+
+        </Pane>
+    </children>
+</AnchorPane>

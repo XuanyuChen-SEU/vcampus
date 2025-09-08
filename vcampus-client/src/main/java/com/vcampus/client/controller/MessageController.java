@@ -32,7 +32,7 @@ public class MessageController {
             }
             
             // 根据ActionType调用对应的子控制器
-            switch (message.getAction()) {
+            switch (message.getAction()) {//注意这边  md里都提到了
                 case LOGIN:
                     if (loginController != null) {
                         loginController.handleLoginResponse(message);

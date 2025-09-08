@@ -1,3 +1,69 @@
+/* 
+ * =================================================================
+ *
+ *              主应用程序界面样式 (MainView)
+ *
+ * =================================================================
+ */
+
+/* === 全局根节点样式 === */
+.root {
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
+/* === 主界面背景 (应用到 BorderPane) === */
+.main-background {
+    -fx-background-color: linear-gradient(to bottom right, #667eea 0%, #764ba2 100%);
+}
+
+/* === 左侧侧边栏样式 === */
+.sidebar {
+    /* 半透明背景，与主背景融合 */
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* === 侧边栏按钮通用样式 === */
+.sidebar .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-alignment: center-left;
+    /* 文字居左 */
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+/* 侧边栏按钮 - 鼠标悬停效果 */
+.sidebar .button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 侧边栏按钮 - 当前焦点/选中效果 */
+.sidebar .button:focused {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+    /* 左侧高亮边框表示选中 */
+    -fx-border-color: #A188E3;
+    -fx-border-width: 0 0 0 3px;
+}
+
+/* === 右侧内容区模块标题样式 === */
+.module-title {
+    -fx-font-size: 48px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+
+/*
+ * =================================================================
+ *
+ *                  登录界面样式 (LoginView)
+ *
+ * =================================================================
+ */
+
 /* 主背景样式 */
 .login-background {
     -fx-background-color: linear-gradient(to bottom right, #667eea 0%, #764ba2 100%);
@@ -58,6 +124,7 @@
 }
 
 /* 登录按钮样式 */
+/* .开始表明这个类的开始*/
 .login-button {
     -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
     -fx-text-fill: white;
@@ -65,7 +132,7 @@
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
 }
-
+/*hover  鼠标移动到那边之后的效果 */
 .login-button:hover {
     -fx-background-color: linear-gradient(to right, #5a6fd8, #6a4190);
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);

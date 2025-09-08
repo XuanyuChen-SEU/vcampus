@@ -9,9 +9,9 @@ import java.net.Socket;
 import com.vcampus.common.dto.Message;
 
 /**
- * 简化的Socket客户端
- * 采用类似服务端的同步处理模式，去掉复杂的异步设计
- * 编写人：谌宣羽
+ * 线程安全的 Socket 客户端
+ * 采用同步发送 + 独立接收线程的模式
+ * 编写人：谌宣羽,周蔚钺
  */
 public class SocketClient implements IMessageClientSrv {
     
@@ -46,7 +46,7 @@ public class SocketClient implements IMessageClientSrv {
     public SocketClient(String host, int port) {
         this.host = host;
         this.port = port;
-        this.messageController = new com.vcampus.client.controller.MessageController();
+        this.messageController = new com.vcampus.client.controller.MessageController();//
     }
     
     @Override
@@ -87,7 +87,7 @@ public class SocketClient implements IMessageClientSrv {
     }
     
     /**
-     * 接收循环
+     * 接收循环 - 优化版本
      */
     private void receiveLoop() {
         while (running && isConnected()) {
@@ -96,16 +96,24 @@ public class SocketClient implements IMessageClientSrv {
                 Object obj = in.readObject();
                 if (obj instanceof Message) {
                     Message message = (Message) obj;
-                    System.out.println("接收到消息: " + message);
+                    // 减少控制台输出，提升性能
+                    if (System.getProperty("debug") != null) {
+                        System.out.println("接收到消息: " + message);
+                    }
                     
                     // 使用MessageController处理消息
-                    messageController.handleMessage(message);
+                    if (messageController != null) {
+                        messageController.handleMessage(message);
+                    }
                 } else {
                     System.err.println("接收到无效的消息类型: " + obj.getClass());
                 }
             } catch (Exception e) {
                 if (running) {
-                    System.err.println("接收消息失败: " + e.getMessage());
+                    // 减少错误日志输出频率
+                    if (System.currentTimeMillis() % 10000 < 100) { // 每10秒最多输出一次
+                        System.err.println("接收消息失败: " + e.getMessage());
+                    }
                     // 如果是连接断开，退出循环
                     if (e instanceof java.net.SocketException || e instanceof EOFException) {
                         break;

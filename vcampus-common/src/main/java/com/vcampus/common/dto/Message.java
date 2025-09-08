@@ -79,7 +79,7 @@ public class Message implements Serializable {
     public boolean isFailure() {
         return !status;
     }
-
+//-------------------------------------------------
     // 创建成功消息的静态方法
     public static Message success(ActionType action, Object data, String message) {
         return new Message(action, data, true, message);
@@ -99,7 +99,7 @@ public class Message implements Serializable {
     public static Message failure(ActionType action, Object data, String message) {
         return new Message(action, data, false, message);
     }
-
+//---------------------------------
     @Override
     public String toString() {
         return "Message{" +

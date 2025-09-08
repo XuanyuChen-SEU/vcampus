@@ -17,7 +17,7 @@ import java.io.Serializable;
  *   构造方法：支持通过用户ID、加密密码、角色直接创建实例</li>
  */
 
-public class User implements Serializable {
+public class User implements Serializable {//数据传输对象
 
     // 七位用户ID（使用String避免首位0丢失）
     private String userId;
@@ -56,5 +56,12 @@ public class User implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
-
+    /**
+     * 重写toString方法，用于打印User对象的信息
+     * @return 包含userId和password的字符串
+     */
+    @Override
+    public String toString() {
+        return "User{userId='" + userId + "', password='" + password + "'}";
+    }
 }
