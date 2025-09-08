@@ -63,6 +63,15 @@
     -fx-scale-y: 0.95;
 }
 
+/* === 顶部Logo样式 === */
+.logo-icon {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+}
+
+.logo-text {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+}
+
 /* === 顶部用户信息栏样式 === */
 .user-info-bar {
     -fx-background-color: linear-gradient(to right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));

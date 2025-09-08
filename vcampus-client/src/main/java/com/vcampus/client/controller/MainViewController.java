@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -38,6 +39,13 @@ public class MainViewController {
     // 用户信息显示标签
     @FXML
     private Label userInfoLabel;
+    
+    // Logo相关组件
+    @FXML
+    private ImageView logoIconView;
+    
+    @FXML
+    private ImageView logoTextView;
     
     // 登出按钮
     @FXML
