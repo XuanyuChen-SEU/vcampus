@@ -2,7 +2,6 @@ package com.vcampus.client;
 
 import com.vcampus.client.net.SocketClient;
 import com.vcampus.client.session.UserSession;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,39 +14,39 @@ import javafx.stage.Stage;
  * 编写人：cursorcursor
  */
 public class MainApp extends Application {//继承自Application类
-    
+
     private static final String APP_TITLE = "VCampus 客户端";
     private static final String LOGIN_FXML = "/fxml/LoginView.fxml";
     private static final String MAIN_FXML = "/fxml/MainView.fxml";
-    
+
     private Stage primaryStage;
     private static MainApp instance;//保证用的都是一个
-    
+
     // 全局网络连接实例
     private static SocketClient globalSocketClient;//共用一个
-    
+
     @Override//默认的启动方法
     public void start(Stage primaryStage) throws Exception {//launch默认启动start
         instance = this;
         this.primaryStage = primaryStage;
-        
+
         // 初始化全局网络连接
         initializeGlobalNetworkConnection();//为了保证都是一个socket  保证后面用的都是这个socket（初始化全局）
-        
+
         // 加载登录界面FXML
         Parent root = FXMLLoader.load(getClass().getResource(LOGIN_FXML));
         Scene scene = new Scene(root);
-        
+
         // 应用CSS样式
         scene.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
-        
+
         primaryStage.setTitle(APP_TITLE);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.centerOnScreen();
         primaryStage.show();
     }
-    
+
     /**
      * 初始化全局网络连接
      */
@@ -60,25 +59,28 @@ public class MainApp extends Application {//继承自Application类
             System.err.println("初始化全局网络连接失败: " + e.getMessage());
         }
     }
-    
+
     /**
      * 获取全局网络连接实例
+     *
      * @return SocketClient实例
      */
     public static SocketClient getGlobalSocketClient() {
         return globalSocketClient;
     }
-    
+
     /**
      * 获取全局用户会话实例
+     *
      * @return UserSession实例
      */
     public static UserSession getGlobalUserSession() {
         return UserSession.getInstance();
     }
-    
+
     /**
      * 获取应用程序实例
+     *
      * @return MainApp实例
      */
     public static MainApp getInstance() {
@@ -87,6 +89,7 @@ public class MainApp extends Application {//继承自Application类
 
     /**
      * 应用程序启动方法
+     *
      * @param args 命令行参数
      */
     public static void main(String[] args) {
