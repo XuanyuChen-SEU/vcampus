@@ -322,6 +322,11 @@ public class LoginController implements IClientController {
             // 5. 设置并显示主界面窗口
             mainStage.setTitle("VCampus 虚拟校园系统");
             mainStage.setScene(scene);
+            mainStage.setMinWidth(800);
+            mainStage.setMinHeight(600);
+            mainStage.setWidth(1000);
+            mainStage.setHeight(700);
+            mainStage.centerOnScreen();
             mainStage.show();
 
         } catch (IOException e) {

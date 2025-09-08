@@ -15,10 +15,6 @@ public interface StudentDAO {
      */
     Student findByUserId(String userId);
 
-    /**
-     * 通过 studentId 查询学籍信息
-     */
-    Student findByStudentId(String studentId);
 
     /**
      * 通过姓名模糊搜索学生
@@ -26,22 +22,22 @@ public interface StudentDAO {
     List<Student> findByNameLike(String name);
 
     /**
-     * 插入新学籍
+     * 插入新学生信息
      */
     boolean insert(Student student);
 
     /**
-     * 更新学籍（全量更新）
+     * 更新学生信息
      */
     boolean update(Student student);
 
     /**
-     * 删除学籍
+     * 删除学生信息
      */
     boolean deleteByUserId(String userId);
 
     /**
-     * 查询所有学生
+     * 查询所有学生，返回所有学生的学生信息
      */
     List<Student> findAll();
 }

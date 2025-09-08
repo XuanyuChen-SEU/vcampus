@@ -1,5 +1,6 @@
 package com.vcampus.client.controller;
 
+import com.vcampus.client.controller.ChangePasswordController;
 import com.vcampus.common.dto.Message;
 
 /**
@@ -11,7 +12,8 @@ public class MessageController {
     
     private LoginController loginController;
     private StudentController studentController;
-    
+
+    private ChangePasswordController changePasswordController;
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -19,10 +21,13 @@ public class MessageController {
     public void setLoginController(LoginController controller) {
         this.loginController = controller;
     }
+    public void setChangePasswordController(ChangePasswordController controller) {
+        this.changePasswordController = controller;
+    }
     public void setStudentController(StudentController controller){
         this.studentController=controller;
     }
-    
+
     /**
      * 处理服务端消息
      * @param message 服务端发送的消息
@@ -49,6 +54,13 @@ public class MessageController {
                         loginController.handleForgetPasswordResponse(message);
                     } else {
                         System.err.println("LoginController未设置，无法处理密码重置响应");
+                    }
+                    break;
+                case CHANGE_PASSWORD:
+                    if (changePasswordController != null) {
+                        changePasswordController.handleChangePasswordResponse(message);
+                    } else {
+                        System.err.println("ChangePasswordController未设置，无法处理修改密码响应");
                     }
                     break;
                 case INFO_STUDENT:
