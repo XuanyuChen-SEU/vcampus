@@ -11,11 +11,13 @@ import com.vcampus.common.enums.ActionType;
 public class MessageController {
     
     private final UserController userController;
+    private final StudentController studentController;
     
     public MessageController() {
-        this.userController = new UserController();//自上而下  连续的好几个构造方法    client不用是因为  （小问题）
+        this.userController = new UserController();
+        this.studentController=new StudentController();//自上而下  连续的好几个构造方法    client不用是因为  （小问题）
     }
-    
+
     /**
      * 处理客户端消息
      * @param request 客户端请求消息
@@ -34,6 +36,8 @@ public class MessageController {
                     return userController.handleLogin(request);
                 case FORGET_PASSWORD:
                     return userController.handleForgetPassword(request);
+                case INFO_STUDENT:
+                    return studentController.handle(request);
                 default:
                     return Message.failure(request.getAction(), "不支持的操作类型: " + request.getAction());
             }

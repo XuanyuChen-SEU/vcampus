@@ -10,6 +10,7 @@ import com.vcampus.common.dto.Message;
 public class MessageController {
     
     private LoginController loginController;
+    private StudentController studentController;
     
     /**
      * 设置LoginController实例（由UI层调用）
@@ -17,6 +18,9 @@ public class MessageController {
      */
     public void setLoginController(LoginController controller) {
         this.loginController = controller;
+    }
+    public void setStudentController(StudentController controller){
+        this.studentController=controller;
     }
     
     /**
@@ -47,6 +51,13 @@ public class MessageController {
                         System.err.println("LoginController未设置，无法处理密码重置响应");
                     }
                     break;
+                case INFO_STUDENT:
+                    if (studentController != null) {
+                    studentController.handleStudentInfoResponse(message);
+                } else {
+                    System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                }
+                break;
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
                     break;

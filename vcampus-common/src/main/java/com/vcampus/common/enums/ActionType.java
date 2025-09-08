@@ -12,7 +12,8 @@ public enum ActionType {
     REGISTER("注册"),
     GLOBAL_NOTIFICATION("全局通知"),
     SYSTEM_BROADCAST("系统广播"),
-    EMERGENCY_NOTIFICATION("紧急通知");
+    EMERGENCY_NOTIFICATION("紧急通知"),
+    INFO_STUDENT("获取学生信息");
 
     private final String description;
 

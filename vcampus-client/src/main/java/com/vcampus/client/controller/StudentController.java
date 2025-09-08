@@ -1,174 +1,100 @@
 package com.vcampus.client.controller;
 
+import com.vcampus.client.service.StudentService;
+import com.vcampus.client.session.UserSession;
+import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.util.Optional;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 
 /**
- * 学籍管理界面控制器
- * 对应 StudentStatus.fxml
- * 编写人：周蔚钺
+ * 学生信息控制器（适配 GridPane + Labels 布局）
  */
 public class StudentController implements IClientController {
 
-    // ====== 顶部查询区组件 ======
-    @FXML
-    private TextField studentIdField;
-    @FXML
-    private TextField nameField;
+    @FXML private Label userIdLabel;
+    @FXML private Label studentIdLabel;
+    @FXML private Label cardIdLabel;
+    @FXML private Label nameLabel;
+    @FXML private Label genderLabel;
+    @FXML private Label collegeLabel;
+    @FXML private Label majorLabel;
+    @FXML private Label gradeLabel;
+    @FXML private Label birthDateLabel;
+    @FXML private Label nativePlaceLabel;
+    @FXML private Label politicsStatusLabel;
+    @FXML private Label studentStatusLabel;
 
-    // ====== 表格组件 ======
-    @FXML
-    private TableView<Student> studentTable;
-    @FXML
-    private TableColumn<Student, String> userIdColumn;
-    @FXML
-    private TableColumn<Student, String> studentIdColumn;
-    @FXML
-    private TableColumn<Student, String> cardIdColumn;
-    @FXML
-    private TableColumn<Student, String> nameColumn;
-    @FXML
-    private TableColumn<Student, String> genderColumn;
-    @FXML
-    private TableColumn<Student, String> collegeColumn;
-    @FXML
-    private TableColumn<Student, String> majorColumn;
-    @FXML
-    private TableColumn<Student, Integer> gradeColumn;
 
-    // 表格数据源
-    private final ObservableList<Student> studentData = FXCollections.observableArrayList();
+    private final StudentService studentService = new StudentService();
 
-    /**
-     * 初始化方法，FXML 加载后自动调用
-     */
     @FXML
     private void initialize() {
-        // 绑定表格列到 Student 对象的属性
-        userIdColumn.setCellValueFactory(new PropertyValueFactory<>("userId"));
-        studentIdColumn.setCellValueFactory(new PropertyValueFactory<>("studentId"));
-        cardIdColumn.setCellValueFactory(new PropertyValueFactory<>("cardId"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        genderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
-        collegeColumn.setCellValueFactory(new PropertyValueFactory<>("college"));
-        majorColumn.setCellValueFactory(new PropertyValueFactory<>("major"));
-        gradeColumn.setCellValueFactory(new PropertyValueFactory<>("grade"));
+        // 注册到 MessageController
+        registerToMessageController();
 
-        // 设置表格数据
-        studentTable.setItems(studentData);
-
-        // 模拟数据（测试用）
-        studentData.addAll(
-                new Student("1000001", "20230001", "123456789", "张三", "男", "计算机学院", "软件工程", 2023),
-                new Student("1000002", "20230002", "987654321", "李四", "女", "经济学院", "金融学", 2022)
-        );
+        // 加载当前登录用户信息
+        loadCurrentStudentInfo();
     }
 
-    /**
-     * 处理查询按钮点击
-     */
-    @FXML
-    private void handleSearch() {
-        String studentId = studentIdField.getText().trim();
-        String name = nameField.getText().trim();
-
-        // TODO: 这里应该调用后端接口查询
-        // 先用简单过滤模拟
-        ObservableList<Student> filtered = FXCollections.observableArrayList();
-        for (Student s : studentData) {
-            boolean matches = true;
-            if (!studentId.isEmpty() && !s.getStudentId().contains(studentId)) {
-                matches = false;
-            }
-            if (!name.isEmpty() && !s.getName().contains(name)) {
-                matches = false;
-            }
-            if (matches) {
-                filtered.add(s);
-            }
+    @Override
+    public void registerToMessageController() {
+        com.vcampus.client.controller.MessageController messageController =
+                studentService.getGlobalSocketClient().getMessageController();
+        if (messageController != null) {
+            messageController.setStudentController(this);
         }
-        studentTable.setItems(filtered);
+    }
+
+    private void loadCurrentStudentInfo() {
+        // 从全局用户会话获取当前用户ID
+        String currentUserId = UserSession.getInstance().getCurrentUserId();
+        if (currentUserId == null || currentUserId.isEmpty()) {
+            showError("当前没有登录用户，请先登录！");
+            return;
+        }
+
+        // 使用当前用户ID向服务端请求学生信息
+        studentService.getStudentById(currentUserId);
     }
 
     /**
-     * 处理新增学生按钮点击
+     * 处理服务端返回的学生信息响应
      */
-    @FXML
-    private void handleAdd() {
-        // 简化处理：弹出输入对话框
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("新增学生");
-        dialog.setHeaderText("请输入学生姓名（其他字段请补全后端接口）");
-        dialog.setContentText("姓名:");
+    public void handleStudentInfoResponse(Message message) {
+        Platform.runLater(() -> {
+            if (message.isSuccess() && message.getData() != null) {
+                Student student = (Student) message.getData();
+                // 将学生信息填充到 GridPane 的 Labels 上
+                userIdLabel.setText(student.getUserId());
+                studentIdLabel.setText(student.getStudentId());
+                cardIdLabel.setText(student.getCardId());
+                nameLabel.setText(student.getName());
+                genderLabel.setText(student.getGender());
+                collegeLabel.setText(student.getCollege());
+                majorLabel.setText(student.getMajor());
+                gradeLabel.setText(String.valueOf(student.getGrade()));
+                birthDateLabel.setText(student.getBirth_date());
+                nativePlaceLabel.setText(student.getNative_place());
+                politicsStatusLabel.setText(student.getPolitics_status());
+                studentStatusLabel.setText(student.getStudent_status());
 
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(name -> {
-            Student newStudent = new Student("1000003", "20230003", "111222333", name, "男",
-                    "测试学院", "测试专业", 2023);
-            studentData.add(newStudent);
+            } else {
+                showError("加载学生信息失败：" + message.getMessage());
+            }
         });
     }
 
-    /**
-     * 处理编辑学生按钮点击
-     */
-    @FXML
-    private void handleEdit() {
-        Student selected = studentTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert("请先选择一个学生再编辑", Alert.AlertType.WARNING);
-            return;
-        }
-
-        TextInputDialog dialog = new TextInputDialog(selected.getName());
-        dialog.setTitle("编辑学生");
-        dialog.setHeaderText("修改学生姓名");
-        dialog.setContentText("姓名:");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(newName -> selected.setName(newName));
-
-        // 刷新表格
-        studentTable.refresh();
-    }
-
-    /**
-     * 处理删除学生按钮点击
-     */
-    @FXML
-    private void handleDelete() {
-        Student selected = studentTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert("请先选择一个学生再删除", Alert.AlertType.WARNING);
-            return;
-        }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("删除确认");
-        confirm.setHeaderText("确认删除学生: " + selected.getName() + " ?");
-        confirm.setContentText("此操作不可撤销！");
-        Optional<ButtonType> result = confirm.showAndWait();
-
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            studentData.remove(selected);
-        }
-    }
-
-    /**
-     * 工具方法：弹出提示框
-     */
-    private void showAlert(String msg, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle("提示");
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("错误");
+        alert.setHeaderText("学生信息加载失败");
+        alert.setContentText(message);
         alert.showAndWait();
     }
 }
+
 
