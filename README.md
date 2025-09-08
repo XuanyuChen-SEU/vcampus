@@ -286,6 +286,21 @@ JUnit测试的语法上网查询，当然ai生成就可以。
 - **类似服务端**：客户端架构风格与服务端保持一致
 - **易于扩展**：添加新功能只需在MessageController中添加case分支
 
+## 快速开始
+请先务必查阅一下数据库接口操作手册的 **开始流程**部分
+### **1. 启动服务端**
+
+```bash
+cd vcampus-server
+mvn exec:java
+```
+
+### **2. 启动客户端**
+
+```bash
+cd vcampus-client
+mvn javafx:run
+```
 ## 测试
 
 ### **单元测试**
