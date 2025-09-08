@@ -7,6 +7,7 @@ import com.vcampus.client.service.LoginService;
 import com.vcampus.client.session.UserSession;
 import com.vcampus.common.dto.Message;
 
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,7 +19,13 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * 客户端登录控制器
@@ -55,6 +62,38 @@ public class LoginController implements IClientController {
     @FXML
     private PasswordField confirmPasswordField;
     
+    // 轮播相关组件
+    @FXML
+    private VBox carouselContainer;
+    
+    @FXML
+    private ImageView carouselImageView;
+    
+    @FXML
+    private HBox indicatorContainer;
+    
+    @FXML
+    private Circle indicator1;
+    
+    @FXML
+    private Circle indicator2;
+    
+    @FXML
+    private Circle indicator3;
+    
+    @FXML
+    private Circle indicator4;
+    
+    // 轮播相关变量
+    private final String[] carouselImages = {
+        "/images/carousel/carousel1.png",
+        "/images/carousel/carousel2.png", 
+        "/images/carousel/carousel3.png",
+        "/images/carousel/carousel4.png"
+    };
+    private int currentImageIndex = 0;
+    private Timeline carouselTimeline;
+    
     // 登录服务实例
     private final LoginService loginService = new LoginService();
     
@@ -80,8 +119,68 @@ public class LoginController implements IClientController {
         // 设置状态标签初始文本
         statusLabel.setText("请输入用户名和密码");
         
+        // 初始化轮播
+        initializeCarousel();
+        
         // 将自己注册到MessageController
         registerToMessageController();
+    }
+    
+    /**
+     * 初始化轮播功能
+     */
+    private void initializeCarousel() {
+        if (carouselImageView != null) {
+            // 设置初始图片
+            updateCarouselImage(0);
+            
+            // 创建轮播时间线，每3秒切换一次
+            carouselTimeline = new Timeline(
+                new javafx.animation.KeyFrame(Duration.seconds(3), e -> nextCarouselImage())
+            );
+            carouselTimeline.setCycleCount(Timeline.INDEFINITE);
+            carouselTimeline.play();
+        }
+    }
+    
+    /**
+     * 切换到下一张图片
+     */
+    private void nextCarouselImage() {
+        currentImageIndex = (currentImageIndex + 1) % carouselImages.length;
+        updateCarouselImage(currentImageIndex);
+    }
+    
+    /**
+     * 更新轮播图片和指示器
+     */
+    private void updateCarouselImage(int index) {
+        try {
+            Image image = new Image(getClass().getResourceAsStream(carouselImages[index]));
+            carouselImageView.setImage(image);
+        } catch (Exception e) {
+            System.err.println("加载轮播图片失败: " + e.getMessage());
+        }
+        
+        // 更新指示器
+        updateIndicators(index);
+    }
+    
+    /**
+     * 更新指示器状态
+     */
+    private void updateIndicators(int activeIndex) {
+        Circle[] indicators = {indicator1, indicator2, indicator3, indicator4};
+        
+        for (int i = 0; i < indicators.length; i++) {
+            if (indicators[i] != null) {
+                if (i == activeIndex) {
+                    indicators[i].getStyleClass().setAll("indicator", "active");
+                } else {
+                    indicators[i].getStyleClass().setAll("indicator");
+                }
+            }
+        }
     }
     
     /**
@@ -330,7 +429,7 @@ public class LoginController implements IClientController {
             mainStage.show();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("加载主界面时发生严重错误: " + e.getMessage());
             showError("加载主界面时发生严重错误: " + e.getMessage());
         }
     }
