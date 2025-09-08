@@ -70,8 +70,7 @@
         
         <!-- 底部提示信息 -->
         <VBox alignment="CENTER" spacing="5.0">
-            <Label text="演示账号：admin/123456 (管理员)" styleClass="demo-info" />
-            <Label text="student/123456 (学生) | teacher/123456 (教师)" styleClass="demo-info" />
+            <Label text="演示账号：1234567/7654321 (学生)" styleClass="demo-info" />
         </VBox>
         
     </VBox>

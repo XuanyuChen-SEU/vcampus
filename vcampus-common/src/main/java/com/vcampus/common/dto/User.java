@@ -19,6 +19,8 @@ import java.io.Serializable;
 
 public class User implements Serializable {//数据传输对象
 
+    private static final long serialVersionUID = 1L;
+
     // 七位用户ID（使用String避免首位0丢失）
     private String userId;
 

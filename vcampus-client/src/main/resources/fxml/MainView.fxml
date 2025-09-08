@@ -14,14 +14,18 @@
 
     <!-- 顶部用户信息栏 -->
     <top>
-        <HBox styleClass="user-info-bar" BorderPane.alignment="CENTER">
+        <HBox styleClass="user-info-bar" BorderPane.alignment="CENTER" spacing="10.0">
             <children>
-                <Label fx:id="userInfoLabel" text="当前用户: 未登录" styleClass="user-info-label" />
+                <Label fx:id="userInfoLabel" text="当前用户: 未登录" styleClass="user-info-label" 
+                       HBox.hgrow="ALWAYS" maxWidth="Infinity" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Button fx:id="logoutButton" text="登出" onAction="#handleLogout" styleClass="logout-button" />
+                <Button fx:id="changePasswordButton" text="🔑 修改密码" onAction="#handleChangePassword" styleClass="change-password-button" 
+                        HBox.hgrow="NEVER" />
+                <Button fx:id="logoutButton" text="🚪 用户登出" onAction="#handleLogout" styleClass="logout-button" 
+                        HBox.hgrow="NEVER" />
             </children>
             <padding>
-                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
             </padding>
         </HBox>
     </top>

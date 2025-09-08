@@ -1,11 +1,12 @@
 package com.vcampus.server.service;
+import java.io.IOException;
+
+import com.vcampus.common.dto.ChangePassword;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.common.enums.Role;
 import com.vcampus.server.dao.impl.UserDao;
-
-import java.io.IOException;
 
 /**
  * 用户服务类
@@ -73,6 +74,29 @@ public class UserService implements AutoCloseable{
             return Message.failure(ActionType.FORGET_PASSWORD, "服务器内部错误");
         }
     }
+
+    /*
+     * 
+     */
+
+    public Message handleChangePassword(ChangePassword changePassword) {
+        try {
+        User user = userDao.getUserById(changePassword.getUserId());
+        if (user.getUserId().equals("")) {
+            return Message.failure(ActionType.CHANGE_PASSWORD, "用户不存在");
+        }
+        if (!user.getPassword().equals(changePassword.getOldPassword())) {
+            return Message.failure(ActionType.CHANGE_PASSWORD, "原密码错误");
+        }
+        user.setPassword(changePassword.getNewPassword());
+        userDao.updateUser(user);
+            return Message.success(ActionType.CHANGE_PASSWORD, "密码修改成功");
+        } catch (Exception e) {
+            System.err.println("处理修改密码申请时发生异常: " + e.getMessage());
+            return Message.failure(ActionType.CHANGE_PASSWORD, "服务器内部错误");
+        }
+    }
+
     // 实现AutoCloseable接口的close方法，关闭UserDao
     @Override
     public void close() throws IOException {

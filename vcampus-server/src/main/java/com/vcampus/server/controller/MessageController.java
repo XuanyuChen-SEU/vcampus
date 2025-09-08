@@ -34,6 +34,8 @@ public class MessageController {
                     return userController.handleLogin(request);
                 case FORGET_PASSWORD:
                     return userController.handleForgetPassword(request);
+                case CHANGE_PASSWORD:
+                    return userController.handleChangePassword(request);
                 default:
                     return Message.failure(request.getAction(), "不支持的操作类型: " + request.getAction());
             }

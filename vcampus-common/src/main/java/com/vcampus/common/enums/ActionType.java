@@ -9,6 +9,7 @@ public enum ActionType {
     LOGIN("登录"),
     FORGET_PASSWORD("忘记密码"),
     LOGOUT("登出"),
+    CHANGE_PASSWORD("修改密码"),
     REGISTER("注册"),
     GLOBAL_NOTIFICATION("全局通知"),
     SYSTEM_BROADCAST("系统广播"),

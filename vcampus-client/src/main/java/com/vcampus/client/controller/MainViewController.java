@@ -59,11 +59,21 @@ public class MainViewController {
         if (userInfoLabel != null) {
             UserSession userSession = MainApp.getGlobalUserSession();
             if (userSession.isLoggedIn()) {
-                userInfoLabel.setText("当前用户: " + userSession.getCurrentUserDisplayName());
+                userInfoLabel.setText("👤 当前用户: " + userSession.getCurrentUserDisplayName());
             } else {
-                userInfoLabel.setText("未登录");
+                userInfoLabel.setText("❌ 未登录");
             }
         }
+    }
+    
+    /**
+     * 处理修改密码按钮点击事件
+     * @param event 点击事件
+     */
+    @FXML
+    private void handleChangePassword(ActionEvent event) {
+        // 加载修改密码界面到中央内容区
+        loadView("/fxml/ChangePasswordView.fxml");
     }
     
     /**
@@ -120,6 +130,8 @@ public class MainViewController {
             loginStage.setTitle("VCampus 客户端 - 登录");
             loginStage.setScene(scene);
             loginStage.setResizable(false);
+            loginStage.setMinWidth(400);
+            loginStage.setMinHeight(500);
             loginStage.centerOnScreen();
             loginStage.show();
             
