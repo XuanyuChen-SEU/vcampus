@@ -2,21 +2,46 @@
 
 ## 🚀 快速开始
 
-### **1. 启动服务端**
+### **前置提醒**
+请务必记住MySQL安装时候设置的用户名和密码
+
+### **1. 数据库初始化**
+
+打开以下配置文件：
+- `vcampus-database/src/main/resources/mybatis-config.xml`
+- `vcampus-server/src/main/resources/mybatis-config.xml`
+
+在这部分设置：
+```xml
+<property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+<property name="url" value="jdbc:mysql://localhost:3306/vcampus_db?useSSL=false&amp;serverTimezone=UTC"/>
+<property name="username" value="root"/>
+<property name="password" value="在这里填入自己的密码"/>
+```
+
+**重要**：这里的username和password需要和MySQL安装时候设置的用户名和密码保持一致,一般来说用户名是`root`.
+
+### **2. Maven编译**
+
+```bash
+mvn clean install
+```
+
+### **3. 启动服务端**
 
 ```bash
 cd vcampus-server
 mvn exec:java
 ```
 
-### **2. 启动客户端**
+### **4. 启动客户端**
 
 ```bash
 cd vcampus-client
 mvn javafx:run
 ```
 
-### **3. 测试登录**
+### **5. 测试登录**
 
 - 用户名：`1234567`（学生）
 - 密码：`7654321`
@@ -286,21 +311,6 @@ JUnit测试的语法上网查询，当然ai生成就可以。
 - **类似服务端**：客户端架构风格与服务端保持一致
 - **易于扩展**：添加新功能只需在MessageController中添加case分支
 
-## 快速开始
-请先务必查阅一下数据库接口操作手册的 **开始流程**部分
-### **1. 启动服务端**
-
-```bash
-cd vcampus-server
-mvn exec:java
-```
-
-### **2. 启动客户端**
-
-```bash
-cd vcampus-client
-mvn javafx:run
-```
 ## 测试
 
 ### **单元测试**
