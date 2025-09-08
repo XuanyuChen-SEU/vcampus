@@ -181,11 +181,6 @@
  * =================================================================
  */
 
-/* 修改密码界面背景 */
-.change-password-background {
-    -fx-background-color: linear-gradient(to bottom right, #667eea 0%, #764ba2 100%);
-}
-
 /* 修改密码标题样式 */
 .change-password-title {
     -fx-text-fill: white;

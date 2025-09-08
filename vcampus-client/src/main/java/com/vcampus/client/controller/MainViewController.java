@@ -186,6 +186,13 @@ public class MainViewController {
             }
             // 加载FXML，这将实例化该FXML对应的控制器（如UserController）
             Node view = FXMLLoader.load(fxmlUrl);
+            
+            // 设置锚点约束，让子视图占满整个AnchorPane
+            AnchorPane.setTopAnchor(view, 0.0);
+            AnchorPane.setBottomAnchor(view, 0.0);
+            AnchorPane.setLeftAnchor(view, 0.0);
+            AnchorPane.setRightAnchor(view, 0.0);
+            
             // 将加载好的视图设置为中央内容区的唯一子节点，实现页面切换
             mainContentPane.getChildren().setAll(view);
         } catch (IOException e) {
