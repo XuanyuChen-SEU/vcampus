@@ -161,6 +161,7 @@ public class SocketClient implements IMessageClientSrv {
         
         try {
             // 发送消息
+            //这里是建立管道传递到服务器的
             out.writeObject(message);
             out.flush();
             System.out.println("已发送消息: " + message);

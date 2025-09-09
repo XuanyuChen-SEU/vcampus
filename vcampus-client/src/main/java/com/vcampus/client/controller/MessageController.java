@@ -23,6 +23,8 @@ public class MessageController {
      * 处理服务端消息
      * @param message 服务端发送的消息
      */
+
+    //这个是回收处理服务端端消息
     public void handleMessage(Message message) {
         try {
             // 验证消息格式
@@ -32,6 +34,8 @@ public class MessageController {
             }
             
             // 根据ActionType调用对应的子控制器
+            //其实这个更像分发层，最先接受到服务器传来的消息，然后分配给各个Controller进行操作
+            // 这里可以根据实际需求添加更多的case，哥哥controller根据消息进行处理，进而回传给终端进行改变
             switch (message.getAction()) {
                 case LOGIN:
                     if (loginController != null) {

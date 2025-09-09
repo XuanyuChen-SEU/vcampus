@@ -226,6 +226,7 @@ public class LoginController implements IClientController {
      * 处理密码重置结果
      * @param result 密码重置结果消息
      */
+    //这个是服务器返回处理信息，然后controller根据这个信息处理前端变化
     private void handlePasswordResetResult(Message result) {
         if (result.isSuccess()) {
             showSuccess("密码重置申请", result.getMessage());

@@ -12,7 +12,22 @@ public enum ActionType {
     REGISTER("注册"),
     GLOBAL_NOTIFICATION("全局通知"),
     SYSTEM_BROADCAST("系统广播"),
-    EMERGENCY_NOTIFICATION("紧急通知");
+    EMERGENCY_NOTIFICATION("紧急通知"),
+
+    //新增课程（学生端）相关枚举值
+    GET_COURSE_TABLE("获取课表"),    // 获取所有可选课程
+    GET_COURSE_DETAIL("获取课程详情"),           // 获取单个课程的详细信息
+    ENROLL_COURSE("选课"),                      // 学生选课
+    DROP_COURSE("退课"),                        // 学生退课
+    CHECK_COURSE_CONFLICT("检查课程冲突"),       // 检查所选课程是否与已选课程冲突
+
+    // 2. 课表功能
+    GET_STUDENT_TIMETABLE("获取学生课表"),       // 获取学生的完整课表
+    GET_STUDENT_ENROLLED_COURSES("获取学生已选课程"), // 获取学生已选课程列表（不包含课表格式）
+
+    // 课程详情相关
+    GET_COURSE_ENROLLMENT_STATUS("获取课程报名状态"); // 获取课程的报名状态（已选人数等）
+
 
     private final String description;
 
