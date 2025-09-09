@@ -20,37 +20,56 @@
 .sidebar {
     /* 半透明背景，与主背景融合 */
     -fx-background-color: rgba(255, 255, 255, 0.08);
-}
-
-/* === 左侧侧边栏样式 === */
-.sidebar {
-    /* 半透明背景，与主背景融合 */
-    -fx-background-color: rgba(255, 255, 255, 0.08);
+    /* 添加阴影效果 */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);
+    /* 圆角边框 */
+    -fx-background-radius: 0 10 10 0;
 }
 
 /* === 侧边栏按钮通用样式 === */
-.sidebar .button {
+.nav-button {
     -fx-background-color: transparent;
     -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-alignment: center-left;
-    /* 文字居左 */
-    -fx-padding: 10px 20px;
-    -fx-background-radius: 5;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-padding: 15px 10px;
+    -fx-background-radius: 8;
     -fx-cursor: hand;
+    /* 添加过渡效果 */
+    -fx-transition: all 0.3s ease;
 }
 
 /* 侧边栏按钮 - 鼠标悬停效果 */
-.sidebar .button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.15);
+.nav-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.3), 5, 0, 0, 0);
 }
 
 /* 侧边栏按钮 - 当前焦点/选中效果 */
-.sidebar .button:focused {
+.nav-button:focused {
     -fx-background-color: rgba(255, 255, 255, 0.25);
     /* 左侧高亮边框表示选中 */
     -fx-border-color: #A188E3;
     -fx-border-width: 0 0 0 3px;
+}
+
+/* 侧边栏按钮 - 按下效果 */
+.nav-button:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* === 顶部Logo样式 === */
+.logo-icon {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+}
+
+.logo-text {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
 }
 
 /* === 顶部用户信息栏样式 === */
@@ -71,7 +90,7 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 2, 0.0, 0, 1);
-    -fx-background-color: linear-gradient(to right, #FFD700, #FFA500);
+    -fx-background-color: linear-gradient(to right, #F4E4BC, #E6B800);
     -fx-background-radius: 15;
     -fx-padding: 6 12 6 12;
     -fx-border-color: rgba(255, 165, 0, 0.6);
@@ -181,11 +200,6 @@
  * =================================================================
  */
 
-/* 修改密码界面背景 */
-.change-password-background {
-    -fx-background-color: linear-gradient(to bottom right, #667eea 0%, #764ba2 100%);
-}
-
 /* 修改密码标题样式 */
 .change-password-title {
     -fx-text-fill: white;
@@ -240,14 +254,39 @@
     -fx-background-color: linear-gradient(to bottom right, #667eea 0%, #764ba2 100%);
 }
 
-/* 应用标题样式 */
-.app-title {
-    -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 2, 0.0, 0, 1);
+/* 左侧登录面板样式 */
+.login-left-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 0 20 20 0;
 }
 
-.app-subtitle {
-    -fx-text-fill: rgba(255, 255, 255, 0.9);
+/* 右侧轮播面板样式 */
+.carousel-panel {
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+    -fx-background-radius: 20 0 0 20;
+}
+
+/* 轮播图片样式 */
+.carousel-image {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 15, 0.0, 0, 5);
+    -fx-background-radius: 15;
+}
+
+/* 轮播指示器容器样式 */
+.carousel-indicators {
+    -fx-padding: 20px;
+}
+
+/* 轮播指示器样式 */
+.indicator {
+    -fx-fill: rgba(255, 255, 255, 0.5);
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.indicator.active {
+    -fx-fill: rgba(255, 255, 255, 0.9);
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.5), 5, 0.0, 0, 2);
 }
 
 /* 登录表单容器 */

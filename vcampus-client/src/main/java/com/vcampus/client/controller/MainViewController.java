@@ -6,6 +6,9 @@ import java.net.URL;
 import com.vcampus.client.MainApp;
 import com.vcampus.client.session.UserSession;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,8 +17,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * 主界面 (MainView.fxml) 的控制器。
@@ -34,9 +40,37 @@ public class MainViewController {
     @FXML
     private Label userInfoLabel;
     
+    // Logo相关组件
+    @FXML
+    private ImageView logoIconView;
+    
+    @FXML
+    private ImageView logoTextView;
+    
     // 登出按钮
     @FXML
     private Button logoutButton;
+    
+    // 侧边栏相关字段
+    @FXML
+    private VBox sidebarContainer;
+    
+    @FXML
+    private Button homeButton;
+    
+    @FXML
+    private Button storeButton;
+    
+    @FXML
+    private Button libraryButton;
+    
+    @FXML
+    private Button studentRecordButton;
+    
+    // 动画相关字段
+    private boolean isSidebarExpanded = false;
+    private Timeline expandTimeline;
+    private Timeline collapseTimeline;
 
     /**
      * 初始化方法，由JavaFX在FXML文件加载完成后自动调用。
@@ -44,9 +78,12 @@ public class MainViewController {
      */
     @FXML
     public void initialize() {
+        // 初始化侧边栏动画
+        initializeSidebar();
+        
         // 显示当前用户信息
         updateUserInfo();
-        
+
         // ------------------ 接口点: MainViewController -> WelcomeView.fxml ------------------
         loadView("/fxml/WelcomeView.fxml"); // 默认加载欢迎界面
         // --------------------------------------------------------------------------------
@@ -186,10 +223,86 @@ public class MainViewController {
             }
             // 加载FXML，这将实例化该FXML对应的控制器（如UserController）
             Node view = FXMLLoader.load(fxmlUrl);
+            
+            // 设置锚点约束，让子视图占满整个AnchorPane
+            AnchorPane.setTopAnchor(view, 0.0);
+            AnchorPane.setBottomAnchor(view, 0.0);
+            AnchorPane.setLeftAnchor(view, 0.0);
+            AnchorPane.setRightAnchor(view, 0.0);
+            
             // 将加载好的视图设置为中央内容区的唯一子节点，实现页面切换
             mainContentPane.getChildren().setAll(view);
         } catch (IOException e) {
             System.err.println("加载视图时发生错误: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 初始化侧边栏动画
+     */
+    private void initializeSidebar() {
+        // 设置初始状态为折叠
+        sidebarContainer.setPrefWidth(60.0);
+        updateButtonTexts();
+        
+        // 创建展开动画
+        expandTimeline = new Timeline(
+            new KeyFrame(Duration.ZERO, new KeyValue(sidebarContainer.prefWidthProperty(), 60.0)),
+            new KeyFrame(Duration.millis(300), new KeyValue(sidebarContainer.prefWidthProperty(), 180.0))
+        );
+        
+        // 创建折叠动画
+        collapseTimeline = new Timeline(
+            new KeyFrame(Duration.ZERO, new KeyValue(sidebarContainer.prefWidthProperty(), 180.0)),
+            new KeyFrame(Duration.millis(300), new KeyValue(sidebarContainer.prefWidthProperty(), 60.0))
+        );
+        
+        // 设置鼠标事件监听器
+        sidebarContainer.setOnMouseEntered(e -> expandSidebar());
+        sidebarContainer.setOnMouseExited(e -> collapseSidebar());
+    }
+    
+    /**
+     * 展开侧边栏
+     */
+    private void expandSidebar() {
+        if (!isSidebarExpanded) {
+            isSidebarExpanded = true;
+            expandTimeline.play();
+            // 延迟更新按钮文本，让动画更流畅
+            Timeline delayTimeline = new Timeline(
+                new KeyFrame(Duration.millis(150), e -> updateButtonTexts())
+            );
+            delayTimeline.play();
+        }
+    }
+    
+    /**
+     * 折叠侧边栏
+     */
+    private void collapseSidebar() {
+        if (isSidebarExpanded) {
+            isSidebarExpanded = false;
+            collapseTimeline.play();
+            // 立即更新按钮文本
+            updateButtonTexts();
+        }
+    }
+    
+    /**
+     * 更新按钮文本（根据侧边栏状态显示图标或完整文本）
+     */
+    private void updateButtonTexts() {
+        if (isSidebarExpanded) {
+            homeButton.setText("🏠 首页");
+            storeButton.setText("🛒 商店");
+            libraryButton.setText("📚 图书馆");
+            studentRecordButton.setText("📋 学籍管理");
+        } else {
+            homeButton.setText("🏠");
+            storeButton.setText("🛒");
+            libraryButton.setText("📚");
+            studentRecordButton.setText("📋");
         }
     }
 }

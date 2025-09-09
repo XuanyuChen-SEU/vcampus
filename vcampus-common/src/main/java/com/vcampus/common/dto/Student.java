@@ -18,6 +18,7 @@ import java.io.Serializable;
  *   - grade: 年级（如 2023）
  */
 public class Student implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String userId;     // 7位用户ID（关联 User.userId）
     private String studentId;  // 学号（8位数字）
