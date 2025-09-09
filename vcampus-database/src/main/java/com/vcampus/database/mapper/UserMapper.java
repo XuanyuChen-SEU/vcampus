@@ -17,6 +17,13 @@ public interface   UserMapper {
     void dropUserTable(String dbName);
     // 插入用户数据
     void InsertTempData();
+
+    void loadUsersFromCsv(String filePath);
+
+
+
+
+
     List<User> selectAll();
     User selectById(String userId);
     List<User> selectByCondition(Map map);

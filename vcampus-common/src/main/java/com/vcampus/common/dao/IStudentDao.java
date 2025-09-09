@@ -8,7 +8,7 @@ import java.util.List;
  * 定义对 student 表的增删改查操作
  * 编写人：周蔚钺
  */
-public interface StudentDAO {
+public interface IStudentDao {
 
     /**
      * 通过 userId 查询学籍信息

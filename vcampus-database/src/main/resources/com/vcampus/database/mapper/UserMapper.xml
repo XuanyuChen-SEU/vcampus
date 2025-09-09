@@ -54,6 +54,16 @@
     </insert>
 
 
+    <update id="loadUsersFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_user
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        OPTIONALLY ENCLOSED BY '"'
+        LINES TERMINATED BY '\r\n'
+        IGNORE 1 ROWS
+        (userId, password)
+    </update>
 
 
 
@@ -140,7 +150,6 @@
             </set>
             where userId = #{userId}
     </update>
-
 
 
     <delete id="deleteById">
