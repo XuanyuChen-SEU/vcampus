@@ -5,9 +5,18 @@
 ### **前置提醒**
 请务必记住MySQL安装时候设置的用户名和密码
 
+
+
+
 ### **1. 数据库初始化**
 
-打开以下配置文件：
+请先登录MySQL，执行命令：
+```bash
+SET GLOBAL local_infile = 1;
+```
+
+
+之后打开项目以下配置文件：
 - `vcampus-database/src/main/resources/mybatis-config.xml`
 - `vcampus-server/src/main/resources/mybatis-config.xml`
 
