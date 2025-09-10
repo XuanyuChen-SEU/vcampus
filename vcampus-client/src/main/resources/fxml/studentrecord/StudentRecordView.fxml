@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<?import javafx.geometry.Insets?>
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -34,7 +33,8 @@
                         style="-fx-background-color: transparent; -fx-border-color: transparent;">
                 <VBox fx:id="studentGridContainer" spacing="15" style="-fx-padding: 10 0;">
                     <!-- 学生信息卡片 -->
-                    <GridPane hgap="10" vgap="10" style="-fx-background-color: white; -fx-padding: 15; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+                    <GridPane fx:id="studentGridPane" hgap="10" vgap="10"
+                              style="-fx-background-color: white; -fx-padding: 15; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
                         <columnConstraints>
                             <ColumnConstraints prefWidth="100"/>
                             <ColumnConstraints prefWidth="120"/>
@@ -81,6 +81,20 @@
                 </VBox>
             </ScrollPane>
         </VBox>
+
+        <!-- 按钮区域，右下角 -->
+        <HBox spacing="10" alignment="CENTER_RIGHT"
+              AnchorPane.bottomAnchor="20.0"
+              AnchorPane.rightAnchor="20.0">
+            <Button fx:id="editButton" text="修改"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6;"
+                    prefWidth="80" prefHeight="30"/>
+            <Button fx:id="saveButton" text="保存" visible="false"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 6;"
+                    prefWidth="80" prefHeight="30"/>
+            <Button fx:id="cancelButton" text="取消" visible="false"
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 6;"
+                    prefWidth="80" prefHeight="30"/>
+        </HBox>
     </children>
 </AnchorPane>
-
