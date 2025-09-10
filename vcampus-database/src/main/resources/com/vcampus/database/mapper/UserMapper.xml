@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+
+
+
+<!--
+    namespace：名称空间
+-->
+<mapper namespace="com.vcampus.database.mapper.UserMapper">
+
+
+
+
+    <update id="createDatabase" parameterType="java.lang.String">
+        CREATE DATABASE IF NOT EXISTS vcampus_db
+        CHARACTER SET utf8mb4
+        COLLATE utf8mb4_unicode_ci
+    </update>
+
+    <update id="dropDatabase" parameterType="java.lang.String">
+        DROP DATABASE IF EXISTS vcampus_db
+    </update>
+
+    <update id="createUserTable" parameterType="java.lang.String">
+            <!-- 显式指定在 Vcampus_db 数据库下创建 user 表 -->
+            CREATE TABLE IF NOT EXISTS vcampus_db.`tb_user` (
+            `userId` VARCHAR(50) NOT NULL COMMENT '用户ID（7位数字字符串）',
+            `password` VARCHAR(50) NOT NULL COMMENT '密码（7位数字字符串）',
+            PRIMARY KEY (`userId`) -- 建议加主键，避免重复插入
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    </update>
+
+
+    <update id="dropUserTable" parameterType="java.lang.String">
+        DROP TABLE IF EXISTS vcampus_db.tb_user
+    </update>
+
+
+    <insert id="InsertTempData">
+
+        <!-- 批量插入固定用户数据（userId和password均为7位数字字符串） -->
+        INSERT INTO vcampus_db.tb_user (userId, password)
+        VALUES
+        ('1234567', '7654321'),  <!-- 字符串类型需用单引号包裹 -->
+        ('2345678', '8765432'),
+        ('3456789', '9876543'),
+        ('4567890', '0987654'),
+        ('5678901', '1098765')
+    </insert>
+
+
+    <update id="loadUsersFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_user
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        OPTIONALLY ENCLOSED BY '"'
+        LINES TERMINATED BY '\r\n'
+        IGNORE 1 ROWS
+        (userId, password)
+    </update>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--statement    -->
+    <select id="selectAll" resultType="com.vcampus.common.dto.User">-- 定义查询语句的
+        select * from tb_user;
+    </select>
+
+
+    <select id="select" resultType="com.vcampus.common.dto.User">
+        select *
+        from tb_user
+        where
+            userId = #{userId}
+          and password = #{password};
+    </select>
+
+
+    <select id="selectById" resultType="com.vcampus.common.dto.User">
+        select * from vcampus_db.tb_user where userId = #{userId};
+    </select>
+
+
+
+    <select id="selectByCondition" resultType="com.vcampus.common.dto.User">
+        select *
+        from vcampus_db.tb_user
+        /*where
+        1=1*/
+        <where>
+            <if test="userId!= null and userId != '' ">
+                and userId = #{userId}
+            </if>
+            <if test="password != null and password != ''">
+                and password like #{password}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectBySingleCondition" resultType="com.vcampus.common.dto.User">
+            select *
+            from vcampus_db.tb_user
+            <where>
+                <choose>
+                    <when test="userId != null and userId != '' ">
+                            and userId = #{userId}
+                    </when>
+                    <when test="password != null and password != ''">
+                        and password like #{password}
+                    </when>
+                </choose>
+            </where>
+    </select>
+
+
+
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        insert into vcampus_db.tb_user(userId,password)
+        values(#{userId},#{password})
+    </insert>
+
+
+
+    <update id="update">
+            update vcampus_db.tb_user
+            <set>
+                <if test="password != null and password != ''">password = #{password},</if>
+            </set>
+            where userId = #{userId}
+    </update>
+
+
+    <delete id="deleteById">
+        delete from vcampus_db.tb_user where userId = #{userId}
+    </delete>
+
+
+    <delete id="deleteByIds">
+        delete from vcampus_db.tb_user where userId
+        in
+        (
+        <foreach collection="array" item="userId" separator=","  >
+            #{userId}
+        </foreach>
+        )
+    </delete>
+
+
+</mapper>

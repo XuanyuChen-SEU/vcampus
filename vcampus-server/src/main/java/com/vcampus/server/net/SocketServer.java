@@ -24,10 +24,10 @@ public class SocketServer {
     private static final int PORT = 9090;
     private static final int MAX_CONNECTIONS = 50;   // 最大同时连接数
 
-    private ServerSocket serverSocket;
-    private ExecutorService connectionPool;  // 接收连接的线程池
-    private ExecutorService workerPool;      // 处理消息的线程池
-    private volatile boolean isRunning = false;
+    private ServerSocket serverSocket;    //#已有
+    private ExecutorService connectionPool;  // 接收连接的线程池  #已有
+    private ExecutorService workerPool;      // 处理消息的线程池   #已有
+    private volatile boolean isRunning = false;            // 服务器运行状态
     private final MessageController messageController;
     // 客户端连接列表（用CopyOnWriteArrayList保证并发安全，适合频繁遍历+修改的场景）
     private final List<ClientConnection> clientConnections;
@@ -117,7 +117,7 @@ public class SocketServer {
                             System.out.println("收到客户端消息: " + request);
                             // 处理消息
                             Message response = messageController.handleMessage(request);
-
+                            //知道这些方法就行  response一定要注意  服务端一定要注意
                             synchronized (out) { // 确保同一客户端的输出流不乱序
                                 out.writeObject(response);
                                 out.flush();

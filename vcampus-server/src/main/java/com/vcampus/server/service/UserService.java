@@ -1,4 +1,7 @@
 package com.vcampus.server.service;
+import java.io.IOException;
+
+import com.vcampus.common.dto.ChangePassword;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.ActionType;
@@ -13,8 +16,7 @@ import com.vcampus.server.dao.impl.UserDao;
 public class UserService {
     private final UserDao userDao;
 
-    public UserService()
-    {
+    public UserService()  {
         userDao = new UserDao();
     }
 
@@ -25,7 +27,9 @@ public class UserService {
      */
     public Message validateLogin(User loginUser) {
         try {
+
             User user = userDao.getUserById(loginUser.getUserId());
+
             if (user.getUserId().equals("")) {
                 return Message.failure(ActionType.LOGIN, "用户不存在");
             }
@@ -70,4 +74,28 @@ public class UserService {
             return Message.failure(ActionType.FORGET_PASSWORD, "服务器内部错误");
         }
     }
+
+    /*
+     * 
+     */
+
+    public Message handleChangePassword(ChangePassword changePassword) {
+        try {
+        User user = userDao.getUserById(changePassword.getUserId());
+        if (user.getUserId().equals("")) {
+            return Message.failure(ActionType.CHANGE_PASSWORD, "用户不存在");
+        }
+        if (!user.getPassword().equals(changePassword.getOldPassword())) {
+            return Message.failure(ActionType.CHANGE_PASSWORD, "原密码错误");
+        }
+        user.setPassword(changePassword.getNewPassword());
+        userDao.updateUser(user);
+            return Message.success(ActionType.CHANGE_PASSWORD, "密码修改成功");
+        } catch (Exception e) {
+            System.err.println("处理修改密码申请时发生异常: " + e.getMessage());
+            return Message.failure(ActionType.CHANGE_PASSWORD, "服务器内部错误");
+        }
+    }
+
+
 }

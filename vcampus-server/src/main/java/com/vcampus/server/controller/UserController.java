@@ -1,9 +1,11 @@
 package com.vcampus.server.controller;
 
+import com.vcampus.common.dto.ChangePassword;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.UserService;
+
 
 /**
  * 用户控制器
@@ -14,7 +16,7 @@ public class UserController {
     
     private final UserService userService;
     
-    public UserController() {
+    public UserController()  {
         this.userService = new UserService();
     }
     
@@ -65,6 +67,25 @@ public class UserController {
         } catch (Exception e) {
             System.err.println("处理忘记密码请求时发生错误: " + e.getMessage());
             return Message.failure(ActionType.FORGET_PASSWORD, "服务器内部错误");
+        }
+    }
+
+    public Message handleChangePassword(Message message) {
+        try {
+            // 获取用户信息
+            ChangePassword changePassword = (ChangePassword) message.getData();
+            
+            // 调用用户服务处理修改密码申请
+            Message result = userService.handleChangePassword(changePassword);
+
+            if (result.isSuccess()) {
+                return Message.success(ActionType.CHANGE_PASSWORD, result.getMessage());
+            } else {
+                return Message.failure(ActionType.CHANGE_PASSWORD, result.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println("处理修改密码请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.CHANGE_PASSWORD, "服务器内部错误");
         }
     }
 }

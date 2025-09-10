@@ -1,28 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
 
-<!-- fx:controller 属性将此视图与 StudentRecordController 类绑定 -->
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.StudentRecordController">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.StudentController"
+            style="-fx-background-color: #f5f7fa;">
+
     <children>
-        <Label text="学籍管理模块" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
-            <font>
-                <Font name="System Bold" size="24.0" />
-            </font>
-        </Label>
+        <!-- 顶部标题栏 -->
+        <HBox spacing="10" alignment="CENTER_LEFT" prefHeight="60.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+              style="-fx-background-color: #2C3E50; -fx-padding: 0 20;">
+            <Label text="学籍管理模块" textFill="white">
+                <font>
+                    <Font name="Microsoft YaHei Bold" size="22.0"/>
+                </font>
+            </Label>
+        </HBox>
 
-        <!--
-          【模块内容区】
-          所有学籍管理模块的UI控件 (如个人信息、成绩单) 都应放置在这个 Pane 内部。
-          使用 fx:id="contentPane" 可以在控制器中引用此 Pane。
-        -->
-        <Pane fx:id="contentPane" layoutX="20.0" layoutY="60.0" prefHeight="520.0" prefWidth="760.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0">
+        <!-- 主内容区 -->
+        <VBox fx:id="contentPane" layoutX="20.0" layoutY="70.0"
+              prefHeight="510.0" prefWidth="760.0"
+              AnchorPane.topAnchor="70.0" AnchorPane.bottomAnchor="20.0"
+              AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
+              spacing="15">
 
-            <!-- 示例: <TableView fx:id="gradeTable" prefHeight="520.0" prefWidth="760.0" /> -->
+            <!-- 学生信息卡片容器 -->
+            <ScrollPane prefHeight="450.0" prefWidth="760.0"
+                        style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                <VBox fx:id="studentGridContainer" spacing="15" style="-fx-padding: 10 0;">
+                    <!-- 学生信息卡片 -->
+                    <GridPane hgap="10" vgap="10" style="-fx-background-color: white; -fx-padding: 15; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+                        <columnConstraints>
+                            <ColumnConstraints prefWidth="100"/>
+                            <ColumnConstraints prefWidth="120"/>
+                            <ColumnConstraints prefWidth="120"/>
+                            <ColumnConstraints prefWidth="100"/>
+                            <ColumnConstraints prefWidth="80"/>
+                            <ColumnConstraints prefWidth="120"/>
+                            <ColumnConstraints prefWidth="120"/>
+                            <ColumnConstraints prefWidth="80"/>
+                            <ColumnConstraints prefWidth="100"/>
+                            <ColumnConstraints prefWidth="100"/>
+                            <ColumnConstraints prefWidth="100"/>
+                            <ColumnConstraints prefWidth="100"/>
+                        </columnConstraints>
 
-        </Pane>
+                        <!-- 信息标题行 -->
+                        <Label text="用户ID" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label text="学号" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <Label text="一卡通号" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                        <Label text="姓名" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                        <Label text="性别" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+                        <Label text="学院" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="5"/>
+                        <Label text="专业" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="6"/>
+                        <Label text="年级" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="7"/>
+                        <Label text="出生日期" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="8"/>
+                        <Label text="籍贯" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="9"/>
+                        <Label text="政治面貌" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="10"/>
+                        <Label text="学籍状态" style="-fx-font-weight: bold; -fx-text-fill: #34495e;" GridPane.rowIndex="0" GridPane.columnIndex="11"/>
+
+                        <!-- 信息内容行 -->
+                        <Label fx:id="userIdLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label fx:id="studentIdLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Label fx:id="cardIdLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                        <Label fx:id="nameLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+                        <Label fx:id="genderLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="4"/>
+                        <Label fx:id="collegeLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="5"/>
+                        <Label fx:id="majorLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="6"/>
+                        <Label fx:id="gradeLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="7"/>
+                        <Label fx:id="birthDateLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="8"/>
+                        <Label fx:id="nativePlaceLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="9"/>
+                        <Label fx:id="politicsStatusLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="10"/>
+                        <Label fx:id="studentStatusLabel" style="-fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="11"/>
+                    </GridPane>
+                </VBox>
+            </ScrollPane>
+        </VBox>
     </children>
 </AnchorPane>
+

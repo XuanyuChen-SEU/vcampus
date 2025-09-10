@@ -2,12 +2,7 @@ package com.vcampus.common.dao;
 
 import com.vcampus.common.dto.User;
 
-public interface IUserDao {
-    /*
-        设置数据库;
-     */
-    void IUDInit();
-
+public interface IUserDao {//数据访问对象
 
     /*
      * @param id 用户ID
@@ -26,6 +21,6 @@ public interface IUserDao {
      * @param user 用户信息
      * @return 是否删除成功
      */
-    boolean deleteUser(User user); 
+    boolean deleteUser(User user);
 
 }

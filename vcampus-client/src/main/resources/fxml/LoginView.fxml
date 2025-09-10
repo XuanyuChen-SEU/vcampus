@@ -2,35 +2,40 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.vcampus.client.controller.LoginController"
-            prefWidth="500.0" prefHeight="400.0" styleClass="login-background">
+            prefWidth="1000.0" prefHeight="600.0" styleClass="login-background">
     
-    <!-- 主容器 -->
-    <VBox alignment="CENTER" spacing="25.0" AnchorPane.topAnchor="50.0" AnchorPane.bottomAnchor="50.0" 
-          AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
+    <!-- 主容器 - 水平布局 -->
+    <HBox alignment="CENTER" spacing="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" 
+          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
         
-        <!-- 标题区域 -->
-        <VBox alignment="CENTER" spacing="10.0">
-            <Label text="VCampus" styleClass="app-title">
-                <font>
-                    <Font name="System Bold" size="32.0" />
-                </font>
-            </Label>
-            <Label text="虚拟校园管理系统" styleClass="app-subtitle">
-                <font>
-                    <Font size="14.0" />
-                </font>
-            </Label>
+        <!-- 左侧登录区域 -->
+        <VBox alignment="CENTER" spacing="25.0" prefWidth="400.0" styleClass="login-left-panel">
+        
+        <!-- Logo区域 -->
+        <VBox fx:id="logoContainer" alignment="CENTER" spacing="5.0">
+            <ImageView fx:id="logoIconView" fitWidth="125.0" preserveRatio="true">
+                <image>
+                    <Image url="@../images/logo-icon.png" />
+                </image>
+            </ImageView>
+            <ImageView fx:id="logoTextView" fitWidth="150.0" preserveRatio="true">
+                <image>
+                    <Image url="@../images/logo-text.png" />
+                </image>
+            </ImageView>
         </VBox>
         
         <!-- 登录表单区域 -->
-        <VBox spacing="15.0" styleClass="login-form">
+        <VBox spacing="15.0" styleClass="login-form" maxWidth="320.0">
             <padding>
-                <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+                <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
             </padding>
             
             <!-- 用户名输入框 -->
@@ -68,11 +73,29 @@
             <Label fx:id="statusLabel" text="" styleClass="status-label" alignment="CENTER" />
         </VBox>
         
-        <!-- 底部提示信息 -->
-        <VBox alignment="CENTER" spacing="5.0">
-            <Label text="演示账号：admin/123456 (管理员)" styleClass="demo-info" />
-            <Label text="student/123456 (学生) | teacher/123456 (教师)" styleClass="demo-info" />
+            <!-- 底部提示信息 -->
+            <VBox alignment="CENTER" spacing="5.0">
+                <Label text="演示账号：1234567/7654321" styleClass="demo-info" />
+            </VBox>
+            
         </VBox>
         
-    </VBox>
+        <!-- 右侧图片轮播区域 -->
+        <VBox fx:id="carouselContainer" alignment="CENTER" prefWidth="600.0" styleClass="carousel-panel">
+            <ImageView fx:id="carouselImageView" fitWidth="550.0" preserveRatio="true" styleClass="carousel-image">
+                <image>
+                    <Image url="@../images/carousel/carousel1.png" />
+                </image>
+            </ImageView>
+            
+            <!-- 轮播指示器 -->
+            <HBox fx:id="indicatorContainer" alignment="CENTER" spacing="10.0" styleClass="carousel-indicators" visible="false" managed="false">
+                <Circle fx:id="indicator1" radius="8.0" styleClass="indicator active" />
+                <Circle fx:id="indicator2" radius="8.0" styleClass="indicator" />
+                <Circle fx:id="indicator3" radius="8.0" styleClass="indicator" />
+                <Circle fx:id="indicator4" radius="8.0" styleClass="indicator" />
+            </HBox>
+        </VBox>
+        
+    </HBox>
 </AnchorPane>

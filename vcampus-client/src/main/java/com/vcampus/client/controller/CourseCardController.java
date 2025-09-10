@@ -2,6 +2,7 @@ package com.vcampus.client.controller;
 
 //import com.vcampus.client.model.Course;（这两个实际上并没有）
 //import com.vcampus.client.model.ClassSession;
+import com.vcampus.client.service.CourseService;
 import com.vcampus.common.dto.ClassSession;
 import com.vcampus.common.dto.Course;
 import com.vcampus.common.dto.Message;
@@ -16,6 +17,15 @@ import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+/**
+ * 中间层“三明治”结构的控制器：课程卡片（或称课程行）。
+ *
+ * 职责:
+ * 1. 作为一个可展开/折叠的组件，显示一门课程的概要信息。
+ * 2. 接收来自 AcademicController 的 Course 数据对象。
+ * 3. 动态加载该课程下所有的 ClassSessionCard 子组件。
+ * 4. 响应自身的点击事件（展开/折叠）和“课程详情”链接的点击事件。
+ */
 //中间层从上层接受数据和命令，再把数据和命令传递给下层
 public class CourseCardController {
 
@@ -28,53 +38,45 @@ public class CourseCardController {
     @FXML private Label departmentLabel;
     @FXML private Label statusLabel;
     @FXML private Label sessionCountLabel;
+    // 用于容纳并显示所有教学班卡片(ClassSessionCard)的容器
     @FXML private FlowPane sessionsContainer;
 
-    private Course course;//dto的工具类，代表了对象，里面包含了传递数据所需要的数据
+    // 持有该卡片所代表的课程数据
+    private Course course;
 
     /**
-     * 由上层(AcademicController)调用，用于填充数据和设置回调
-     * @param course 该卡片代表的课程数据
-     * @param onSelectCallback 最终要执行的回调函数 (需要继续向下传递)
+     * 公共入口方法，由上层控制器(AcademicController)调用。
+     * 负责接收数据、填充UI，并串联加载最内层的教学班卡片。
+     * @param course 该卡片需要显示的课程数据
      */
-    public void setData(Course course, Consumer<ClassSession> onSelectCallback) {
+    public void setData(Course course) {
         this.course = course;
 
-        // 1. 填充标题行信息
+        // 1. 填充标题行（自身）的UI信息
         courseIdLabel.setText(course.getCourseId());
         courseNameLabel.setText(course.getCourseName());
         courseTypeLabel.setText(course.getCourseType());
         departmentLabel.setText(course.getDepartment());
-        int sessionCount = course.getSessions() != null ? course.getSessions().size() : 0;
+
+        int sessionCount = (course.getSessions() != null) ? course.getSessions().size() : 0;
         sessionCountLabel.setText(String.valueOf(sessionCount));
+
+        // 根据课程状态更新状态标签的显示
         updateStatusLabel(course);
 
-        // 2. ⭐ 串联的实现：加载“最低层”的 FXML
-        sessionsContainer.getChildren().clear();
-        //这个应该是组件，吧组件加载后再对内部的逻辑进行处理
-
-        if (sessionCount > 0) {
-            for (ClassSession session : course.getSessions()) {
-                try {
-                    //改一下内部关联的例子
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/academic/CourseCard.fxml"));
-                    Node sessionCardNode = loader.load();
-                    ClassSessionCardController sessionController = loader.getController();
-
-                    // 3. 将数据和回调函数“接力”传递给最内层的 Controller
-                    sessionController.setData(session, onSelectCallback);
-
-                    sessionsContainer.getChildren().add(sessionCardNode);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        // 2. 动态加载并填充下属的教学班卡片
+        loadSessionCards();
     }
 
-
+    /**
+     * FXML中定义的标题行点击事件处理方法，用于展开/折叠教学班列表。
+     */
     @FXML
     private void toggleSessions() {
+        // 检查是否有教学班，如果没有，则不执行任何操作
+        if (sessionsContainer.getChildren().isEmpty()) {
+            return;
+        }
         boolean isVisible = sessionsContainer.isVisible();
         sessionsContainer.setVisible(!isVisible);
         sessionsContainer.setManaged(!isVisible);
@@ -86,11 +88,43 @@ public class CourseCardController {
     }
 
 
-    @FXML
-    private void handleDetailsLinkClick(MouseEvent event) {
-        System.out.println("点击了课程详情: " + course.getCourseId());
-        event.consume();
+//    @FXML
+//    private void handleDetailsLinkClick(MouseEvent event) {
+//        System.out.println("点击了课程详情: " + course.getCourseId());
+//        event.consume();
+//    }
+
+    /**
+     * 私有辅助方法：加载并初始化所有的教学班卡片。
+     */
+    private void loadSessionCards() {
+        // 先清空，防止重复加载
+        sessionsContainer.getChildren().clear();
+
+        if (course.getSessions() != null && !course.getSessions().isEmpty()) {
+            for (ClassSession session : course.getSessions()) {
+                try {
+                    // 动态加载最内层的 FXML 文件
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/vcampus/client/view/ClassSessionCard.fxml"));
+                    Node sessionCardNode = loader.load();
+
+                    // 获取最内层 FXML 对应的控制器实例
+                    ClassSessionCardController sessionController = loader.getController();
+
+                    // 将教学班数据传递给最内层的控制器
+                    sessionController.setData(session);
+
+                    // 将加载好的教学班卡片UI添加到本层的 FlowPane 容器中
+                    sessionsContainer.getChildren().add(sessionCardNode);
+                } catch (IOException e) {
+                    System.err.println("加载教学班卡片失败 for session: " + session.getSessionId());
+                    e.printStackTrace();
+                }
+            }
+        }
     }
+
+
 
     //处理前端逻辑
     //根据课程状态更新标签
@@ -116,6 +150,9 @@ public class CourseCardController {
                 break;
         }
     }
+
+
+
 
 
 }
