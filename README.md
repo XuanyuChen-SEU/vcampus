@@ -10,7 +10,13 @@
 
 ### **1. 数据库初始化**
 
-请先登录MySQL，执行命令：
+请先以管理员生效身份登录MySQL，执行命令：
+
+
+```bash
+SHOW GLOBAL VARIABLES LIKE 'local_infile';
+```
+
 ```bash
 SET GLOBAL local_infile = 1;
 ```
