@@ -1,10 +1,10 @@
 package com.vcampus.database.mapper;
 
 
-import com.vcampus.common.dto.User;
-
 import java.util.List;
 import java.util.Map;
+
+import com.vcampus.common.dto.User;
 
 public interface   UserMapper {
     // 创建数据库

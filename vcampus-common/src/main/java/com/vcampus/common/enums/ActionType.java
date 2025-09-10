@@ -28,6 +28,7 @@ public enum ActionType {
 //    // 课程详情相关
 //    GET_COURSE_ENROLLMENT_STATUS("获取课程报名状态"), // 获取课程的报名状态（已选人数等）
 //
+    UPDATE_STUDENT("更新学生信息"),
     INFO_STUDENT("获取学生信息"),
     // === 选课相关操作 ===
 
