@@ -67,6 +67,9 @@ public class MainViewController {
     @FXML
     private Button studentRecordButton;
     
+    @FXML
+    private Button academicButton;
+    
     // 动画相关字段
     private boolean isSidebarExpanded = false;
     private Timeline expandTimeline;
@@ -207,6 +210,11 @@ public class MainViewController {
     void handleStudentRecordNav(ActionEvent event) {
         loadView("/fxml/studentrecord/StudentRecordView.fxml");
     }
+    
+    @FXML
+    void handleAcademicNav(ActionEvent event) {
+        loadView("/fxml/academic/AcademicView.fxml");
+    }
 
     /**
      * 一个通用的、可复用的方法，用于将指定的FXML视图加载到主内容面板中。
@@ -298,11 +306,13 @@ public class MainViewController {
             storeButton.setText("🛒 商店");
             libraryButton.setText("📚 图书馆");
             studentRecordButton.setText("📋 学籍管理");
+            academicButton.setText("🎓 教务管理");
         } else {
             homeButton.setText("🏠");
             storeButton.setText("🛒");
             libraryButton.setText("📚");
             studentRecordButton.setText("📋");
+            academicButton.setText("🎓");
         }
     }
 }

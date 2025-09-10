@@ -2,7 +2,6 @@ package com.vcampus.server;
 
 import com.vcampus.database.service.DBService;
 import com.vcampus.server.net.SocketServer;
-import com.vcampus.database.utils.MyBatisUtil;
 /**
  * 主服务器类
  * 服务端程序的入口点，启动Socket服务器
@@ -38,12 +37,12 @@ public class MainServer {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\n正在关闭服务器...");
 
-            instance.server.stop();
+            server.stop();
         }));
         
         try {
             // 启动服务器
-            instance.server.start();
+            server.start();
         } catch (Exception e) {
             System.err.println("服务器启动失败: " + e.getMessage());
             System.exit(1);
