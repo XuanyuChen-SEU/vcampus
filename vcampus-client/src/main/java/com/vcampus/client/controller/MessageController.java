@@ -12,7 +12,11 @@ public class MessageController {
     
     private LoginController loginController;
     private StudentController studentController;
+<<<<<<< HEAD
     private LibraryController libraryController;
+=======
+    private ShopController shopController;
+>>>>>>> fb009107c6a3789920ac7e9a00cc8594ef6c32bb
     private ChangePasswordController changePasswordController;
     /**
      * 设置LoginController实例（由UI层调用）
@@ -27,11 +31,18 @@ public class MessageController {
     public void setStudentController(StudentController controller){
         this.studentController=controller;
     }
+<<<<<<< HEAD
     public void setLibraryController(LibraryController controller){this.libraryController=controller;}
+=======
+    public void setShopController(ShopController controller){this.shopController=controller;}
+
+>>>>>>> fb009107c6a3789920ac7e9a00cc8594ef6c32bb
     /**
      * 处理服务端消息
      * @param message 服务端发送的消息
      */
+
+    //这个是回收处理服务端端消息
     public void handleMessage(Message message) {
         try {
             // 验证消息格式
@@ -39,9 +50,12 @@ public class MessageController {
                 System.err.println("接收到无效的消息格式");
                 return;
             }
+
             
             // 根据ActionType调用对应的子控制器
-            switch (message.getAction()) {//注意这边  md里都提到了
+            //其实这个更像分发层，最先接受到服务器传来的消息，然后分配给各个Controller进行操作
+            // 这里可以根据实际需求添加更多的case，哥哥controller根据消息进行处理，进而回传给终端进行改变
+            switch (message.getAction()) {
                 case LOGIN:
                     if (loginController != null) {
                         loginController.handleLoginResponse(message);
@@ -75,6 +89,7 @@ public class MessageController {
                     } else {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
+<<<<<<< HEAD
                 case INFO_BOOK:
                     if (libraryController != null) {
                         libraryController.handleBookInfoResponse(message);
@@ -86,6 +101,31 @@ public class MessageController {
                         libraryController.handleUpdateBookResponse(message);
                     } else {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
+=======
+                break;
+                case SHOP_GET_ALL_PRODUCTS:
+                case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
+                    if (shopController != null) {
+                        shopController.handleProductListResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到商品列表响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_GET_MY_ORDERS:
+                    if (shopController != null) {
+                        shopController.handleGetMyOrdersResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到订单列表响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_GET_MY_FAVORITES:
+                    if (shopController != null) {
+                        shopController.handleGetMyFavoritesResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到收藏列表响应，但ShopController未注册。");
+>>>>>>> fb009107c6a3789920ac7e9a00cc8594ef6c32bb
                     }
                     break;
                 default:

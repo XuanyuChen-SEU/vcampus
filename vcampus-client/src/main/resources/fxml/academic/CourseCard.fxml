@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox style="-fx-background-color: white; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;"
+      xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vcampus.client.controller.CourseCardController">
+    <children>
+        <HBox fx:id="headerRow" alignment="CENTER_LEFT" style="-fx-padding: 15 20;" onMouseClicked="#toggleSessions">
+            <cursor>
+                <Cursor fx:constant="HAND" />
+            </cursor>
+            <children>
+
+                <VBox prefWidth="140.0" spacing="5.0">
+                    <children>
+                        <Label fx:id="courseIdLabel" text="B17M0010" style="-fx-font-size: 14px; -fx-text-fill: #333;" />
+                        <Hyperlink fx:id="detailsLink" onAction="#handleDetailsLinkClick" text="课程详情" />
+                    </children>
+                </VBox>
+
+                <Label fx:id="courseNameLabel" text="大学英语II" style="-fx-font-size: 14px; -fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+
+                <Label fx:id="courseTypeLabel" text="必修" style="-fx-font-size: 14px;" prefWidth="100.0" alignment="CENTER" />
+
+                <Label fx:id="departmentLabel" text="外国语学院" style="-fx-font-size: 14px;" prefWidth="180.0" alignment="CENTER_LEFT" />
+
+                <Label fx:id="statusLabel" text="未选课" style="-fx-font-size: 14px; -fx-text-fill: #888;" prefWidth="100.0" alignment="CENTER" />
+
+                <Label fx:id="sessionCountLabel" text="5" style="-fx-font-size: 14px;" prefWidth="100.0" alignment="CENTER_RIGHT" />
+
+            </children>
+        </HBox>
+
+        <FlowPane fx:id="sessionsContainer" hgap="15.0" vgap="15.0" managed="false" visible="false" style="-fx-background-color: #fafafa; -fx-padding: 20;" />
+    </children>
+</VBox>

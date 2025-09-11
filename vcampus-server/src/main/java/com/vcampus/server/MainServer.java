@@ -22,7 +22,6 @@ public class MainServer {
         return dbservice;
     }
     public static void main(String[] args) {
-
         System.out.println("=== VCampus 服务器启动 ===");
         instance = new MainServer();
         // 创建并启动Socket服务器
