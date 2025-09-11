@@ -12,7 +12,7 @@ public class MessageController {
     
     private LoginController loginController;
     private StudentController studentController;
-
+    private LibraryController libraryController;
     private ChangePasswordController changePasswordController;
     /**
      * 设置LoginController实例（由UI层调用）
@@ -27,7 +27,7 @@ public class MessageController {
     public void setStudentController(StudentController controller){
         this.studentController=controller;
     }
-
+    public void setLibraryController(LibraryController controller){this.libraryController=controller;}
     /**
      * 处理服务端消息
      * @param message 服务端发送的消息
@@ -75,7 +75,19 @@ public class MessageController {
                     } else {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
-                break;
+                case INFO_BOOK:
+                    if (libraryController != null) {
+                        libraryController.handleBookInfoResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                case UPDATE_BOOK:
+                    if (libraryController != null) {
+                        libraryController.handleUpdateBookResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
                     break;

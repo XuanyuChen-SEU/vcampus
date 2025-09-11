@@ -14,7 +14,12 @@ public enum ActionType {
     GLOBAL_NOTIFICATION("全局通知"),
     SYSTEM_BROADCAST("系统广播"),
     EMERGENCY_NOTIFICATION("紧急通知"),
-    INFO_STUDENT("获取学生信息");
+    INFO_STUDENT("获取学生信息"),
+    UPDATE_STUDENT("更新学生信息"),
+    INFO_BOOK("获取图书信息"),
+    UPDATE_BOOK("更新图书信息");
+
+
 
     private final String description;
 
