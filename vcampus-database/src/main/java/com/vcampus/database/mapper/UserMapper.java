@@ -1,10 +1,10 @@
 package com.vcampus.database.mapper;
 
 
-import com.vcampus.common.dto.User;
-
 import java.util.List;
 import java.util.Map;
+
+import com.vcampus.common.dto.User;
 
 public interface   UserMapper {
     // 创建数据库
@@ -17,6 +17,13 @@ public interface   UserMapper {
     void dropUserTable(String dbName);
     // 插入用户数据
     void InsertTempData();
+
+    void loadUsersFromCsv(String filePath);
+
+
+
+
+
     List<User> selectAll();
     User selectById(String userId);
     List<User> selectByCondition(Map map);

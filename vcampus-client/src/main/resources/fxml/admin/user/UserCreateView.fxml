@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.userAdmin.UserCreateViewController"
+            styleClass="admin-content-background">
+    
+    <!-- 标题区域 -->
+    <VBox fx:id="titleContainer" alignment="CENTER" spacing="10.0" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+        <children>
+            <Label text="➕ 创建新用户" styleClass="admin-title" />
+            <Label text="添加新的学生或教师账户" styleClass="admin-subtitle" />
+        </children>
+    </VBox>
+    
+    <!-- 表单区域 -->
+    <VBox fx:id="formContainer" alignment="CENTER" spacing="20.0" AnchorPane.topAnchor="120.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0">
+        <children>
+            <!-- 用户ID输入 -->
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="用户ID:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="userIdField" promptText="请输入7位用户ID" styleClass="form-field" prefWidth="200.0" />
+                </children>
+            </HBox>
+            
+            <!-- 用户角色选择 -->
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="用户角色:" styleClass="form-label" prefWidth="100.0" />
+                    <ComboBox fx:id="roleCombo" promptText="选择用户角色" styleClass="form-combo" prefWidth="200.0" />
+                </children>
+            </HBox>
+            
+            <!-- 初始密码设置 -->
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="初始密码:" styleClass="form-label" prefWidth="100.0" />
+                    <PasswordField fx:id="passwordField" promptText="请输入初始密码" styleClass="form-field" prefWidth="200.0" />
+                </children>
+            </HBox>
+            
+            <!-- 确认密码 -->
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="确认密码:" styleClass="form-label" prefWidth="100.0" />
+                    <PasswordField fx:id="confirmPasswordField" promptText="请再次输入密码" styleClass="form-field" prefWidth="200.0" />
+                </children>
+            </HBox>
+            
+            <!-- 按钮区域 -->
+            <HBox alignment="CENTER" spacing="20.0">
+                <children>
+                    <Button fx:id="createButton" text="✅ 创建用户" onAction="#handleCreate" styleClass="create-button" />
+                    <Button fx:id="resetButton" text="🔄 重置表单" onAction="#handleReset" styleClass="reset-button" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+    
+    <!-- 提示信息 -->
+    <VBox fx:id="infoContainer" alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+        <children>
+            <Label text="💡 提示信息" styleClass="info-title" />
+            <Label text="• 用户ID必须是7位数字，首位表示角色（1=学生，2=教师，3=管理员）" styleClass="info-text" />
+            <Label text="• 密码长度建议6-20位，包含字母和数字" styleClass="info-text" />
+            <Label text="• 创建后用户可以使用此ID和密码登录系统" styleClass="info-text" />
+        </children>
+    </VBox>
+</AnchorPane>

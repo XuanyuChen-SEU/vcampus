@@ -7,13 +7,22 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Test;
 import com.vcampus.common.dto.User;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Usermappertest {
+
+
+
+
+
+
     @Test
     public void testSelect() throws IOException {
         //1.加载mubatis配置文件，获取SqlSessionFactory
@@ -225,6 +234,36 @@ public class Usermappertest {
         sqlSession.commit();
         sqlSession.close();
     }
+
+
+    @Test
+    public void testLoadDataFromCsv() throws Exception {
+        // 1. 获取CSV文件在项目中的URL
+        String csvResourcePath = "db/tb_user.csv";
+        URL resourceUrl = getClass().getClassLoader().getResource(csvResourcePath);
+        if (resourceUrl == null) {
+            throw new RuntimeException("在 resources 目录中找不到文件: " + csvResourcePath);
+        }
+
+        // 2. 将URL转换为绝对文件路径
+        File csvFile = new File(resourceUrl.toURI());
+        String absolutePath = csvFile.getAbsolutePath();
+        System.out.println("正在从文件加载: " + absolutePath);
+
+        String resource = "mybatis-config.xml";
+        InputStream inputStream = Resources.getResourceAsStream(resource);//字符串传进来  返回字节输入流
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 3. 调用Mapper方法执行批量加载
+        // (这里的 userMapper 和 sqlSession 应该通过 @Before 方法初始化)
+        userMapper.loadUsersFromCsv(absolutePath);
+        sqlSession.commit(); // 提交事务
+
+        System.out.println("CSV数据批量加载成功！");
+    }
+
 
 }
 

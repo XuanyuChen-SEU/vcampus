@@ -13,7 +13,7 @@ import com.vcampus.server.dao.impl.UserDao;
  * 负责用户相关的业务逻辑，包括登录、忘记密码、重置密码等
  * 编写人：谌宣羽
  */
-public class UserService implements AutoCloseable{
+public class UserService {
     private final UserDao userDao;
 
     public UserService()  {
@@ -97,12 +97,5 @@ public class UserService implements AutoCloseable{
         }
     }
 
-    // 实现AutoCloseable接口的close方法，关闭UserDao
-    @Override
-    public void close() throws IOException {
-        if (userDao != null) {
-            userDao.UDClose(); // 调用UserDao的close方法释放资源
-        }
-        System.out.println("UserService已关闭，关联的UserDao资源已释放");
-    }
+
 }

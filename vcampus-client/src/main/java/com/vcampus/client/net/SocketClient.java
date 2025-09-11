@@ -46,7 +46,8 @@ public class SocketClient implements IMessageClientSrv {
     public SocketClient(String host, int port) {
         this.host = host;
         this.port = port;
-        this.messageController = new com.vcampus.client.controller.MessageController();//
+        this.messageController = new com.vcampus.client.controller.MessageController();
+        //公共messageController(全局唯一）
     }
     
     @Override
@@ -160,6 +161,7 @@ public class SocketClient implements IMessageClientSrv {
         
         try {
             // 发送消息
+            //这里是建立管道传递到服务器的
             out.writeObject(message);
             out.flush();
             System.out.println("已发送消息: " + message);

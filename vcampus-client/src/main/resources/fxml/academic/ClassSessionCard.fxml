@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+<VBox spacing="8.0" style="-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 12; -fx-background-color: #fafafa; -fx-background-radius: 6; -fx-border-radius: 6;"
+                                            alignment="TOP_LEFT" maxWidth="280.0" minWidth="250.0" prefWidth="270.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.ClassSessionCardController">
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <children>
+                <Label fx:id="teacherNameLabel" style="-fx-font-weight: bold; -fx-font-size: 14px;" text="[081] 王晨星" />
+                <Region HBox.hgrow="ALWAYS" /> <Label fx:id="conflictLabel" style="-fx-background-color: #FFCDD2; -fx-text-fill: #B71C1C; -fx-padding: 2 6; -fx-background-radius: 3; -fx-font-size: 12px;" text="课程冲突" visible="false" />
+                <Label fx:id="selectedTagLabel" style="-fx-background-color: #C8E6C9; -fx-text-fill: #1B5E20; -fx-padding: 2 6; -fx-background-radius: 3; -fx-font-size: 12px;" text="已选" visible="false" />
+            </children>
+        </HBox>
+
+        <Label fx:id="scheduleLabel" text="1-16周 星期一 8-9节 教四-403, 2-16周(双) 星..." wrapText="true" style="-fx-font-size: 13px; -fx-text-fill: #555;" />
+
+        <Label fx:id="capacityLabel" text="课容量: 85人" style="-fx-font-size: 13px; -fx-text-fill: #555;" />
+
+        <Label fx:id="enrolledLabel" text="已选人数: 2" style="-fx-font-size: 13px; -fx-text-fill: #555;" />
+
+        <HBox spacing="10.0" alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS" fillHeight="false"> <children>
+            <Button mnemonicParsing="false" text="教学班详情" style="-fx-background-color: #e0e0e0; -fx-text-fill: #333; -fx-background-radius: 5; -fx-padding: 5 12; -fx-font-size: 12px;" />
+            <Button fx:id="actionButton" mnemonicParsing="false" onAction="#handleSelectAction" text="选择"
+                    style="-fx-background-color: #42A5F5; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 5 15; -fx-font-size: 12px;" />
+        </children>
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+        </HBox>
+    </children>
+</VBox>

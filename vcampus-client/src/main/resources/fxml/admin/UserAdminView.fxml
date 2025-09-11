@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vcampus.client.controller.UserAdminViewController"
+      alignment="CENTER" spacing="20.0" styleClass="admin-content-background">
+    
+    <!-- 标题区域 -->
+    <VBox alignment="CENTER" spacing="10.0">
+        <Label text="👥 用户管理系统" styleClass="admin-title" />
+        <Label text="管理学生、教师账户信息" styleClass="admin-subtitle" />
+    </VBox>
+    
+    <!-- 功能按钮区域 -->
+    <HBox alignment="CENTER" spacing="20.0">
+        <children>
+            <Button fx:id="viewUsersButton" text="📋 查看所有用户" onAction="#handleViewUsers" styleClass="admin-function-button" />
+            <Button fx:id="createUserButton" text="➕ 创建新用户" onAction="#handleCreateUser" styleClass="admin-function-button" />
+            <Button fx:id="resetPasswordButton" text="🔄 重置密码处理" onAction="#handleResetPassword" styleClass="admin-function-button" />
+        </children>
+    </HBox>
+    
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+</VBox>

@@ -12,10 +12,12 @@ public class MessageController {
     
     private final UserController userController;
     private final StudentController studentController;
-    
+    private final CourseController courseController;
+
     public MessageController() {
         this.userController = new UserController();
         this.studentController=new StudentController();//自上而下  连续的好几个构造方法    client不用是因为  （小问题）
+        this.courseController=new CourseController();//按照习俗创建应该需要创建的部分
     }
 
     /**
@@ -36,8 +38,13 @@ public class MessageController {
                     return userController.handleLogin(request);
                 case FORGET_PASSWORD:
                     return userController.handleForgetPassword(request);
-                case INFO_STUDENT:
-                    return studentController.handle(request);
+                // --- 课程相关 ---调用服务端的controller层相关逻辑部分
+                case GET_ALL_COURSES:
+                    return courseController.handleGetAllCourses(request);
+                case SELECT_COURSE:
+                    return courseController.handleSelectCourse(request);
+                case DROP_COURSE:
+                    return courseController.handleDropCourse(request);
                 case CHANGE_PASSWORD:
                     return userController.handleChangePassword(request);
                 default:

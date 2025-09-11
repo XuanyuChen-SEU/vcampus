@@ -3,10 +3,6 @@ package com.vcampus.common.dao;
 import com.vcampus.common.dto.User;
 
 public interface IUserDao {//数据访问对象
-    /*
-        设置数据库;
-     */
-    void UDInit();
 
     /*
      * @param id 用户ID
@@ -27,5 +23,4 @@ public interface IUserDao {//数据访问对象
      */
     boolean deleteUser(User user);
 
-    void UDClose();
 }

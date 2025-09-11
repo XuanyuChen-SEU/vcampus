@@ -12,7 +12,7 @@ package com.vcampus.common.enums;
 public enum Role {
     STUDENT(1, "学生"),
     TEACHER(2, "教师"),
-    ADMIN(3, "管理员");
+    ADMIN(3, "用户管理员");
 
     private final int code;  // 数据库存储的编码（如 "student"）
     private final String desc;  // 显示用描述
