@@ -12,7 +12,7 @@ public class MessageController {
     
     private LoginController loginController;
     private StudentController studentController;
-
+    private ShopController shopController;
     private ChangePasswordController changePasswordController;
     /**
      * 设置LoginController实例（由UI层调用）
@@ -27,6 +27,7 @@ public class MessageController {
     public void setStudentController(StudentController controller){
         this.studentController=controller;
     }
+    public void setShopController(ShopController controller){this.shopController=controller;}
 
     /**
      * 处理服务端消息
@@ -81,6 +82,30 @@ public class MessageController {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
                 break;
+                case SHOP_GET_ALL_PRODUCTS:
+                case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
+                    if (shopController != null) {
+                        shopController.handleProductListResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到商品列表响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_GET_MY_ORDERS:
+                    if (shopController != null) {
+                        shopController.handleGetMyOrdersResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到订单列表响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_GET_MY_FAVORITES:
+                    if (shopController != null) {
+                        shopController.handleGetMyFavoritesResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到收藏列表响应，但ShopController未注册。");
+                    }
+                    break;
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
                     break;
