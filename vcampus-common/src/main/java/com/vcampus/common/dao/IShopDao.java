@@ -88,4 +88,5 @@ public interface IShopDao {
      * 关闭数据库连接或资源（如果需要）。
      */
     void SDClose();
+
 }
