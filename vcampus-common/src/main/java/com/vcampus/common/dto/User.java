@@ -27,6 +27,9 @@ public class User implements Serializable {//数据传输对象
     // 加密后的密码（传输为明文和存储为密文）
     private String password;
 
+    // --- 为商店功能新增的字段 ---
+    private String cardNumber;  // 一卡通号
+    private Double balance;     // 一卡通余额
 
     // 默认构造方法（反序列化必需）
     public User() {}
@@ -34,6 +37,12 @@ public class User implements Serializable {//数据传输对象
     public User(String userId, String password) {
         this.userId = userId;
         this.password = password;
+    }
+
+    public User(String userId, String cardNumber, Double balance) {
+        this.setUserId(userId); // 使用setter
+        this.cardNumber = cardNumber;
+        this.balance = balance;
     }
 
     // Getter & Setter
@@ -58,6 +67,23 @@ public class User implements Serializable {//数据传输对象
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
+    }
+
     /**
      * 重写toString方法，用于打印User对象的信息
      * @return 包含userId和password的字符串
