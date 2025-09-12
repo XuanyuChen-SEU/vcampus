@@ -2,6 +2,7 @@ package com.vcampus.database.service;
 
 import com.vcampus.database.mapper.Mapper;
 import com.vcampus.database.mapper.StudentMapper;
+import com.vcampus.database.mapper.PasswordResetApplicationMapper;
 import com.vcampus.database.mapper.UserMapper;
 import com.vcampus.database.utils.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
@@ -25,6 +26,7 @@ public class DBService {
         SqlSession sqlSession = myBatisUtil.openSession();
         File userCsvTempFile = null;
         File studentCsvTempFile = null;
+        File passwordResetApplicationCsvTempFile = null;
 
         try {
             Mapper mapper = sqlSession.getMapper(Mapper.class);
@@ -38,29 +40,40 @@ public class DBService {
 
             mapper.createUserTable();
             mapper.createStudentTable();
+            mapper.createPasswordResetApplicationTable();
+            
+            
             System.out.println("成功在数据库 " + dbName + " 中创建表结构。");
             System.out.println("准备从CSV文件加载数据...");
 
             // 1. 定义资源路径
             String userCSVPath = "db/tb_user.csv";
             String studentCSVPath = "db/tb_student.csv";
+            String passwordResetApplicationCSVPath = "db/tb_password_reset_application.csv";
 
             // 2. 将资源文件写入临时文件，并获取其路径
             userCsvTempFile = createTempFileFromResource(userCSVPath);
             studentCsvTempFile = createTempFileFromResource(studentCSVPath);
+            passwordResetApplicationCsvTempFile = createTempFileFromResource(passwordResetApplicationCSVPath);
+
 
             String userPath = userCsvTempFile.getAbsolutePath();
             String studentPath = studentCsvTempFile.getAbsolutePath();
+            String passwordResetApplicationPath = passwordResetApplicationCsvTempFile.getAbsolutePath();
+
 
             System.out.println("正在从临时文件加载: " + userPath);
             System.out.println("正在从临时文件加载: " + studentPath);
+            System.out.println("正在从临时文件加载: " + passwordResetApplicationPath);
 
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
+            PasswordResetApplicationMapper passwordResetApplicationMapper = sqlSession.getMapper(PasswordResetApplicationMapper.class);
 
             // 3. 调用Mapper方法执行批量加载，传入临时文件的路径
             userMapper.loadUsersFromCsv(userPath);
             studentMapper.loadStudentsFromCsv(studentPath);
+            passwordResetApplicationMapper.loadPasswordResetApplicationsFromCsv(passwordResetApplicationPath);
             sqlSession.commit(); // 提交事务
 
             System.out.println("CSV数据批量加载成功！");
@@ -83,6 +96,9 @@ public class DBService {
             }
             if (studentCsvTempFile != null && studentCsvTempFile.exists()) {
                 studentCsvTempFile.delete();
+            }
+            if (passwordResetApplicationCsvTempFile != null && passwordResetApplicationCsvTempFile.exists()) {
+                passwordResetApplicationCsvTempFile.delete();
             }
             if (sqlSession != null) {
                 sqlSession.close();

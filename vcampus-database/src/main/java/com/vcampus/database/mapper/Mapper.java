@@ -9,6 +9,7 @@ public interface Mapper {
     // 创建用户表（示例表）
     void createUserTable();
     void createStudentTable();
+    void createPasswordResetApplicationTable();
 
 
     //加载数据

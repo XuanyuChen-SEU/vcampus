@@ -56,6 +56,12 @@ public class MessageController {
                     return userController.handleResetUserPassword(request);
                 case CREATE_USER:
                     return userController.handleCreateUser(request);
+                case GET_FORGET_PASSWORD_TABLE:
+                    return userController.handleGetForgetPasswordTable(request);
+                case APPROVE_FORGET_PASSWORD_APPLICATION:
+                    return userController.handleApproveForgetPasswordApplication(request);
+                case REJECT_FORGET_PASSWORD_APPLICATION:
+                    return userController.handleRejectForgetPasswordApplication(request);
 
                 // --- 课程相关 ---
                 case GET_ALL_COURSES:
