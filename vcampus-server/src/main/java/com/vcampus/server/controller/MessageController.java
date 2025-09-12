@@ -37,17 +37,37 @@ public class MessageController {
             if (request == null || request.getAction() == null) {
                 return Message.failure(ActionType.LOGIN, "无效的消息格式");
             }
-
-            // --- 3. 合并 switch 路由逻辑 ---
-            // 将所有 case 都放到同一个 switch 语句中
-            switch (request.getAction()) {
-                // --- 用户相关 (已有) ---
+            // 根据ActionType调用对应的控制器
+            switch (request.getAction()) {//需要什么服务  自己加上）
+                // --- 用户登录相关 ---
                 case LOGIN:
                     return userController.handleLogin(request);
                 case FORGET_PASSWORD:
                     return userController.handleForgetPassword(request);
                 case CHANGE_PASSWORD:
                     return userController.handleChangePassword(request);
+
+                // --- 学籍相关 ---
+                case INFO_STUDENT:
+                    return studentController.handle(request);
+                case UPDATE_STUDENT:
+                    return studentController.updateStudent(request);
+
+                // --- 用户管理员相关 ---
+                case SEARCH_USERS:
+                    return userController.handleSearchUsers(request);
+                case DELETE_USER:
+                    return userController.handleDeleteUser(request);
+                case RESET_USER_PASSWORD:
+                    return userController.handleResetUserPassword(request);
+                case CREATE_USER:
+                    return userController.handleCreateUser(request);
+                case GET_FORGET_PASSWORD_TABLE:
+                    return userController.handleGetForgetPasswordTable(request);
+                case APPROVE_FORGET_PASSWORD_APPLICATION:
+                    return userController.handleApproveForgetPasswordApplication(request);
+                case REJECT_FORGET_PASSWORD_APPLICATION:
+                    return userController.handleRejectForgetPasswordApplication(request);
 
                 // --- 课程相关 ---
                 case GET_ALL_COURSES:

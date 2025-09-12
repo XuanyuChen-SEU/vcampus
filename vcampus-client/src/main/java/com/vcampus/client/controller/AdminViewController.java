@@ -56,9 +56,6 @@ public class AdminViewController {
         // 显示当前用户信息
         updateUserInfo();
         
-        // 验证用户权限
-        validateAdminAccess();
-        
         // 根据用户角色加载相应的内容
         loadAdminContent();
     }
@@ -78,24 +75,6 @@ public class AdminViewController {
     }
     
     /**
-     * 验证管理员访问权限
-     */
-    private void validateAdminAccess() {
-        UserSession userSession = MainApp.getGlobalUserSession();
-        if (!userSession.isLoggedIn() || !userSession.hasRole(com.vcampus.common.enums.Role.ADMIN)) {
-            // 如果不是管理员，显示错误并返回登录界面
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("访问被拒绝");
-            alert.setHeaderText("权限不足");
-            alert.setContentText("您没有管理员权限，无法访问此页面。");
-            alert.showAndWait();
-            
-            // 返回登录界面
-            showLoginView();
-        }
-    }
-    
-    /**
      * 根据用户角色加载相应的管理员内容
      */
     private void loadAdminContent() {
@@ -109,16 +88,19 @@ public class AdminViewController {
                 case "3": // 用户管理员
                     contentPath = "/fxml/admin/UserAdminView.fxml";
                     break;
-                case "4": // 系统管理员
-                    contentPath = "/fxml/admin/SystemAdminView.fxml";
+                case "4": // 学籍管理员
+                    contentPath = "/fxml/admin/StudentAdminView.fxml";
                     break;
-                case "5": // 内容管理员
-                    contentPath = "/fxml/admin/ContentAdminView.fxml";
+                case "5": // 教务管理员
+                    contentPath = "/fxml/admin/CourseAdminView.fxml";
                     break;
-                case "6": // 财务管理员
-                    contentPath = "/fxml/admin/FinanceAdminView.fxml";
+                case "6": // 图书馆管理员
+                    contentPath = "/fxml/admin/LibraryAdminView.fxml";
                     break;
-                default: // 默认用户管理员
+                case "7": // 商店管理员
+                    contentPath = "/fxml/admin/ShopAdminView.fxml";
+                    break;
+                default: // 默认管理员
                     contentPath = "/fxml/admin/UserAdminView.fxml";
                     break;
             }

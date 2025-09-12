@@ -59,8 +59,7 @@
         INTO TABLE vcampus_db.tb_user
         CHARACTER SET utf8mb4
         FIELDS TERMINATED BY ','
-        OPTIONALLY ENCLOSED BY '"'
-        LINES TERMINATED BY '\r\n'
+        LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
         (userId, password)
     </update>
@@ -80,15 +79,15 @@
 
 
 
-    <!--statement    -->
-    <select id="selectAll" resultType="com.vcampus.common.dto.User">-- 定义查询语句的
-        select * from tb_user;
+    <!-- 查询所有用户 -->
+    <select id="selectAll" resultType="com.vcampus.common.dto.User">
+        select * from vcampus_db.tb_user
     </select>
 
 
     <select id="select" resultType="com.vcampus.common.dto.User">
         select *
-        from tb_user
+        from vcampus_db.tb_user
         where
             userId = #{userId}
           and password = #{password};
