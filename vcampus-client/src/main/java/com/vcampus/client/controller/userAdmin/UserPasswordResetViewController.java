@@ -25,7 +25,7 @@ public class UserPasswordResetViewController implements IClientController{
         com.vcampus.client.controller.MessageController messageController = 
             MainApp.getGlobalSocketClient().getMessageController();
         if (messageController != null) {
-            messageController.setUserPasswordResetViewController(this);
+           // messageController.setUserPasswordResetViewController(this);
         }
     }
 
