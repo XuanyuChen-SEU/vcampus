@@ -42,6 +42,12 @@ public class MessageController {
                 case CHANGE_PASSWORD:
                     return userController.handleChangePassword(request);
 
+                // --- 学籍相关 ---
+                case INFO_STUDENT:
+                    return studentController.handle(request);
+                case UPDATE_STUDENT:
+                    return studentController.updateStudent(request);
+
                 // --- 用户管理员相关 ---
                 case SEARCH_USERS:
                     return userController.handleSearchUsers(request);
@@ -51,6 +57,12 @@ public class MessageController {
                     return userController.handleResetUserPassword(request);
                 case CREATE_USER:
                     return userController.handleCreateUser(request);
+                case GET_FORGET_PASSWORD_TABLE:
+                    return userController.handleGetForgetPasswordTable(request);
+                case APPROVE_FORGET_PASSWORD_APPLICATION:
+                    return userController.handleApproveForgetPasswordApplication(request);
+                case REJECT_FORGET_PASSWORD_APPLICATION:
+                    return userController.handleRejectForgetPasswordApplication(request);
 
                 // --- 课程相关 ---
 

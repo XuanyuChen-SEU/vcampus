@@ -27,6 +27,9 @@ public class UserAdminViewController {
     @FXML
     private Button resetPasswordButton;
     
+    @FXML
+    private Button forgetPasswordTableButton;
+    
     // 子视图容器
     @FXML
     private AnchorPane subViewContainer;
@@ -75,6 +78,16 @@ public class UserAdminViewController {
     }
     
     /**
+     * 处理忘记密码申请按钮点击
+     */
+    @FXML
+    private void handleForgetPasswordTable(ActionEvent event) {
+        currentView = "forgetPasswordTable";
+        loadForgetPasswordTableView();
+        updateButtonStyles();
+    }
+    
+    /**
      * 加载用户列表视图
      */
     private void loadUserListView() {
@@ -93,6 +106,13 @@ public class UserAdminViewController {
      */
     private void loadResetPasswordView() {
         loadSubView("/fxml/admin/user/UserPasswordResetView.fxml", null);
+    }
+    
+    /**
+     * 加载忘记密码申请视图
+     */
+    private void loadForgetPasswordTableView() {
+        loadSubView("/fxml/admin/user/ForgetPasswordTableView.fxml", null);
     }
     
     /**
@@ -154,6 +174,7 @@ public class UserAdminViewController {
         userListButton.getStyleClass().removeAll("nav-button-active");
         createUserButton.getStyleClass().removeAll("nav-button-active");
         resetPasswordButton.getStyleClass().removeAll("nav-button-active");
+        forgetPasswordTableButton.getStyleClass().removeAll("nav-button-active");
         
         // 为当前选中的按钮添加激活样式
         switch (currentView) {
@@ -165,6 +186,9 @@ public class UserAdminViewController {
                 break;
             case "resetPassword":
                 resetPasswordButton.getStyleClass().add("nav-button-active");
+                break;
+            case "forgetPasswordTable":
+                forgetPasswordTableButton.getStyleClass().add("nav-button-active");
                 break;
         }
     }

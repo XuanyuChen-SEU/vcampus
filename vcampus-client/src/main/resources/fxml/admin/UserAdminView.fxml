@@ -24,6 +24,7 @@
             <Button fx:id="userListButton" text="📋 用户列表" onAction="#handleUserList" styleClass="nav-button" />
             <Button fx:id="createUserButton" text="➕ 创建用户" onAction="#handleCreateUser" styleClass="nav-button" />
             <Button fx:id="resetPasswordButton" text="🔄 重置密码" onAction="#handleResetPassword" styleClass="nav-button" />
+            <Button fx:id="forgetPasswordTableButton" text="🔐 忘记密码申请" onAction="#handleForgetPasswordTable" styleClass="nav-button" />
         </children>
     </HBox>
     

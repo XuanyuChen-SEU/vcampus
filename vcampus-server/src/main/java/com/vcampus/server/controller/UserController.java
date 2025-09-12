@@ -191,4 +191,46 @@ public class UserController {
             return Message.failure(ActionType.CREATE_USER, "服务器内部错误");
         }
     }
+
+    /*  
+     * 处理获取忘记密码申请请求
+     * @param message 获取忘记密码申请请求消息
+     * @return 获取忘记密码申请响应消息
+     */
+    public Message handleGetForgetPasswordTable(Message message) {
+        try {
+            return userService.getForgetPasswordTable();
+        } catch (Exception e) {
+            System.err.println("处理获取忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.GET_FORGET_PASSWORD_TABLE, "服务器内部错误");
+        }
+    }
+
+    /*  
+     * 处理批准忘记密码申请请求
+     * @param message 批准忘记密码申请请求消息
+     * @return 批准忘记密码申请响应消息
+     */
+    public Message handleApproveForgetPasswordApplication(Message message) {
+        try {
+            return userService.approveForgetPasswordApplication((String) message.getData());
+        } catch (Exception e) {
+            System.err.println("处理批准忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.APPROVE_FORGET_PASSWORD_APPLICATION, "服务器内部错误");
+        }
+    }
+
+    /*  
+     * 处理拒绝忘记密码申请请求
+     * @param message 拒绝忘记密码申请请求消息
+     * @return 拒绝忘记密码申请响应消息
+     */
+    public Message handleRejectForgetPasswordApplication(Message message) {
+        try {
+            return userService.rejectForgetPasswordApplication((String)message.getData());
+        } catch (Exception e) {
+            System.err.println("处理拒绝忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.REJECT_FORGET_PASSWORD_APPLICATION, "服务器内部错误");
+        }
+    }
 }

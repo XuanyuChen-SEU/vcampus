@@ -3,10 +3,12 @@ import java.util.List;
 
 import com.vcampus.common.dto.ChangePassword;
 import com.vcampus.common.dto.Message;
+import com.vcampus.common.dto.PasswordResetApplication;
 import com.vcampus.common.dto.User;
 import com.vcampus.common.dto.UserSearch;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.common.enums.Role;
+import com.vcampus.server.dao.impl.PasswordResetApplicationDao;
 import com.vcampus.server.dao.impl.UserDao;
 
 /**
@@ -16,9 +18,11 @@ import com.vcampus.server.dao.impl.UserDao;
  */
 public class UserService {
     private final UserDao userDao;
+    private final PasswordResetApplicationDao passwordResetApplicationDao;
 
     public UserService()  {
         userDao = new UserDao();
+        passwordResetApplicationDao = new PasswordResetApplicationDao();
     }
 
     /**
@@ -60,16 +64,22 @@ public class UserService {
                 return Message.failure(ActionType.FORGET_PASSWORD, "用户不存在");
             }
             
-            // 5. 创建密码重置申请（模拟成功）
-            // TODO: 这里可以添加数据库操作，记录密码重置申请
-            boolean success = true; // 模拟成功
-            
-            if (success) {
-                return Message.success(ActionType.FORGET_PASSWORD, "密码重置申请已提交，请等待管理员审核");
+            // 验证用户是否存在
+            User existingUser = userDao.getUserById(user.getUserId());
+            if (existingUser == null) {
+                return Message.failure(ActionType.FORGET_PASSWORD, "用户不存在");
+            }
+
+            // 验证用户是否曾经提交过申请
+            PasswordResetApplication oldApplication = passwordResetApplicationDao.selectById(user.getUserId());
+            PasswordResetApplication newApplication = new PasswordResetApplication(user.getUserId(), user.getPassword());
+            if (oldApplication != null) {
+                passwordResetApplicationDao.update(newApplication);
             } else {
-                return Message.failure(ActionType.FORGET_PASSWORD, "密码重置申请提交失败，请稍后重试");
+                passwordResetApplicationDao.add(newApplication);
             }
             
+            return Message.success(ActionType.FORGET_PASSWORD, "密码重置申请已提交，请等待管理员审核");
         } catch (Exception e) {
             System.err.println("处理忘记密码申请时发生异常: " + e.getMessage());
             return Message.failure(ActionType.FORGET_PASSWORD, "服务器内部错误");
@@ -178,5 +188,50 @@ public class UserService {
         }
     }
 
+    /*
+     * 处理获取忘记密码申请请求
+     * @return 获取忘记密码申请响应消息
+     */
+    public Message getForgetPasswordTable() {
+        try {
+            return Message.success(ActionType.GET_FORGET_PASSWORD_TABLE, passwordResetApplicationDao.selectAll(), "获取忘记密码申请成功");
+        } catch (Exception e) {
+            System.err.println("处理获取忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.GET_FORGET_PASSWORD_TABLE, "服务器内部错误");
+        }
+    }
+
+    /*
+     * 处理批准忘记密码申请请求
+     * @param userId 用户ID
+     * @return 批准忘记密码申请响应消息
+     */
+    public Message approveForgetPasswordApplication(String userId) {
+        try {
+            PasswordResetApplication passwordResetApplication = passwordResetApplicationDao.selectById(userId);
+            User user = new User(passwordResetApplication.getUserId(), passwordResetApplication.getNewPassword());
+            userDao.updateUser(user);
+            passwordResetApplicationDao.deleteById(userId);
+            return Message.success(ActionType.APPROVE_FORGET_PASSWORD_APPLICATION, "密码重置申请批准成功");
+        } catch (Exception e) {
+            System.err.println("处理批准忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.APPROVE_FORGET_PASSWORD_APPLICATION, "服务器内部错误");
+        }
+    }
+
+    /*
+     * 处理拒绝忘记密码申请请求
+     * @param userId 用户ID
+     * @return 拒绝忘记密码申请响应消息
+     */
+    public Message rejectForgetPasswordApplication(String userId) {
+        try {
+            passwordResetApplicationDao.deleteById(userId);
+            return Message.success(ActionType.REJECT_FORGET_PASSWORD_APPLICATION, "密码重置申请拒绝成功");
+        } catch (Exception e) {
+            System.err.println("处理拒绝忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.REJECT_FORGET_PASSWORD_APPLICATION, "服务器内部错误");
+        }
+    }       
 
 }

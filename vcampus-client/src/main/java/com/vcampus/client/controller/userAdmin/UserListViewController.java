@@ -95,9 +95,6 @@ public class UserListViewController implements IClientController{
         
         // 使用统一的搜索功能加载用户数据（全局搜索）
         searchUser("", "全部");
-        
-        // 更新统计信息
-        updateStatistics();
     }
     
     /**
