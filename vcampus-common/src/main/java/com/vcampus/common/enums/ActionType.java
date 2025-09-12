@@ -14,6 +14,8 @@ public enum ActionType {
     GLOBAL_NOTIFICATION("全局通知"),
     SYSTEM_BROADCAST("系统广播"),
     EMERGENCY_NOTIFICATION("紧急通知"),
+    INFO_STUDENT("获取学生信息"),
+    UPDATE_STUDENT("修改学生信息"),
 
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
@@ -62,8 +64,6 @@ public enum ActionType {
 //    // 课程详情相关
 //    GET_COURSE_ENROLLMENT_STATUS("获取课程报名状态"), // 获取课程的报名状态（已选人数等）
 //
-    UPDATE_STUDENT("更新学生信息"),
-    INFO_STUDENT("获取学生信息"),
     // === 选课相关操作 ===
 
     // 客户端 -> 服务端 (请求)
@@ -75,8 +75,6 @@ public enum ActionType {
     GET_ALL_COURSES_RESPONSE("对获取课程请求的响应"),   // 对获取课程请求的响应
     SELECT_COURSE_RESPONSE("对选课请求的响应"),     // 对选课请求的响应
     DROP_COURSE_RESPONSE("对退课请求的响应");       // 对退课请求的响应
-    
-    
 
 
 

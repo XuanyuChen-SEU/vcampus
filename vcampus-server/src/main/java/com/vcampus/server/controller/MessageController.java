@@ -47,6 +47,12 @@ public class MessageController {
                 case CHANGE_PASSWORD:
                     return userController.handleChangePassword(request);
 
+                // --- 学籍相关 ---
+                case INFO_STUDENT:
+                    return studentController.handle(request);
+                case UPDATE_STUDENT:
+                    return studentController.updateStudent(request);
+
                 // --- 用户管理员相关 ---
                 case SEARCH_USERS:
                     return userController.handleSearchUsers(request);
