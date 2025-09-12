@@ -40,9 +40,13 @@ public enum ActionType {
     // 服务端 -> 客户端 (响应)
     GET_ALL_COURSES_RESPONSE("对获取课程请求的响应"),   // 对获取课程请求的响应
     SELECT_COURSE_RESPONSE("对选课请求的响应"),     // 对选课请求的响应
-    DROP_COURSE_RESPONSE("对退课请求的响应");       // 对退课请求的响应
-
-
+    DROP_COURSE_RESPONSE("对退课请求的响应"),       // 对退课请求的响应
+    
+    // === 用户管理相关操作 ===
+    CREATE_USER("创建用户"),                   // 创建新用户
+    DELETE_USER("删除用户"),                   // 删除用户
+    RESET_USER_PASSWORD("重置用户密码"),        // 重置用户密码
+    SEARCH_USERS("搜索用户");                  // 搜索用户
 
 
 

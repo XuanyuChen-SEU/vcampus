@@ -34,10 +34,22 @@ public class MessageController {
             
             // 根据ActionType调用对应的控制器
             switch (request.getAction()) {//需要什么服务  自己加上）
+                // --- 用户登录相关 ---
                 case LOGIN:
                     return userController.handleLogin(request);
                 case FORGET_PASSWORD:
                     return userController.handleForgetPassword(request);
+                case CHANGE_PASSWORD:
+                    return userController.handleChangePassword(request);
+                // --- 用户管理员相关 ---
+                case SEARCH_USERS:
+                    return userController.handleSearchUsers(request);
+                case DELETE_USER:
+                    return userController.handleDeleteUser(request);
+                case RESET_USER_PASSWORD:
+                    return userController.handleResetUserPassword(request);
+                case CREATE_USER:
+                    return userController.handleCreateUser(request);
                 // --- 课程相关 ---调用服务端的controller层相关逻辑部分
                 case GET_ALL_COURSES:
                     return courseController.handleGetAllCourses(request);
@@ -45,8 +57,7 @@ public class MessageController {
                     return courseController.handleSelectCourse(request);
                 case DROP_COURSE:
                     return courseController.handleDropCourse(request);
-                case CHANGE_PASSWORD:
-                    return userController.handleChangePassword(request);
+                
                 default:
                     return Message.failure(request.getAction(), "不支持的操作类型: " + request.getAction());
             }

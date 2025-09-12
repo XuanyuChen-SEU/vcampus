@@ -34,3 +34,4 @@ public class LoginRoleTest extends Application {
         launch(args);
     }
 }
+

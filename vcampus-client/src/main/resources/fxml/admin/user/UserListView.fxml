@@ -15,16 +15,8 @@
             fx:controller="com.vcampus.client.controller.userAdmin.UserListViewController"
             styleClass="admin-content-background">
     
-    <!-- 标题区域 -->
-    <VBox fx:id="titleContainer" alignment="CENTER" spacing="10.0" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
-        <children>
-            <Label text="📋 用户列表" styleClass="admin-title" />
-            <Label text="查看和管理所有用户信息" styleClass="admin-subtitle" />
-        </children>
-    </VBox>
-    
     <!-- 搜索和操作区域 -->
-    <HBox fx:id="searchContainer" alignment="CENTER" spacing="15.0" AnchorPane.topAnchor="120.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+    <HBox fx:id="searchContainer" alignment="CENTER" spacing="15.0" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
         <children>
             <TextField fx:id="searchField" promptText="输入用户ID或姓名搜索..." styleClass="search-field" HBox.hgrow="ALWAYS" />
             <ComboBox fx:id="roleFilterCombo" promptText="选择角色筛选" styleClass="filter-combo" />
@@ -34,24 +26,21 @@
     </HBox>
     
     <!-- 用户表格 -->
-    <TableView fx:id="userTable" AnchorPane.topAnchor="180.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="user-table">
+    <TableView fx:id="userTable" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="user-table">
         <columns>
-            <TableColumn fx:id="idColumn" text="用户ID" prefWidth="120.0" />
-            <TableColumn fx:id="roleColumn" text="角色" prefWidth="100.0" />
-            <TableColumn fx:id="statusColumn" text="状态" prefWidth="80.0" />
-            <TableColumn fx:id="lastLoginColumn" text="最后登录" prefWidth="150.0" />
-            <TableColumn fx:id="actionsColumn" text="操作" prefWidth="200.0" />
+            <TableColumn fx:id="idColumn" text="用户ID" minWidth="150.0" />
+            <TableColumn fx:id="roleColumn" text="角色" minWidth="120.0" />
+            <TableColumn fx:id="actionsColumn" text="操作" minWidth="200.0" />
         </columns>
     </TableView>
     
     <!-- 底部统计信息 -->
     <HBox fx:id="statsContainer" alignment="CENTER" spacing="30.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
         <children>
-            <Label fx:id="totalUsersLabel" text="总用户数: 0" styleClass="stats-label" />
-            <Label fx:id="activeUsersLabel" text="活跃用户: 0" styleClass="stats-label" />
-            <Label fx:id="studentCountLabel" text="学生: 0" styleClass="stats-label" />
-            <Label fx:id="teacherCountLabel" text="教师: 0" styleClass="stats-label" />
-            <Label fx:id="adminCountLabel" text="管理员: 0" styleClass="stats-label" />
+            <Label fx:id="totalUsersLabel" text="总用户数: 0" styleClass="stats-label-highlight" />
+            <Label fx:id="studentCountLabel" text="学生: 0" styleClass="stats-label-highlight" />
+            <Label fx:id="teacherCountLabel" text="教师: 0" styleClass="stats-label-highlight" />
+            <Label fx:id="adminCountLabel" text="管理员: 0" styleClass="stats-label-highlight" />
         </children>
     </HBox>
 </AnchorPane>
