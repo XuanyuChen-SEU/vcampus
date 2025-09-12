@@ -40,6 +40,8 @@ public class MessageController {
                     return studentController.handle(request);
                 case CHANGE_PASSWORD:
                     return userController.handleChangePassword(request);
+                case UPDATE_STUDENT:
+                    return studentController.updateStudent(request);
                 default:
                     return Message.failure(request.getAction(), "不支持的操作类型: " + request.getAction());
             }
