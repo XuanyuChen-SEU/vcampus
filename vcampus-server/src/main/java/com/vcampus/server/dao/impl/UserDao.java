@@ -1,10 +1,13 @@
 package com.vcampus.server.dao.impl;
 
-import com.vcampus.common.dao.IUserDao;
-import com.vcampus.common.dto.User;
-import com.vcampus.database.mapper.UserMapper;
-import com.vcampus.database.utils.MyBatisUtil; // 引入MyBatisUtil
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
+
+import com.vcampus.common.dao.IUserDao;
+import com.vcampus.common.dto.User; // 引入MyBatisUtil
+import com.vcampus.database.mapper.UserMapper;
+import com.vcampus.database.utils.MyBatisUtil;
 
 public class UserDao implements IUserDao {
 
@@ -32,13 +35,78 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public boolean deleteUser(User user) { // 接口的参数最好直接是ID，而不是整个User对象
+    public boolean deleteUser(String userId) { 
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
-            userMapper.deleteById(user.getUserId());
+            userMapper.deleteById(userId);
             sqlSession.commit();
             return true;
         }
     }
-
+    
+    // === 用户管理相关方法实现 ===
+    
+    @Override
+    public boolean createUser(User user) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            userMapper.add(user);
+            sqlSession.commit();
+            return true;
+        }
+    }
+    
+    @Override
+    public List<User> searchUsers(String searchText, String selectedRole) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            // 使用selectAll然后过滤，因为UserMapper没有searchByKeyword方法
+            List<User> allUsers = userMapper.selectAll();
+            return allUsers.stream()
+                    .filter(user -> {
+                        // 根据用户ID前缀判断角色
+                        boolean roleMatch = true;
+                        if (selectedRole != null && !selectedRole.isEmpty()) {
+                            char firstChar = user.getUserId().charAt(0);
+                            switch (selectedRole) {
+                                case "学生":
+                                    roleMatch = firstChar == '1';
+                                    break;
+                                case "教师":
+                                    roleMatch = firstChar == '2';
+                                    break;
+                                case "管理员":
+                                    roleMatch = firstChar >= '3';
+                                    break;
+                                default:
+                                    roleMatch = true; // 如果角色不明确，显示所有
+                            }
+                        }
+                        // 检查用户ID是否包含搜索文本
+                        boolean textMatch = user.getUserId().contains(searchText);
+                        
+                        return roleMatch && textMatch;
+                    })
+                    .collect(java.util.stream.Collectors.toList());
+        }
+    }
+    
+    @Override
+    public boolean resetUserPassword(User user) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            int affectedRows = userMapper.update(user);
+            sqlSession.commit();
+            return affectedRows > 0;
+        }
+    }
+    
+    @Override
+    public boolean isUserIdExists(String userId) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            User user = userMapper.selectById(userId);
+            return user != null;
+        }
+    }
 }

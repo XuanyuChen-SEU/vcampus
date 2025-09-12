@@ -1,28 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<!-- fx:controller 属性将此视图与 AcademicController 类绑定 -->
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.AcademicController">
+<VBox spacing="10.0" style="-fx-background-color: #f4f6f8;"
+      prefWidth="1200.0" prefHeight="800.0"
+      xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vcampus.client.controller.AcademicController">
+    <padding>
+        <Insets top="20.0" right="25.0" bottom="20.0" left="25.0" />
+    </padding>
     <children>
-        <Label text="教务管理模块" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
+        <Label text="教务管理模块">
             <font>
                 <Font name="System Bold" size="24.0" />
             </font>
         </Label>
 
-        <!--
-          【模块内容区】
-          所有教务管理模块的UI控件 (如课程表、成绩单) 都应放置在这个 Pane 内部。
-          使用 fx:id="contentPane" 可以在控制器中引用此 Pane。
-        -->
-        <Pane fx:id="contentPane" layoutX="20.0" layoutY="60.0" prefHeight="520.0" prefWidth="760.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0">
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <children>
+                <Button fx:id="timetableButton" mnemonicParsing="false" onAction="#handleShowTimetable" text="我的课表" styleClass="tab-button" />
+                <Button fx:id="selectCoursesButton" mnemonicParsing="false" onAction="#handleShowSelectCourses" text="选课" styleClass="tab-button" />
+            </children>
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+        </HBox>
 
-            <!-- 示例: <TableView fx:id="courseTable" prefHeight="520.0" prefWidth="760.0" /> -->
+        <Separator prefWidth="200.0" />
 
-        </Pane>
+        <Pane fx:id="contentPane" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 6;" />
+
     </children>
-</AnchorPane>
+</VBox>

@@ -325,6 +325,7 @@ public class LoginController implements IClientController {
      * 处理密码重置结果
      * @param result 密码重置结果消息
      */
+    //这个是服务器返回处理信息，然后controller根据这个信息处理前端变化
     private void handlePasswordResetResult(Message result) {
         if (result.isSuccess()) {
             showSuccess("密码重置申请", result.getMessage());
@@ -363,7 +364,8 @@ public class LoginController implements IClientController {
             statusLabel.setText("登录成功，欢迎使用VCampus系统");
             passwordField.clear();
             
-            switchToMainView();
+            // 根据用户ID首位数字跳转到不同界面
+            switchToRoleBasedView(username);
         } else {
             showError("登录失败: " + result.getMessage());
             statusLabel.setText("登录失败，请检查用户名和密码");
@@ -393,7 +395,11 @@ public class LoginController implements IClientController {
         alert.showAndWait();
     }
 
-    private void switchToMainView() {
+    /**
+     * 根据用户角色跳转到相应的界面
+     * @param username 用户ID
+     */
+    private void switchToRoleBasedView(String username) {
         try {
             // 1. 关闭当前的登录窗口
             Stage currentStage = (Stage) loginButton.getScene().getWindow();
@@ -402,24 +408,44 @@ public class LoginController implements IClientController {
             // 2. 创建一个新的 Stage 用于主界面
             Stage mainStage = new Stage();
 
-            // 3. 加载主界面的 FXML 文件
-            URL fxmlLocation = getClass().getResource("/fxml/MainView.fxml");
+            // 3. 根据用户ID首位数字确定角色和界面
+            String firstChar = username.substring(0, 1);
+            String fxmlPath;
+            String windowTitle;
+
+            switch (firstChar) {
+                case "1": // 学生
+                    fxmlPath = "/fxml/MainView.fxml";
+                    windowTitle = "VCampus 虚拟校园系统 - 学生端";
+                    break;
+                case "2": // 教师
+                    fxmlPath = "/fxml/MainView.fxml";
+                    windowTitle = "VCampus 虚拟校园系统 - 教师端";
+                    break;
+                default: // 其他角色为管理员
+                    fxmlPath = "/fxml/MainView.fxml";
+                    windowTitle = "VCampus 虚拟校园系统 - 管理员端";
+                    break;
+            }
+
+            // 4. 加载对应界面的 FXML 文件
+            URL fxmlLocation = getClass().getResource(fxmlPath);
             if (fxmlLocation == null) {
-                System.err.println("严重错误: 找不到主界面 FXML 文件 /fxml/MainView.fxml");
-                showError("无法加载应用程序主界面，请联系管理员。");
+                System.err.println("严重错误: 找不到界面 FXML 文件 " + fxmlPath);
+                showError("无法加载应用程序界面，请联系管理员。");
                 return;
             }
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Scene scene = new Scene(loader.load());
 
-            // 4. 为主界面加载 CSS
+            // 5. 为界面加载 CSS
             URL cssLocation = getClass().getResource("/css/styles.css");
             if(cssLocation != null) {
                 scene.getStylesheets().add(cssLocation.toExternalForm());
             }
 
-            // 5. 设置并显示主界面窗口
-            mainStage.setTitle("VCampus 虚拟校园系统");
+            // 6. 设置并显示界面窗口
+            mainStage.setTitle(windowTitle);
             mainStage.setScene(scene);
             mainStage.setMinWidth(800);
             mainStage.setMinHeight(600);
@@ -429,8 +455,8 @@ public class LoginController implements IClientController {
             mainStage.show();
 
         } catch (IOException e) {
-            System.err.println("加载主界面时发生严重错误: " + e.getMessage());
-            showError("加载主界面时发生严重错误: " + e.getMessage());
+            System.err.println("加载界面时发生严重错误: " + e.getMessage());
+            showError("加载界面时发生严重错误: " + e.getMessage());
         }
     }
     

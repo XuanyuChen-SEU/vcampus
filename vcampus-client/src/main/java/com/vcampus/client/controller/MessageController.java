@@ -1,6 +1,8 @@
 package com.vcampus.client.controller;
 
-import com.vcampus.client.controller.ChangePasswordController;
+import com.vcampus.client.controller.userAdmin.UserCreateViewController;
+import com.vcampus.client.controller.userAdmin.UserListViewController;
+import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
 import com.vcampus.common.dto.Message;
 
 /**
@@ -12,8 +14,14 @@ public class MessageController {
     
     private LoginController loginController;
     private StudentController studentController;
-
     private ChangePasswordController changePasswordController;
+
+    private UserCreateViewController userCreateViewController;
+    private UserListViewController userListViewController;
+    private UserPasswordResetViewController userPasswordResetViewController;
+
+    private ShopController shopController;
+
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -27,11 +35,23 @@ public class MessageController {
     public void setStudentController(StudentController controller){
         this.studentController=controller;
     }
+    public void setUserCreateViewController(UserCreateViewController controller){
+        this.userCreateViewController=controller;
+    }
+    public void setUserListViewController(UserListViewController controller){
+        this.userListViewController=controller;
+    }
+    public void setUserPasswordResetViewController(UserPasswordResetViewController controller){
+        this.userPasswordResetViewController=controller;
+    }
+    public void setShopController(ShopController controller){this.shopController=controller;}
 
     /**
      * 处理服务端消息
      * @param message 服务端发送的消息
      */
+
+    //这个是回收处理服务端端消息
     public void handleMessage(Message message) {
         try {
             // 验证消息格式
@@ -39,9 +59,12 @@ public class MessageController {
                 System.err.println("接收到无效的消息格式");
                 return;
             }
+
             
             // 根据ActionType调用对应的子控制器
-            switch (message.getAction()) {//注意这边  md里都提到了
+            //其实这个更像分发层，最先接受到服务器传来的消息，然后分配给各个Controller进行操作
+            // 这里可以根据实际需求添加更多的case，哥哥controller根据消息进行处理，进而回传给终端进行改变
+            switch (message.getAction()) {
                 case LOGIN:
                     if (loginController != null) {
                         loginController.handleLoginResponse(message);
@@ -63,6 +86,34 @@ public class MessageController {
                         System.err.println("ChangePasswordController未设置，无法处理修改密码响应");
                     }
                     break;
+                case SEARCH_USERS:
+                    if (userListViewController != null) {
+                        userListViewController.handleSearchUsersResponse(message);
+                    } else {
+                        System.err.println("UserListViewController未设置，无法处理搜索用户响应");
+                    }
+                    break;
+                case DELETE_USER:
+                    if (userListViewController != null) {
+                        userListViewController.handleDeleteUserResponse(message);
+                    } else {
+                        System.err.println("UserListViewController未设置，无法处理删除用户响应");
+                    }
+                    break;
+                case RESET_USER_PASSWORD:
+                    if (userPasswordResetViewController != null) {
+                        userPasswordResetViewController.handleResetUserPasswordResponse(message);
+                    } else {
+                        System.err.println("UserPasswordResetViewController未设置，无法处理重置用户密码响应");
+                    }
+                    break;
+                case CREATE_USER:
+                    if (userCreateViewController != null) {
+                        userCreateViewController.handleCreateUserResponse(message);
+                    } else {
+                        System.err.println("UserCreateViewController未设置，无法处理创建用户响应");
+                    }
+                    break;
                 case INFO_STUDENT:
                     if (studentController != null) {
                     studentController.handleStudentInfoResponse(message);
@@ -76,6 +127,30 @@ public class MessageController {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
                 break;
+                case SHOP_GET_ALL_PRODUCTS:
+                case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
+                    if (shopController != null) {
+                        shopController.handleProductListResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到商品列表响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_GET_MY_ORDERS:
+                    if (shopController != null) {
+                        shopController.handleGetMyOrdersResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到订单列表响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_GET_MY_FAVORITES:
+                    if (shopController != null) {
+                        shopController.handleGetMyFavoritesResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到收藏列表响应，但ShopController未注册。");
+                    }
+                    break;
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
                     break;

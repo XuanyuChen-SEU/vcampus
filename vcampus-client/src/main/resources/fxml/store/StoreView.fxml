@@ -1,28 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.text.Font?>
 
-<!-- fx:controller 属性将此视图与 StoreController 类绑定 -->
-<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.StoreController">
-    <children>
-        <Label text="商店模块" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
-            <font>
-                <Font name="System Bold" size="24.0" />
-            </font>
-        </Label>
+<!-- fx:controller 路径已指向我们新的、功能更强大的 ShopController -->
+<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.ShopController">
 
-        <!--
-          【模块内容区】
-          所有商店模块的UI控件 (如商品列表、购物车) 都应放置在这个 Pane 内部。
-          使用 fx:id="contentPane" 可以在控制器中引用此 Pane。
-        -->
-        <Pane fx:id="contentPane" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0">
+    <!-- ===== 顶部区域：搜索与导航 (保持不变) ===== -->
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="15.0" style="-fx-background-color: #F0F0F0; -fx-border-color: #CCCCCC; -fx-border-width: 0 0 1 0;">
+            <padding> <Insets left="20.0" right="20.0" /> </padding>
+            <children>
+                <Label text="校园商店"> <font> <Font name="System Bold" size="18.0" /> </font> </Label>
+                <TextField fx:id="searchField" onAction="#handleSearch" promptText="搜索商品..." HBox.hgrow="ALWAYS" />
+                <Button fx:id="searchButton" onAction="#handleSearch" text="搜索" />
+                <Button fx:id="myOrdersButton" onAction="#handleShowMyOrders" text="我的订单" />
+                <Button fx:id="myFavoritesButton" onAction="#handleShowMyFavorites" text="我的收藏" />
+            </children>
+        </HBox>
+    </top>
 
-            <!-- 示例: <TableView fx:id="productTable" prefHeight="520.0" prefWidth="760.0" /> -->
+    <!-- ===== 中部区域：【重大升级】使用 StackPane 实现视图切换 ===== -->
+    <center>
+        <StackPane fx:id="centerStackPane" BorderPane.alignment="CENTER">
+            <children>
+                <!-- 视图一：商品/收藏 展示区 (默认可见) -->
+                <ScrollPane fx:id="productScrollPane" fitToWidth="true" hbarPolicy="NEVER">
+                    <content>
+                        <TilePane fx:id="productPane" hgap="20.0" prefColumns="4" vgap="20.0">
+                            <padding> <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /> </padding>
+                        </TilePane>
+                    </content>
+                </ScrollPane>
 
-        </Pane>
-    </children>
-</AnchorPane>
+                <!-- 视图二：订单 展示区 (默认不可见) -->
+                <TableView fx:id="orderTable" prefHeight="200.0" prefWidth="200.0" visible="false">
+                    <columns>
+                        <!-- 这些 fx:id 必须和 Controller 中的 TableColumn 变量名完全对应 -->
+                        <TableColumn fx:id="orderIdColumn" prefWidth="75.0" text="订单号" />
+                        <TableColumn fx:id="orderDateColumn" prefWidth="150.0" text="购买日期" />
+                        <TableColumn fx:id="orderProductColumn" prefWidth="300.0" text="商品" />
+                        <TableColumn fx:id="orderPriceColumn" prefWidth="100.0" text="实付款" />
+                        <TableColumn fx:id="orderStatusColumn" prefWidth="150.0" text="订单状态" />
+                    </columns>
+                </TableView>
+            </children>
+        </StackPane>
+    </center>
+
+    <!-- ===== 底部区域：用户信息与状态 (保持不变) ===== -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" spacing="20.0" style="-fx-background-color: #E0E0E0;">
+            <padding> <Insets right="20.0" /> </padding>
+            <children>
+                <Label fx:id="userInfoLabel" text="用户: 未登录" />
+                <Label fx:id="balanceLabel" text="余额: ￥0.00" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -135,6 +135,38 @@
     -fx-scale-y: 0.92;
 }
 
+/* === 回到主页按钮样式 === */
+.back-to-home-button {
+    -fx-background-color: linear-gradient(to right, #4CAF50, #45a049);
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0.0, 0, 2);
+    -fx-pref-width: 100px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1;
+    -fx-alignment: center;
+}
+
+.back-to-home-button:hover {
+    -fx-background-color: linear-gradient(to right, #45a049, #3d8b40);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 6, 0.0, 0, 3);
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+    -fx-border-color: rgba(255, 255, 255, 0.4);
+}
+
+.back-to-home-button:pressed {
+    -fx-background-color: linear-gradient(to right, #3d8b40, #357a38);
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.4), 4, 0.0, 0, 2);
+    -fx-scale-x: 0.92;
+    -fx-scale-y: 0.92;
+}
+
 /* === 登出按钮样式 === */
 .logout-button {
     -fx-background-color: linear-gradient(to right, #ff6b6b, #ee5a52);
@@ -398,4 +430,442 @@
     -fx-background-color: rgba(255, 255, 255, 0.3);
     -fx-border-radius: 5;
     -fx-background-radius: 5;
+}
+
+
+/*
+ * =================================================================
+ *
+ *                  管理员界面样式 (AdminView)
+ *
+ * =================================================================
+ */
+
+/* === 管理员内容背景样式 === */
+.admin-content-background {
+    -fx-background-color: transparent;
+}
+
+/* === 管理员标题样式 === */
+.admin-title {
+    -fx-font-size: 48px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+    -fx-padding: 20px 0 10px 0;
+}
+
+/* === 管理员功能按钮样式 === */
+.admin-function-button {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 15 25 15 25;
+    -fx-min-width: 150px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.0, 0, 2);
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1;
+}
+
+.admin-function-button:hover {
+    -fx-background-color: linear-gradient(to right, #5a6fd8, #6a4190);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0.0, 0, 3);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: rgba(255, 255, 255, 0.4);
+}
+
+.admin-function-button:pressed {
+    -fx-background-color: linear-gradient(to right, #4e5bc6, #5e377e);
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* === 用户统计面板样式 === */
+.user-stats-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+    -fx-padding: 20px 30px 20px 30px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 15;
+    -fx-border-width: 1;
+}
+
+/* === 统计标题样式 === */
+.stats-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.0, 0, 1);
+}
+
+/* === 统计项目样式 === */
+.stats-item {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 8;
+    -fx-padding: 8 16 8 16;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+/* === 最近操作面板样式 === */
+.recent-actions-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+    -fx-padding: 20px 30px 20px 30px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 15;
+    -fx-border-width: 1;
+}
+
+/* === 最近操作标题样式 === */
+.recent-actions-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.0, 0, 1);
+}
+
+/* === 最近操作内容样式 === */
+.recent-actions-content {
+    -fx-font-size: 14px;
+    -fx-text-fill: rgba(255, 255, 255, 0.8);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 8;
+    -fx-padding: 10 20 10 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+/*
+ * =================================================================
+ *
+ *                  用户管理子页面样式
+ *
+ * =================================================================
+ */
+
+/* === 搜索和筛选组件样式 === */
+.search-field {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 12 8 12;
+    -fx-font-size: 14px;
+}
+
+.search-field:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+.filter-combo {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+}
+
+.filter-combo:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+.search-button,
+.refresh-button,
+.back-button,
+.home-button {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-min-width: 80px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.search-button:hover,
+.refresh-button:hover,
+.back-button:hover,
+.home-button:hover {
+    -fx-background-color: linear-gradient(to right, #5a6fd8, #6a4190);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+/* === 表格样式 === */
+.user-table {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+}
+
+.user-table .column-header {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.user-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.user-table .table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+}
+
+/* === 表单组件样式 === */
+.form-label {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.form-field {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 15 10 15;
+    -fx-font-size: 14px;
+}
+
+.form-field:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+.form-field-readonly {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 15 10 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: #666666;
+}
+
+.form-combo {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+}
+
+.form-combo:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+/* === 按钮样式 === */
+.create-button,
+.save-button,
+.reset-button {
+    -fx-background-color: linear-gradient(to right, #4CAF50, #45a049);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-min-width: 120px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.create-button:hover,
+.save-button:hover,
+.reset-button:hover {
+    -fx-background-color: linear-gradient(to right, #45a049, #3d8b40);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+.clear-button {
+    -fx-background-color: linear-gradient(to right, #ff9800, #f57c00);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-min-width: 120px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.clear-button:hover {
+    -fx-background-color: linear-gradient(to right, #f57c00, #ef6c00);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+/* === 统计标签样式 === */
+.stats-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 8;
+    -fx-padding: 8 16 8 16;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+/* === 高亮统计标签样式 === */
+.stats-label-highlight {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to right, #4CAF50, #45a049);
+    -fx-background-radius: 10;
+    -fx-padding: 10 18 10 18;
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(76, 175, 80, 0.4), 4, 0.0, 0, 2);
+}
+
+.stats-label-highlight:hover {
+    -fx-background-color: linear-gradient(to right, #45a049, #3d8b40);
+    -fx-effect: dropshadow(gaussian, rgba(76, 175, 80, 0.6), 6, 0.0, 0, 3);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* === 提示信息样式 === */
+.info-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.0, 0, 1);
+}
+
+.info-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255, 255, 255, 0.8);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+}
+
+/* === 导航按钮样式 === */
+.nav-button {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-min-width: 120px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0.0, 0, 2);
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1;
+}
+
+.nav-button:hover {
+    -fx-background-color: linear-gradient(to right, #5a6fd8, #6a4190);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0.0, 0, 3);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: rgba(255, 255, 255, 0.4);
+}
+
+.nav-button:pressed {
+    -fx-background-color: linear-gradient(to right, #4e5bc6, #5e377e);
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0.0, 0, 2);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* === 激活状态的导航按钮样式 === */
+.nav-button-active {
+    -fx-background-color: linear-gradient(to right, #4CAF50, #45a049);
+    -fx-border-color: rgba(255, 255, 255, 0.6);
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(76, 175, 80, 0.4), 8, 0.0, 0, 3);
+}
+
+.nav-button-active:hover {
+    -fx-background-color: linear-gradient(to right, #45a049, #3d8b40);
+    -fx-effect: dropshadow(gaussian, rgba(76, 175, 80, 0.6), 10, 0.0, 0, 4);
+}
+
+/* === 子视图容器样式 === */
+.sub-view-container {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+}
+
+/* === 响应式设计：小屏幕适配 === */
+@media (max-width: 800px) {
+    .admin-title {
+        -fx-font-size: 36px;
+    }
+
+    .admin-subtitle {
+        -fx-font-size: 14px;
+    }
+
+    .admin-function-button {
+        -fx-min-width: 120px;
+        -fx-padding: 12 20 12 20;
+        -fx-font-size: 12px;
+    }
+
+    .nav-button {
+        -fx-min-width: 100px;
+        -fx-padding: 8 16 8 16;
+        -fx-font-size: 11px;
+    }
+
+    .stats-item {
+        -fx-font-size: 14px;
+        -fx-padding: 6 12 6 12;
+    }
+
+    .recent-actions-content {
+        -fx-font-size: 12px;
+        -fx-padding: 8 16 8 16;
+    }
+
+    .form-field,
+    .form-combo {
+        -fx-pref-width: 150px;
+    }
+
+    .create-button,
+    .save-button,
+    .reset-button,
+    .clear-button {
+        -fx-min-width: 100px;
+        -fx-padding: 8 16 8 16;
+        -fx-font-size: 12px;
+    }
 }
