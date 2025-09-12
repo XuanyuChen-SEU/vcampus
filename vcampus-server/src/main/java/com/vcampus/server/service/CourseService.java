@@ -1,81 +1,146 @@
 package com.vcampus.server.service;
 
+import com.vcampus.common.dao.ICourseDao;
+import com.vcampus.common.dto.ClassSession;
 import com.vcampus.common.dto.Course;
 import com.vcampus.common.dto.CourseSelection;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.common.enums.CourseStatus;
-import com.vcampus.server.dao.impl.CourseDao;
-import com.vcampus.common.dao.ICourseDao;
+import com.vcampus.server.dao.impl.FakeCourseDao;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * 服务端课程服务 (最终测试版)
+ * 职责：
+ * 1. 在构造时创建【您指定的】模拟数据。
+ * 2. 将模拟数据注入到一个 FakeCourseDao 实例中。
+ * 3. 包含所有业务逻辑，并通过 DAO 接口进行数据操作。
+ */
 public class CourseService {
-    //这里要紧行具体实现
-    private final ICourseDao courseDAO = new CourseDao();
+
+    private final ICourseDao courseDAO;
+
+    public CourseService() {
+        FakeCourseDao fakeDao = new FakeCourseDao();
+        this.courseDAO = fakeDao;
+
+        List<Course> courseTable = new ArrayList<>();
+        List<CourseSelection> selectionTable = new ArrayList<>();
+
+        System.out.println("SERVICE: 正在创建【最终版】可交互的测试数据...");
+
+        // ⭐ 1. 用于测试【退课】功能
+        List<ClassSession> englishSessions = List.of(
+                new ClassSession("ENG_S01", "[01] 张老师", "1-16周 周二 3-4节", 60, 16, false)
+        );
+        courseTable.add(new Course("B17M0010", "大学英语II", "必修", "外国语学院", null, englishSessions));
+
+        // ⭐ 2. 用于测试【选课】功能
+        List<ClassSession> seSessions = List.of(
+                new ClassSession("SE_S01", "[01] 刘老师", "1-16周 周一 5-6节", 50, 20, false)
+        );
+        courseTable.add(new Course("B08M4000", "软件工程", "限选", "计算机学院", null, seSessions));
+
+        // ⭐ 3. 用于测试【选课失败 - 已满】
+        List<ClassSession> networkSessions = List.of(
+                new ClassSession("CS_S01", "[01] 王教授", "1-8周 周一 1-4节", 50, 50, false)
+        );
+        courseTable.add(new Course("B08M3000", "计算机网络", "必修", "计算机学院", null, networkSessions));
+
+        // ⭐ 4. 为学生 '1234567' 创建初始选课记录
+        // 注意：这里的 sessionId 'ENG_S01' 必须与上面课程中定义的 sessionId 一致
+        selectionTable.add(new CourseSelection("1234567", "ENG_S01", "已选"));
+
+        // 注入数据
+        fakeDao.setCourseTable(courseTable);
+        fakeDao.setSelectionTable(selectionTable);
+    }
+
+    // --- 业务逻辑方法 (使用 Message.success/failure 静态方法) ---
 
     public Message getAllCourses(String userId) {
         try {
-            // 1. 从DAO获取所有课程的“模板”数据
             List<Course> allCourses = courseDAO.getAllCourses();
-            // 2. 从DAO获取该学生的所有选课记录
             List<CourseSelection> userSelections = courseDAO.getSelectionsByStudentId(userId);
             Set<String> selectedSessionIds = userSelections.stream()
                     .map(CourseSelection::getCourseId)
                     .collect(Collectors.toSet());
 
-            // 3. ⭐ 核心业务逻辑：为该学生动态计算每门课的状态
+            //----------------------------------------------------------------------------------
+            // 打印所有课程数据（在处理前）
+            System.out.println("获取了所有的课程如下：");
             for (Course course : allCourses) {
-                // 判断学生是否已选该课程下的某个教学班
+                System.out.println("课程ID: " + course.getCourseId());
+                System.out.println("课程名称: " + course.getCourseName());
+                //System.out.println("课程类型: " + course.getType());
+                System.out.println("开课学院: " + course.getDepartment());
+                System.out.println("课程状态: " + course.getStatus());
+                System.out.println("教学班数量: " + course.getSessions().size());
+                System.out.println("教学班信息:");
+                for (ClassSession session : course.getSessions()) {
+                    System.out.println("  - 教学班ID: " + session.getSessionId());
+                    //System.out.println("    教师: " + session.getTeacher());
+                    //System.out.println("    时间地点: " + session.getSchedule());
+                    System.out.println("    容量: " + session.getCapacity());
+                    //System.out.println("    当前人数: " + session.getCurrentEnrollment());
+                    System.out.println("    是否已选: " + session.isSelectedByStudent());
+                }
+                System.out.println("------------------------");
+            }
+
+            //----------------------------------------------------------------------------------
+
+            for (Course course : allCourses) {
                 boolean isCourseSelected = course.getSessions().stream()
                         .anyMatch(session -> selectedSessionIds.contains(session.getSessionId()));
-
                 if (isCourseSelected) {
                     course.setStatus(CourseStatus.SELECTED);
-                    // 标记具体的教学班为已选
                     course.getSessions().forEach(session -> {
                         if (selectedSessionIds.contains(session.getSessionId())) {
                             session.setSelectedByStudent(true);
                         }
                     });
                 } else {
-                    // TODO: 在这里可以添加更复杂的冲突、已满等状态判断
                     course.setStatus(CourseStatus.NOT_SELECTED);
                 }
-                course.setSessionnum(course.getSessions().size()); // 更新教学班数量
+                course.setSessionnum(course.getSessions().size());
             }
-
-            return new Message(ActionType.GET_ALL_COURSES_RESPONSE, true, allCourses.toString());
+            // 返回修正后的成功消息
+            return Message.success(ActionType.GET_ALL_COURSES_RESPONSE, allCourses, "成功获取课程列表");
         } catch (Exception e) {
             e.printStackTrace();
-            return new Message(ActionType.GET_ALL_COURSES_RESPONSE, false, "获取课程列表时服务器出错");
+            return Message.failure(ActionType.GET_ALL_COURSES_RESPONSE, "获取课程列表时服务器出错");
         }
     }
 
     public Message selectCourse(String studentId, String sessionId) {
         try {
-            // 在这里进行业务逻辑判断
             if (courseDAO.isSessionFull(sessionId)) {
-                return new Message(ActionType.SELECT_COURSE_RESPONSE, false, "选课失败：课程人数已满");
+                // ⭐ 修正：使用 Message.failure
+                return Message.failure(ActionType.SELECT_COURSE_RESPONSE, "选课失败：课程人数已满");
             }
             if (courseDAO.hasScheduleConflict(studentId, sessionId)) {
-                return new Message(ActionType.SELECT_COURSE_RESPONSE, false, "选课失败：与已选课程时间冲突");
+                // ⭐ 修正：使用 Message.failure
+                return Message.failure(ActionType.SELECT_COURSE_RESPONSE, "选课失败：与已选课程时间冲突");
             }
-            // ... 其他判断
 
-            // 调用DAO执行数据库操作
             CourseSelection newSelection = new CourseSelection(studentId, sessionId, "已选");
             boolean success = courseDAO.addCourseSelection(newSelection);
 
             if(success) {
-                return new Message(ActionType.SELECT_COURSE_RESPONSE, true, "选课成功！");
+                // ⭐ 修正：使用 Message.success(ActionType, String)，因为这里不需要返回额外数据
+                return Message.success(ActionType.SELECT_COURSE_RESPONSE, "选课成功！");
             } else {
-                return new Message(ActionType.SELECT_COURSE_RESPONSE, false, "选课失败，数据库操作异常");
+                return Message.failure(ActionType.SELECT_COURSE_RESPONSE, "选课失败，数据库操作异常");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new Message(ActionType.SELECT_COURSE_RESPONSE, false, "处理选课时服务器出错");
+            return Message.failure(ActionType.SELECT_COURSE_RESPONSE, "处理选课时服务器出错");
         }
     }
 
@@ -83,14 +148,14 @@ public class CourseService {
         try {
             boolean success = courseDAO.removeCourseSelection(studentId, sessionId);
             if(success) {
-                return new Message(ActionType.DROP_COURSE_RESPONSE, true, "退课成功！");
+                // ⭐ 修正：使用 Message.success
+                return Message.success(ActionType.DROP_COURSE_RESPONSE, "退课成功！");
             } else {
-                return new Message(ActionType.DROP_COURSE_RESPONSE, false, "退课失败，您可能未选此课");
+                return Message.failure(ActionType.DROP_COURSE_RESPONSE, "退课失败，您可能未选此课");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new Message(ActionType.DROP_COURSE_RESPONSE, false, "处理退课时服务器出错");
+            return Message.failure(ActionType.DROP_COURSE_RESPONSE, "处理退课时服务器出错");
         }
     }
 }
-

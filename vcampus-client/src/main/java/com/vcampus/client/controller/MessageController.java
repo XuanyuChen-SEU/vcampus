@@ -9,11 +9,12 @@ import com.vcampus.common.dto.Message;
  * 编写人：谌宣羽
  */
 public class MessageController {
-    
+
     private LoginController loginController;
     private StudentController studentController;
     private ShopController shopController;
     private ChangePasswordController changePasswordController;
+    private AcademicController academicController; // ⭐ 新增 AcademicController 的引用
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -28,6 +29,11 @@ public class MessageController {
         this.studentController=controller;
     }
     public void setShopController(ShopController controller){this.shopController=controller;}
+    // ⭐ 新增 AcademicController 的注册方法
+    public void setAcademicController(AcademicController controller) {
+        this.academicController = controller;
+        System.out.println("INFO: AcademicController 已成功注册到 MessageController。");
+    }
 
     /**
      * 处理服务端消息
@@ -106,6 +112,29 @@ public class MessageController {
                         System.err.println("路由警告：收到收藏列表响应，但ShopController未注册。");
                     }
                     break;
+
+
+                    //处理新增课程相关业务
+                // --- ⭐ 新增：处理课程相关的响应 ---
+                case GET_ALL_COURSES_RESPONSE:
+                    if (academicController != null) {
+                        academicController.handleGetAllCoursesResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到课程列表响应，但 AcademicController 未注册！");
+                    }
+                    break;
+
+                case SELECT_COURSE_RESPONSE:
+                case DROP_COURSE_RESPONSE:
+                    if (academicController != null) {
+                        academicController.handleSelectOrDropCourseResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到选/退课响应，但 AcademicController 未注册！");
+                    }
+                    break;
+
+
+
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
                     break;

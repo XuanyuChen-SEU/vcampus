@@ -4,6 +4,7 @@ import com.vcampus.common.enums.CourseStatus;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 课程数据传输对象（DTO）
@@ -41,6 +42,27 @@ public class Course implements Serializable {
         this.sessions = sessions;
         this.sessionnum = sessions.size() ;
     }
+
+    //进行一项深拷贝
+    // 在 Course.java (common DTO) 中添加
+    public Course(Course other) {
+        this.courseId = other.courseId;
+        this.courseName = other.courseName;
+        this.courseType = other.courseType;
+        this.department = other.department;
+        this.status = other.status;
+        this.sessionnum = other.sessionnum;
+        // 对 sessions 列表也进行深拷贝
+        if (other.sessions != null) {
+            this.sessions = other.sessions.stream().map(ClassSession::new).collect(Collectors.toList());
+        }
+    }
+
+
+
+
+
+
 
     // Getter & Setter方法
     // --- 构造方法, Getters, Setters ---

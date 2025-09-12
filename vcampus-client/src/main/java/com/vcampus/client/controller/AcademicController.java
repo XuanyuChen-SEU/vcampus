@@ -72,9 +72,9 @@ public class AcademicController implements IClientController {
 //    @FXML
 //    private Button viewCourseTableButton;
 //
-//    //所有选课课表
+    //所有选课课表
 //    @FXML
-//    private TableView<Course> CoursesTable;
+//    private Button selectCoursesButton; // 变量名必须和 fx:id 完全一致
 //
 //    //我的课表
 //    @FXML
@@ -109,7 +109,7 @@ public class AcademicController implements IClientController {
 //    private TableColumn<Course, String> timeSlotColumn;
 
     // AcademicController 持有 CourseService 的实例来请求数据（准备传给service用来拉取信息💻）
-    private final CourseService courseService = new CourseService();
+    private final CourseService CourseService = new CourseService();
     private ClassSession session;
     // 用于跟踪当前激活的导航按钮
     private Button currentActiveButton;
@@ -126,10 +126,13 @@ public class AcademicController implements IClientController {
     @FXML
     public void initialize() {
         System.out.println("教务模块已加载。");
+        // ⭐ 注册自己到总消息控制器
+
         handleShowSelectCourses(null);//默认进行选课画面
         // 示例：调用服务层获取数据并更新UI
         // setupBookTable();
         // loadAllBooks();
+        registerToMessageController();
     }
 
     @FXML
@@ -159,6 +162,7 @@ public class AcademicController implements IClientController {
         updateButtonStyles(selectCoursesButton);
 
         // ⭐ 指挥 Service 层去从服务器获取数据
+        //  最先要实现的功能，就是先把所有课表进行拉取
         requestCourseDataFromServer();
     }
 
@@ -167,9 +171,17 @@ public class AcademicController implements IClientController {
     //必须做的一步：注册到message controller(线桥），要不然无法住转发
     @Override
     public void registerToMessageController() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'registerToMessageController'");
+        // 获取全局SocketClient中的MessageController
+        com.vcampus.client.controller.MessageController messageController =
+                CourseService.getGlobalSocketClient().getMessageController();
+        if (messageController != null) {
+            messageController.setAcademicController(this);
+            System.out.println("教务Controller 已成功注册到 MessageController。");
+        } else {
+            System.err.println("严重错误：教务Controller 注册失败，无法获取 MessageController 实例！");
+        }
     }
+/// //
 
     // =================================================================
     //
@@ -200,6 +212,44 @@ public class AcademicController implements IClientController {
                 // 注意：这里需要你和后端约定好，数据是以 List<Course> 的形式存放在 message.getData() 中
                 try {
                     List<Course> courses = (List<Course>) message.getData();
+
+
+
+                    // =========================================================
+                    // ⭐ 新增：在控制台清晰地打印出收到的所有课程数据
+                    // =========================================================
+//                    System.out.println(); // 打印一个空行，方便区分
+//                    System.out.println("----------- ✅ 客户端成功收到课程数据 ✅ -----------");
+//
+//                    if (courses == null || courses.isEmpty()) {
+//                        System.out.println("收到的课程列表为空。");
+//                    } else {
+//                        System.out.println("共收到 " + courses.size() + " 门课程:");
+//                        for (Course course : courses) {
+//                            System.out.println(String.format(
+//                                    "  - 课程ID: %-10s | 名称: %-15s | 状态: %-12s | 教学班数量: %d",
+//                                    course.getCourseId(),
+//                                    course.getCourseName(),
+//                                    course.getStatus(),
+//                                    course.getSessions() != null ? course.getSessions().size() : 0
+//                            ));
+//                            if (course.getSessions() != null) {
+//                                for (ClassSession session : course.getSessions()) {
+//                                    System.out.println(String.format(
+//                                            "    -> 教学班ID: %-10s | 教师: %-10s | 是否已选: %b",
+//                                            session.getSessionId(),
+//                                            session.getTeacherName(),
+//                                            session.isSelectedByStudent()
+//                                    ));
+//                                }
+//                            }
+//                        }
+//                    }
+//                    System.out.println("-------------------------------------------------");
+//                    System.out.println(); // 打印一个空行
+////-------------------------------------------------------
+
+
                     // 2. 调用我们之前写好的UI填充方法
                     populateCourseList(courses);
                 } catch (Exception e) {
@@ -222,7 +272,7 @@ public class AcademicController implements IClientController {
             if (message.isSuccess()) {
                 // 操作成功，刷新整个课程列表以同步最新状态
                 System.out.println("选课/退课操作成功，刷新列表...");
-                courseService.getAllSelectableCourses(); // 再次请求数据
+                CourseService.getAllSelectableCourses(); // 再次请求数据
                 showLoadingIndicator();
             } else {
                 // 操作失败，弹窗提示错误信息
@@ -282,9 +332,9 @@ public class AcademicController implements IClientController {
      */
     private void handleFinalSelectAction(ClassSession session) {
         if (session.isSelectedByStudent()) {
-            courseService.dropCourse(session.getSessionId());
+            CourseService.dropCourse(session.getSessionId());
         } else {
-            courseService.selectCourse(session.getSessionId());
+            CourseService.selectCourse(session.getSessionId());
         }
     }
 
@@ -333,10 +383,11 @@ public class AcademicController implements IClientController {
 
     /**
      * 私有辅助方法，负责发起数据请求和显示加载动画。
+     * //拉取所有课表
      */
     private void requestCourseDataFromServer() {
         showLoadingIndicator();
-        courseService.getAllSelectableCourses();
+        CourseService.getAllSelectableCourses();
     }
 
     /**
@@ -354,7 +405,7 @@ public class AcademicController implements IClientController {
             }
 
             for (Course course : courses) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/vcampus/client/view/CourseCard.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/academic/CourseCard.fxml"));
                 Node courseCardNode = loader.load();
                 CourseCardController controller = loader.getController();
 
@@ -380,23 +431,23 @@ public class AcademicController implements IClientController {
 
     // 小测一手数据
     // 模拟数据，请替换为您的真实数据来源
-    private List<Course> createMockCourses() {
-        List<Course> courses = new ArrayList<>();
-        List<ClassSession> sessions1 = List.of(
-                new ClassSession("S01", "[01] 宋安娜教师", "1-16周 周二 1-2节", 31, 0, false),
-                new ClassSession("S02", "[02] 宋安娜教师", "1-16周 周五 6-7节", 31, 0, false)
-        );
-        courses.add(new Course("B17M0010", "大学英语II", "必修", "外国语学院", CourseStatus.NOT_SELECTED, sessions1));
-
-        List<ClassSession> sessions2 = List.of(
-                new ClassSession("S03", "[01] 李教授", "1-8周 周一 3-4节", 50, 50, false)
-        );
-        courses.add(new Course("B08M3000", "计算机网络", "必修", "计算机学院", CourseStatus.FULL, sessions2));
-
-        List<ClassSession> sessions3 = List.of(
-                new ClassSession("S04", "[01] 赵老师", "1-16周 周三 1-2节", 40, 39, true)
-        );
-        courses.add(new Course("B07M1010", "数学分析", "必修", "理学院", CourseStatus.SELECTED, sessions3));
-        return courses;
-    }
+//    private List<Course> createMockCourses() {
+//        List<Course> courses = new ArrayList<>();
+//        List<ClassSession> sessions1 = List.of(
+//                new ClassSession("S01", "[01] 宋安娜教师", "1-16周 周二 1-2节", 31, 0, false),
+//                new ClassSession("S02", "[02] 宋安娜教师", "1-16周 周五 6-7节", 31, 0, false)
+//        );
+//        courses.add(new Course("B17M0010", "大学英语II", "必修", "外国语学院", CourseStatus.NOT_SELECTED, sessions1));
+//
+//        List<ClassSession> sessions2 = List.of(
+//                new ClassSession("S03", "[01] 李教授", "1-8周 周一 3-4节", 50, 50, false)
+//        );
+//        courses.add(new Course("B08M3000", "计算机网络", "必修", "计算机学院", CourseStatus.FULL, sessions2));
+//
+//        List<ClassSession> sessions3 = List.of(
+//                new ClassSession("S04", "[01] 赵老师", "1-16周 周三 1-2节", 40, 39, true)
+//        );
+//        courses.add(new Course("B07M1010", "数学分析", "必修", "理学院", CourseStatus.SELECTED, sessions3));
+//        return courses;
+//    }
 }
