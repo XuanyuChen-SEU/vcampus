@@ -81,6 +81,7 @@ public class MessageController {
                 } else {
                     System.err.println("StudentController未设置，无法处理学生信息获取响应");
                 }
+                break;
                 case UPDATE_STUDENT:
                     if (studentController != null) {
                         studentController.handleUpdateStudentResponse(message);

@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -18,34 +17,29 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-/**
- * 最外层“三明治”结构的控制器：教务管理模块主控制器。 (最终修正版)
- */
 public class AcademicController implements IClientController {
 
-    @FXML private Pane contentPane;
+    // ⭐ 修正1：注入的不再是 Pane，而是 FXML 中 ScrollPane 内部的 VBox 容器
+    @FXML
+    private VBox courseListContainer;
+
     @FXML private Button timetableButton;
     @FXML private Button selectCoursesButton;
 
-    // ⭐ 修正1：遵循 Java 命名规范，变量名以小写字母开头。
+    // ⭐ 修正2：遵循 Java 命名规范，变量名以小写字母开头
     private final CourseService courseService = new CourseService();
     private Button currentActiveButton;
 
     @FXML
     public void initialize() {
         System.out.println("教务模块已加载。");
-        // 注册自己到总消息控制器，以便接收服务器响应
         registerToMessageController();
-        // 默认显示选课界面并加载数据
         handleShowSelectCourses(null);
     }
 
-    /**
-     * 实现 IClientController 接口的注册方法。
-     */
     @Override
     public void registerToMessageController() {
-        // ⭐ 修正2：从应用主类(MainApp)获取全局 MessageController，而不是从 Service 获取
+        // ⭐ 修正3：从应用主类(MainApp)获取全局 MessageController
         com.vcampus.client.controller.MessageController messageController =
                 courseService.getGlobalSocketClient().getMessageController();
         if (messageController != null) {
@@ -57,33 +51,30 @@ public class AcademicController implements IClientController {
 
     @FXML
     private void handleShowTimetable(ActionEvent event) {
-        System.out.println("切换到'我的课表'视图");
         updateButtonStyles(timetableButton);
-        contentPane.getChildren().clear();
+        // ⭐ 现在的操作目标是 courseListContainer
+        courseListContainer.getChildren().clear();
         showPlaceholder("“我的课表”功能正在开发中...");
     }
 
     @FXML
     private void handleShowSelectCourses(ActionEvent event) {
-        System.out.println("切换到'选课'视图");
         if (selectCoursesButton != null) {
             updateButtonStyles(selectCoursesButton);
         }
         requestCourseDataFromServer();
     }
 
-    /**
-     * [响应处理器 ①]：处理“获取所有课程”的响应
-     */
     public void handleGetAllCoursesResponse(Message message) {
         Platform.runLater(() -> {
             hideLoadingIndicator();
-            if (message.isSuccess()) {
+            if (message.isSuccess() && message.getData() instanceof List) {
                 try {
+                    @SuppressWarnings("unchecked")
                     List<Course> courses = (List<Course>) message.getData();
                     populateCourseList(courses);
-                } catch (ClassCastException e) {
-                    showError("客户端错误：无法解析服务器返回的课程数据。");
+                } catch (Exception e) {
+                    showError("客户端错误：渲染课程UI失败。");
                     e.printStackTrace();
                 }
             } else {
@@ -92,76 +83,53 @@ public class AcademicController implements IClientController {
         });
     }
 
-    /**
-     * [响应处理器 ②]：处理“选课/退课”操作的最终结果
-     */
     public void handleSelectOrDropCourseResponse(Message message) {
         Platform.runLater(() -> {
             if (message.isSuccess()) {
                 showAlert(Alert.AlertType.INFORMATION, "操作成功", message.getMessage());
-                // 操作成功后，重新请求数据以刷新整个界面，确保状态完全同步
-                requestCourseDataFromServer();
             } else {
                 showAlert(Alert.AlertType.ERROR, "操作失败", message.getMessage());
-                // 即使操作失败，也刷新一次，以解除按钮的“处理中”状态
-                requestCourseDataFromServer();
             }
+            // 无论成功失败，都刷新列表以同步最新状态
+            requestCourseDataFromServer();
         });
     }
 
-    /**
-     * 私有辅助方法，负责发起数据请求和显示加载动画。
-     */
     private void requestCourseDataFromServer() {
         showLoadingIndicator();
-        // ⭐ 修正3：通过“对象实例(courseService)”来调用它的“非静态方法”
         courseService.getAllSelectableCourses();
     }
 
     /**
-     * 私有辅助方法，负责将课程数据动态加载成UI（串联“中间层”的核心）。
+     * ⭐ 修正4：方法已大大简化，不再需要创建 VBox 和 ScrollPane
      */
     private void populateCourseList(List<Course> courses) {
+        courseListContainer.getChildren().clear();
+        if (courses == null || courses.isEmpty()) {
+            showPlaceholder("当前没有可选课程。");
+            return;
+        }
         try {
-            contentPane.getChildren().clear();
-            VBox courseListContainer = new VBox();
-
-            if (courses == null || courses.isEmpty()) {
-                showPlaceholder("当前没有可选课程。");
-                return;
-            }
-
             for (Course course : courses) {
-                // ⭐ 修正4：修复 FXML 路径中的拼写错误 (fxmll -> fxml)
-                String fxmlPath = "/fxml/academic/CourseCard.fxml";
-
-                URL resourceUrl = getClass().getResource(fxmlPath);
+                if(course == null) continue;
+                URL resourceUrl = getClass().getResource("/fxml/academic/CourseCard.fxml");
                 if (resourceUrl == null) {
-                    showError("客户端严重错误：找不到 CourseCard.fxml 文件！请检查路径：" + fxmlPath);
+                    showError("客户端致命错误：找不到 CourseCard.fxml 文件！");
                     return;
                 }
-
                 FXMLLoader loader = new FXMLLoader(resourceUrl);
                 Node courseCardNode = loader.load();
                 CourseCardController controller = loader.getController();
                 controller.setData(course);
+                // ⭐ 直接将课程卡片添加到 FXML 中定义的 VBox 里
                 courseListContainer.getChildren().add(courseCardNode);
             }
-
-            ScrollPane scrollPane = new ScrollPane(courseListContainer);
-            scrollPane.setFitToWidth(true);
-            scrollPane.getStyleClass().add("edge-to-edge");
-
-            contentPane.getChildren().add(scrollPane);
         } catch (IOException e) {
             e.printStackTrace();
-            showError("加载课程卡片UI失败：" + e.getMessage());
+            showError("加载课程UI失败：" + e.getMessage());
         }
     }
 
-    /**
-     * 私有辅助方法，更新导航按钮的样式。
-     */
     private void updateButtonStyles(Button activeButton) {
         if (currentActiveButton != null) {
             currentActiveButton.getStyleClass().remove("active-tab-button");
@@ -172,24 +140,27 @@ public class AcademicController implements IClientController {
         }
     }
 
-    // --- UI反馈辅助方法 ---
+    // ⭐ 修正5：让加载动画和提示信息也显示在 courseListContainer 中
     private void showLoadingIndicator() {
-        contentPane.getChildren().clear();
+        courseListContainer.getChildren().clear();
         ProgressIndicator pi = new ProgressIndicator();
-        StackPane.setAlignment(pi, javafx.geometry.Pos.CENTER);
-        contentPane.getChildren().add(pi);
+        courseListContainer.setAlignment(javafx.geometry.Pos.CENTER);
+        courseListContainer.getChildren().add(pi);
     }
 
     private void hideLoadingIndicator() {
-        contentPane.getChildren().removeIf(node -> node instanceof ProgressIndicator);
+        // 当 populateCourseList 运行时，它会先 clear()，所以这个方法可以为空
+        // 或者保留以防万一
+        courseListContainer.getChildren().removeIf(node -> node instanceof ProgressIndicator);
+        courseListContainer.setAlignment(javafx.geometry.Pos.TOP_LEFT); // 恢复默认对齐
     }
 
     private void showPlaceholder(String text) {
-        contentPane.getChildren().clear();
+        courseListContainer.getChildren().clear();
         Label placeholder = new Label(text);
         placeholder.setStyle("-fx-font-size: 16px; -fx-text-fill: #888;");
-        StackPane.setAlignment(placeholder, javafx.geometry.Pos.CENTER);
-        contentPane.getChildren().add(placeholder);
+        courseListContainer.setAlignment(javafx.geometry.Pos.CENTER);
+        courseListContainer.getChildren().add(placeholder);
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
@@ -198,10 +169,8 @@ public class AcademicController implements IClientController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
-
-
     }
-    // 添加缺失的showError方法
+
     private void showError(String errorMessage) {
         showAlert(Alert.AlertType.ERROR, "错误", errorMessage);
     }

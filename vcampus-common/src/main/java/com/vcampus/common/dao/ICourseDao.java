@@ -21,4 +21,6 @@ public interface ICourseDao {
     boolean addCourseSelection(CourseSelection selection);
     // 删除一条选课记录
     boolean removeCourseSelection(String studentId, String sessionId);
+    // 检查学生是否已选过该课程
+    boolean isAlreadyEnrolled(String studentId, String sessionId);
 }

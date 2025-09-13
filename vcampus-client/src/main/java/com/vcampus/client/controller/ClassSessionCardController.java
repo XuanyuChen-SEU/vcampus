@@ -28,15 +28,22 @@ public class ClassSessionCardController {
      */
     //这个回调我觉得后期可以换成message,就是怎么通过message来实现回调
     public void setData(ClassSession session) {
+//        this.session = session;
+//
+//        teacherNameLabel.setText(session.getTeacherName());
+//        //scheduleLabel.setText(session.getScheduleInfo());
+//        capacityLabel.setText("课容量: " + session.getCapacity() + "人");
+//        enrolledLabel.setText("已选人数: " + session.getEnrolledCount() + "人");
+//
+//        selectedTagLabel.setVisible(session.isSelectedByStudent());
+//        selectedTagLabel.setManaged(session.isSelectedByStudent());
+//        updateButtonState();
         this.session = session;
-
+        // ⭐ 每次都用最新的 session 对象数据来完全重置UI
         teacherNameLabel.setText(session.getTeacherName());
-        //scheduleLabel.setText(session.getScheduleInfo());
+        scheduleLabel.setText(session.getScheduleInfo());
         capacityLabel.setText("课容量: " + session.getCapacity() + "人");
         enrolledLabel.setText("已选人数: " + session.getEnrolledCount() + "人");
-
-        selectedTagLabel.setVisible(session.isSelectedByStudent());
-        selectedTagLabel.setManaged(session.isSelectedByStudent());
         updateButtonState();
     }
 
