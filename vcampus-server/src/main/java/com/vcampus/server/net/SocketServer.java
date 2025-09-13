@@ -122,7 +122,7 @@ public class SocketServer {
                                 out.writeObject(response);
                                 out.flush();
                             }
-                            System.out.println("发送响应: " + response.getAction() + " - " + response.isSuccess());
+                            System.out.println("发送响应: " + response.getAction() + " - " + response.isSuccess() + "-" + response.getMessage());
                         } catch (IOException e) {
                             System.err.println("发送响应失败: " + e.getMessage());
                         }

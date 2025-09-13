@@ -69,6 +69,7 @@ public class CourseService {
 
     /**
      * 请求退选一个教学班。
+     * \
      * @param sessionId 要退选的教学班 ID
      */
     public void dropCourse(String sessionId) {
@@ -87,11 +88,6 @@ public class CourseService {
         System.out.println("Service: 发送退课请求 -> " + request);
         socketClient.sendMessage(request);
     }
-
-
-
-
-
 
 
 
@@ -195,6 +191,13 @@ public class CourseService {
     public SocketClient getGlobalSocketClient() {
         return socketClient;
     }
+
+    /**
+     * 获取学生信息：我随便创造一组数据
+     */
+//    public String getLoginInfoForDisplay(String userId, String password) {
+//        return String.format("用户名: %s, 密码: %s", userId, password);
+//
 
      //调试用：
 }

@@ -1,8 +1,6 @@
 package com.vcampus.client.controller;
 
-import com.vcampus.client.controller.userAdmin.UserCreateViewController;
-import com.vcampus.client.controller.userAdmin.UserListViewController;
-import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
+import com.vcampus.client.controller.ChangePasswordController;
 import com.vcampus.common.dto.Message;
 
 /**
@@ -11,18 +9,13 @@ import com.vcampus.common.dto.Message;
  * 编写人：谌宣羽
  */
 public class MessageController {
-    
+
     private LoginController loginController;
     private StudentController studentController;
     private StudentAdminController studentadminController;
-    private ChangePasswordController changePasswordController;
-
-    private UserCreateViewController userCreateViewController;
-    private UserListViewController userListViewController;
-    private UserPasswordResetViewController userPasswordResetViewController;
-
     private ShopController shopController;
-
+    private ChangePasswordController changePasswordController;
+    private AcademicController academicController; // ⭐ 新增 AcademicController 的引用
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -37,16 +30,12 @@ public class MessageController {
         this.studentController=controller;
     }
     public void setStudentAdminController(StudentAdminController controller){this.studentadminController=controller;}
-    public void setUserCreateViewController(UserCreateViewController controller){
-        this.userCreateViewController=controller;
-    }
-    public void setUserListViewController(UserListViewController controller){
-        this.userListViewController=controller;
-    }
-    public void setUserPasswordResetViewController(UserPasswordResetViewController controller){
-        this.userPasswordResetViewController=controller;
-    }
     public void setShopController(ShopController controller){this.shopController=controller;}
+    // ⭐ 新增 AcademicController 的注册方法
+    public void setAcademicController(AcademicController controller) {
+        this.academicController = controller;
+        System.out.println("INFO: AcademicController 已成功注册到 MessageController。");
+    }
 
     /**
      * 处理服务端消息
@@ -62,7 +51,7 @@ public class MessageController {
                 return;
             }
 
-            
+
             // 根据ActionType调用对应的子控制器
             //其实这个更像分发层，最先接受到服务器传来的消息，然后分配给各个Controller进行操作
             // 这里可以根据实际需求添加更多的case，哥哥controller根据消息进行处理，进而回传给终端进行改变
@@ -88,40 +77,12 @@ public class MessageController {
                         System.err.println("ChangePasswordController未设置，无法处理修改密码响应");
                     }
                     break;
-                case SEARCH_USERS:
-                    if (userListViewController != null) {
-                        userListViewController.handleSearchUsersResponse(message);
-                    } else {
-                        System.err.println("UserListViewController未设置，无法处理搜索用户响应");
-                    }
-                    break;
-                case DELETE_USER:
-                    if (userListViewController != null) {
-                        userListViewController.handleDeleteUserResponse(message);
-                    } else {
-                        System.err.println("UserListViewController未设置，无法处理删除用户响应");
-                    }
-                    break;
-                case RESET_USER_PASSWORD:
-                    if (userPasswordResetViewController != null) {
-                        userPasswordResetViewController.handleResetUserPasswordResponse(message);
-                    } else {
-                        System.err.println("UserPasswordResetViewController未设置，无法处理重置用户密码响应");
-                    }
-                    break;
-                case CREATE_USER:
-                    if (userCreateViewController != null) {
-                        userCreateViewController.handleCreateUserResponse(message);
-                    } else {
-                        System.err.println("UserCreateViewController未设置，无法处理创建用户响应");
-                    }
-                    break;
                 case INFO_STUDENT:
                     if (studentController != null) {
-                    studentController.handleStudentInfoResponse(message);
-                } else {
-                    System.err.println("StudentController未设置，无法处理学生信息获取响应");
-                }
+                        studentController.handleStudentInfoResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
                 case UPDATE_STUDENT:
                     if (studentController != null) {
                         studentController.handleUpdateStudentResponse(message);
@@ -150,6 +111,7 @@ public class MessageController {
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
                     }
                     break;
+
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
                     if (shopController != null) {
@@ -174,11 +136,34 @@ public class MessageController {
                         System.err.println("路由警告：收到收藏列表响应，但ShopController未注册。");
                     }
                     break;
+
+
+                //处理新增课程相关业务
+                // --- ⭐ 新增：处理课程相关的响应 ---
+                case GET_ALL_COURSES_RESPONSE:
+                    if (academicController != null) {
+                        academicController.handleGetAllCoursesResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到课程列表响应，但 AcademicController 未注册！");
+                    }
+                    break;
+
+                case SELECT_COURSE_RESPONSE:
+                case DROP_COURSE_RESPONSE:
+                    if (academicController != null) {
+                        academicController.handleSelectOrDropCourseResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到选/退课响应，但 AcademicController 未注册！");
+                    }
+                    break;
+
+
+
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
                     break;
             }
-            
+
         } catch (Exception e) {
             System.err.println("处理消息时发生错误: " + e.getMessage());
         }
