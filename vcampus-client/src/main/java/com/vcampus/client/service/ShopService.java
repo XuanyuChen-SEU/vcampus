@@ -72,4 +72,12 @@ public class ShopService {
     public SocketClient getGlobalSocketClient() {
         return socketClient;
     }
+
+    public void getProductDetail(String productId) {
+        // 【核心修正】只发送消息，不等待响应。
+        // 我们假设发送方法是 getGlobalSocketClient().send(message)
+        // 请根据您项目中其他 Service 的写法，确认是 send 还是 sendMessage
+        Message request = new Message(ActionType.SHOP_GET_PRODUCT_DETAIL, productId);
+        getGlobalSocketClient().sendMessage(request);
+    }
 }

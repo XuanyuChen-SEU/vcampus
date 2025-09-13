@@ -80,4 +80,14 @@ public class ShopService {
     public List<ShopTransaction> getMyFavorites(String userId) {
         return shopDao.getFavoritesByUserId(userId);
     }
+    public Product getProductDetail(String productId) {
+        // 1. 在 Service 层进行业务逻辑校验
+        if (productId == null || productId.trim().isEmpty()) {
+            // 抛出异常，由 Controller 层捕获并处理
+            throw new IllegalArgumentException("无效的请求数据：商品ID不能为空。");
+        }
+
+        // 2. 调用 DAO 层获取数据
+        return shopDao.getProductById(productId);
+    }
 }

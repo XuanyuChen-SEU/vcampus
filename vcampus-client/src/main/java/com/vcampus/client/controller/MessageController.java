@@ -113,6 +113,13 @@ public class MessageController {
                         System.err.println("路由警告：收到收藏列表响应，但ShopController未注册。");
                     }
                     break;
+                case SHOP_GET_PRODUCT_DETAIL:
+                    if (shopController != null) {
+                        shopController.handleGetProductDetailResponse(message);
+                    }else {
+                        System.err.println("路由警告：收到商品详情响应，但ShopController未注册。");
+                    }
+                    break;
 
 
                     //处理新增课程相关业务
@@ -133,8 +140,6 @@ public class MessageController {
                         System.err.println("路由警告：收到选/退课响应，但 AcademicController 未注册！");
                     }
                     break;
-
-
 
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());

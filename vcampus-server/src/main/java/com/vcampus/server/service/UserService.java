@@ -35,10 +35,10 @@ public class UserService {
 
             User user = userDao.getUserById(loginUser.getUserId());
 
-            if (user == null || user.getUserId() == null || user.getUserId().equals("")) {
+            if (user==null||user.getUserId()==null||user.getUserId().equals("")) {
                 return Message.failure(ActionType.LOGIN, "用户不存在");
             }
-            if (!user.getPassword().equals(loginUser.getPassword())) {
+            if (!user.getPassword().trim().equals(loginUser.getPassword().trim())) {
                 return Message.failure(ActionType.LOGIN, "密码错误");
             }
             Role role = Role.fromUserId(loginUser.getUserId());
