@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vcampus.client.controller.StudentAdminController"
+      spacing="10">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <!-- 顶部搜索栏 -->
+    <HBox spacing="10">
+        <TextField fx:id="searchField" promptText="请输入学号或姓名" HBox.hgrow="ALWAYS"/>
+        <Button text="搜索" fx:id="searchButton"/>
+    </HBox>
+
+    <!-- 学生信息表格 -->
+    <TableView fx:id="studentTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colUserId" text="用户ID" prefWidth="100"/>
+            <TableColumn fx:id="colStudentId" text="学号" prefWidth="100"/>
+            <TableColumn fx:id="colCardId" text="一卡通号" prefWidth="120"/>
+            <TableColumn fx:id="colName" text="姓名" prefWidth="80"/>
+            <TableColumn fx:id="colGender" text="性别" prefWidth="60"/>
+            <TableColumn fx:id="colCollege" text="学院" prefWidth="120"/>
+            <TableColumn fx:id="colMajor" text="专业" prefWidth="120"/>
+            <TableColumn fx:id="colGrade" text="年级" prefWidth="80"/>
+            <TableColumn fx:id="colAction" text="操作" prefWidth="100"/>
+        </columns>
+    </TableView>
+</VBox>
+
+
+
+

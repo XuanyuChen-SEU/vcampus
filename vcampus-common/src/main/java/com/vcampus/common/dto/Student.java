@@ -43,17 +43,35 @@ public class Student implements Serializable {
     // 默认构造
     public Student() {}
 
-    public Student(String userId, String studentId, String cardId,
-                   String name, String gender, String college,
-                   String major, int grade) {
-        setUserId(userId);
-        setStudentId(studentId);
-        setCardId(cardId);
+    public Student(String userId, String studentId, String cardId, String name, String gender,
+                   String college, String major, int grade, String birth_date,
+                   String native_place, String politics_status, String student_status,
+                   String phone, String email, String dormAddress,
+                   String fatherName, String fatherPhone, String fatherPoliticsStatus, String fatherWorkUnit,
+                   String motherName, String motherPhone, String motherPoliticsStatus, String motherWorkUnit) {
+        this.userId = userId;
+        this.studentId = studentId;
+        this.cardId = cardId;
         this.name = name;
         this.gender = gender;
         this.college = college;
         this.major = major;
         this.grade = grade;
+        this.birth_date = birth_date;
+        this.native_place = native_place;
+        this.politics_status = politics_status;
+        this.student_status = student_status;
+        this.phone = phone;
+        this.email = email;
+        this.dormAddress = dormAddress;
+        this.fatherName = fatherName;
+        this.fatherPhone = fatherPhone;
+        this.fatherPoliticsStatus = fatherPoliticsStatus;
+        this.fatherWorkUnit = fatherWorkUnit;
+        this.motherName = motherName;
+        this.motherPhone = motherPhone;
+        this.motherPoliticsStatus = motherPoliticsStatus;
+        this.motherWorkUnit = motherWorkUnit;
     }
 
     // Getter & Setter

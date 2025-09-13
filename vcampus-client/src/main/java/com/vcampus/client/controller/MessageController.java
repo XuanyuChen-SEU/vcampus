@@ -14,6 +14,7 @@ public class MessageController {
     
     private LoginController loginController;
     private StudentController studentController;
+    private StudentAdminController studentadminController;
     private ChangePasswordController changePasswordController;
 
     private UserCreateViewController userCreateViewController;
@@ -35,6 +36,7 @@ public class MessageController {
     public void setStudentController(StudentController controller){
         this.studentController=controller;
     }
+    public void setStudentAdminController(StudentAdminController controller){this.studentadminController=controller;}
     public void setUserCreateViewController(UserCreateViewController controller){
         this.userCreateViewController=controller;
     }
@@ -126,7 +128,28 @@ public class MessageController {
                     } else {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
-                break;
+                    break;
+                case ALL_STUDENT:
+                    if(studentadminController!=null){
+                        studentadminController.handleAllStudentResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case SEARCH_STUDENT:
+                    if(studentadminController!=null){
+                        studentadminController.handleSearchStudentResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case INFO_STUDENT_ADMIN:
+                    if(studentadminController!=null){
+                        studentadminController.handleInfoStudentAdminResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
                     if (shopController != null) {

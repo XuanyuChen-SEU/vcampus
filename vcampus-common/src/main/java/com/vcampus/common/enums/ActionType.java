@@ -14,8 +14,15 @@ public enum ActionType {
     GLOBAL_NOTIFICATION("全局通知"),
     SYSTEM_BROADCAST("系统广播"),
     EMERGENCY_NOTIFICATION("紧急通知"),
+
+    // --- 学籍模块 - 用户端 ---
     INFO_STUDENT("获取学生信息"),
     UPDATE_STUDENT("修改学生信息"),
+    // --- 学籍模块 -管理员端 ---
+    ALL_STUDENT("获取所有学生信息"),
+    SEARCH_STUDENT("姓名模糊搜索"),
+    INFO_STUDENT_ADMIN("查看学生详细信息"),
+    UPDATE_STUDENT_ADMIN("更新学生信息"),
 
 
     // --- 商店模块 - 用户端 ---
