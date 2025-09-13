@@ -88,11 +88,11 @@ public class CourseCardController {
     }
 
 
-//    @FXML
-//    private void handleDetailsLinkClick(MouseEvent event) {
-//        System.out.println("点击了课程详情: " + course.getCourseId());
-//        event.consume();
-//    }
+    @FXML
+    private void handleDetailsLinkClick(MouseEvent event) {
+        System.out.println("点击了课程详情: " + course.getCourseId());
+        event.consume();
+    }
 
     /**
      * 私有辅助方法：加载并初始化所有的教学班卡片。
@@ -105,7 +105,7 @@ public class CourseCardController {
             for (ClassSession session : course.getSessions()) {
                 try {
                     // 动态加载最内层的 FXML 文件
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/vcampus/client/view/ClassSessionCard.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/academic/ClassSessionCard.fxml"));
                     Node sessionCardNode = loader.load();
 
                     // 获取最内层 FXML 对应的控制器实例
