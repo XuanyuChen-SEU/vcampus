@@ -105,5 +105,39 @@ public class ShopController {
         }
     }
 
+    /**
+     * 【新增】处理“获取商品详情”的请求。
+     * 这个方法是请求的入口，它调用 Service 层来完成工作。
+     *
+     * @param message 客户端请求，data 字段为 String 类型的商品ID。
+     * @return 包含商品详情或错误信息的响应 Message。
+     */
+    public Message handleGetProductDetail(Message message) {
+        try {
+            // 1. 验证传入的数据类型
+            if (!(message.getData() instanceof String)) {
+                return Message.failure(ActionType.SHOP_GET_PRODUCT_DETAIL, "无效的请求数据：商品ID必须为字符串。");
+            }
+            String productId = (String) message.getData();
+
+            // 2. 调用 Service 层处理业务逻辑
+            Product product = shopService.getProductDetail(productId);
+
+            if (product != null) {
+                // 3. 如果 Service 层成功返回数据，构建成功的响应
+                return Message.success(ActionType.SHOP_GET_PRODUCT_DETAIL, product, "获取商品详情成功");
+            } else {
+                // 4. 如果 Service 层返回 null (表示DAO没找到)，构建失败的响应
+                return Message.failure(ActionType.SHOP_GET_PRODUCT_DETAIL, "商品不存在或已下架。");
+            }
+            // 5. 捕获 Service 层可能抛出的任何异常（如参数错误）
+        } catch (IllegalArgumentException e) {
+            return Message.failure(ActionType.SHOP_GET_PRODUCT_DETAIL, e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_GET_PRODUCT_DETAIL, "服务器内部错误: " + e.getMessage());
+        }
+    }
+
 
 }

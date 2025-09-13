@@ -1,25 +1,18 @@
 package com.vcampus.server.controller;
-
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.enums.ActionType;
-
 /**
- * 消息控制器
- * 负责消息路由和参数验证
- * (已合并 Course 和 Shop 模块)
+ 消息控制器
+ 负责消息路由和参数验证
+ 编写人：谌宣羽
  */
 public class MessageController {
-
-    // --- 1. 合并字段声明 ---
-    // 我们需要保留所有的控制器实例
     private final UserController userController;
     private final StudentController studentController;
     private final StudentAdminController studentadminController;
     private final CourseController courseController; // 来自远程的修改
     private final ShopController shopController;     // 来自您的修改
 
-    // --- 2. 合并构造函数 ---
-    // 在构造函数中，我们需要实例化所有的控制器
     public MessageController() {
         this.userController = new UserController();
         this.studentController = new StudentController();
@@ -30,6 +23,7 @@ public class MessageController {
 
     /**
      * 处理客户端消息
+     *
      * @param request 客户端请求消息
      * @return 服务端响应消息
      */
@@ -42,6 +36,7 @@ public class MessageController {
             // 根据ActionType调用对应的控制器
             switch (request.getAction()) {//需要什么服务  自己加上）
                 // --- 用户登录相关 ---
+
                 case LOGIN:
                     return userController.handleLogin(request);
                 case FORGET_PASSWORD:
@@ -83,6 +78,9 @@ public class MessageController {
                     return studentadminController.updateStudent(request);
 
                 // --- 课程相关 ---
+
+                // --- 课程相关 ---调用服务端的controller层相关逻辑部分
+
                 case GET_ALL_COURSES:
                     return courseController.handleGetAllCourses(request);
                 case SELECT_COURSE:
@@ -99,19 +97,17 @@ public class MessageController {
                     return shopController.handleGetMyOrders(request);
                 case SHOP_GET_MY_FAVORITES:
                     return shopController.handleGetMyFavorites(request);
-                // 如果您还有 removeFavorite, 也应该加在这里
-                // case SHOP_REMOVE_FAVORITE:
-                //     return shopController.handleRemoveFavorite(request);
+                case SHOP_GET_PRODUCT_DETAIL: // <-- 【新增】添加这一行 case
+                    return shopController.handleGetProductDetail(request);
 
-                // --- 默认处理 ---
+                // --- 添加结束 ---
+
                 default:
                     return Message.failure(request.getAction(), "不支持的操作类型: " + request.getAction());
             }
         } catch (Exception e) {
             System.err.println("处理消息时发生错误: " + e.getMessage());
-            // 尝试返回带有 action 的错误，如果 request 本身是 null 则返回 null
-            ActionType action = (request != null) ? request.getAction() : null;
-            return Message.failure(action, "服务器内部错误");
+            return Message.failure(request.getAction(), "服务器内部错误");
         }
     }
 }
