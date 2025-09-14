@@ -1,6 +1,9 @@
 package com.vcampus.client.controller;
 
-import com.vcampus.client.controller.ChangePasswordController;
+import com.vcampus.client.controller.userAdmin.ForgetPasswordTableViewController;
+import com.vcampus.client.controller.userAdmin.UserCreateViewController;
+import com.vcampus.client.controller.userAdmin.UserListViewController;
+import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
 import com.vcampus.common.dto.Message;
 
 /**
@@ -14,6 +17,10 @@ public class MessageController {
     private StudentController studentController;
     private ShopController shopController;
     private ChangePasswordController changePasswordController;
+    private UserListViewController userListViewController;
+    private UserPasswordResetViewController userPasswordResetViewController;
+    private UserCreateViewController userCreateViewController;
+    private ForgetPasswordTableViewController forgetPasswordTableViewController;
     private AcademicController academicController; // ⭐ 新增 AcademicController 的引用
     /**
      * 设置LoginController实例（由UI层调用）
@@ -34,7 +41,18 @@ public class MessageController {
         this.academicController = controller;
         System.out.println("INFO: AcademicController 已成功注册到 MessageController。");
     }
-
+    public void setUserListViewController(UserListViewController controller) {
+        this.userListViewController = controller;
+    }
+    public void setUserPasswordResetViewController(UserPasswordResetViewController controller) {
+        this.userPasswordResetViewController = controller;
+    }
+    public void setUserCreateViewController(UserCreateViewController controller) {
+        this.userCreateViewController = controller;
+    }
+    public void setForgetPasswordTableViewController(ForgetPasswordTableViewController controller) {
+        this.forgetPasswordTableViewController = controller;
+    }
     /**
      * 处理服务端消息
      * @param message 服务端发送的消息
@@ -73,6 +91,55 @@ public class MessageController {
                         changePasswordController.handleChangePasswordResponse(message);
                     } else {
                         System.err.println("ChangePasswordController未设置，无法处理修改密码响应");
+                    }
+                    break;
+                case SEARCH_USERS:
+                    if (userListViewController != null) {
+                        userListViewController.handleSearchUsersResponse(message);
+                    } else {
+                        System.err.println("UserListViewController未设置，无法处理搜索用户响应");
+                    }
+                    break;
+                case DELETE_USER:
+                    if (userListViewController != null) {
+                        userListViewController.handleDeleteUserResponse(message);
+                    } else {
+                        System.err.println("UserListViewController未设置，无法处理删除用户响应");
+                    }
+                    break;
+                case RESET_USER_PASSWORD:
+                    if (userPasswordResetViewController != null) {
+                        userPasswordResetViewController.handleResetUserPasswordResponse(message);
+                    } else {
+                        System.err.println("UserPasswordResetViewController未设置，无法处理重置用户密码响应");
+                    }
+                    break;
+                case CREATE_USER:
+                    if (userCreateViewController != null) {
+                        userCreateViewController.handleCreateUserResponse(message);
+                    } else {
+                        System.err.println("UserCreateViewController未设置，无法处理创建用户响应");
+                    }
+                    break;
+                case GET_FORGET_PASSWORD_TABLE:
+                    if (forgetPasswordTableViewController != null) {
+                        forgetPasswordTableViewController.handleGetForgetPasswordTableResponse(message);
+                    } else {
+                        System.err.println("ForgetPasswordTableViewController未设置，无法处理获取忘记密码申请响应");
+                    }
+                    break;
+                case APPROVE_FORGET_PASSWORD_APPLICATION:
+                    if (forgetPasswordTableViewController != null) {
+                        forgetPasswordTableViewController.handleApproveForgetPasswordApplicationResponse(message);
+                    } else {
+                        System.err.println("ForgetPasswordTableViewController未设置，无法处理批准忘记密码申请响应");
+                    }
+                    break;
+                case REJECT_FORGET_PASSWORD_APPLICATION:
+                    if (forgetPasswordTableViewController != null) {
+                        forgetPasswordTableViewController.handleRejectForgetPasswordApplicationResponse(message);
+                    } else {
+                        System.err.println("ForgetPasswordTableViewController未设置，无法处理拒绝忘记密码申请响应");
                     }
                     break;
                 case INFO_STUDENT:
