@@ -84,8 +84,24 @@ public class MessageController {
                     return shopController.handleGetMyOrders(request);
                 case SHOP_GET_MY_FAVORITES:
                     return shopController.handleGetMyFavorites(request);
-                case SHOP_GET_PRODUCT_DETAIL: // <-- 【新增】添加这一行 case
+                case SHOP_GET_PRODUCT_DETAIL:
                     return shopController.handleGetProductDetail(request);
+
+                // --- 商店管理员相关 ---
+                case SHOP_ADMIN_ADD_PRODUCT:
+                    return shopController.handleAddProduct(request);
+                case SHOP_ADMIN_UPDATE_PRODUCT:
+                    return shopController.handleUpdateProduct(request);
+                case SHOP_ADMIN_DELETE_PRODUCT:
+                    return shopController.handleDeleteProduct(request);
+                case SHOP_ADMIN_GET_ALL_ORDERS:
+                    return shopController.handleGetAllOrders(request);
+                case SHOP_ADMIN_GET_ALL_FAVORITES:
+                    return shopController.handleGetAllFavorites(request);
+                case SHOP_ADMIN_GET_ORDERS_BY_USER:
+                    return shopController.handleGetOrdersByUser(request);
+                case SHOP_ADMIN_GET_FAVORITES_BY_USER:
+                    return shopController.handleGetFavoritesByUser(request);
 
                 // --- 添加结束 ---
 

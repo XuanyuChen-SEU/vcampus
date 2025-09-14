@@ -48,6 +48,12 @@ public enum ActionType {
     SHOP_ADMIN_ADD_PRODUCT("管理员添加商品"),
     SHOP_ADMIN_UPDATE_PRODUCT("管理员更新商品"),
     SHOP_ADMIN_DELETE_PRODUCT("管理员删除商品"),
+    SHOP_ADMIN_GET_ALL_ORDERS("管理员获取所有订单"),
+    SHOP_ADMIN_GET_ALL_FAVORITES("管理员获取所有收藏"),
+    SHOP_ADMIN_GET_ORDERS_BY_USER("管理员根据用户ID获取订单"),
+    SHOP_ADMIN_GET_FAVORITES_BY_USER("管理员根据用户ID获取收藏"),
+    
+
     
     
     // === 选课相关操作 ===

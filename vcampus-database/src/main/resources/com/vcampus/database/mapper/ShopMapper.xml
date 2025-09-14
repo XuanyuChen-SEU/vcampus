@@ -193,6 +193,21 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 添加新商品 -->
+    <insert id="addProduct" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO vcampus_db.tb_product (
+            name, price, stock, description, imageUrl, status
+        )
+        VALUES (
+            #{name}, #{price}, #{stock}, #{description}, #{imageUrl}, #{status}
+        )
+    </insert>
+
+    <!-- 删除商品 -->
+    <delete id="deleteProductById">
+        DELETE FROM vcampus_db.tb_product WHERE id = #{productId}
+    </delete>
+
     <!-- ==========================================================
          订单(Order)相关操作
          ========================================================== -->

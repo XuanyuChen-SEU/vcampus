@@ -4,6 +4,11 @@ import com.vcampus.client.controller.userAdmin.ForgetPasswordTableViewController
 import com.vcampus.client.controller.userAdmin.UserCreateViewController;
 import com.vcampus.client.controller.userAdmin.UserListViewController;
 import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
+import com.vcampus.client.controller.shopAdmin.ProductManagementViewController;
+import com.vcampus.client.controller.shopAdmin.ProductAddViewController;
+import com.vcampus.client.controller.shopAdmin.ProductEditViewController;
+import com.vcampus.client.controller.shopAdmin.OrderManagementViewController;
+import com.vcampus.client.controller.shopAdmin.FavoriteManagementViewController;
 import com.vcampus.common.dto.Message;
 
 /**
@@ -22,6 +27,11 @@ public class MessageController {
     private UserCreateViewController userCreateViewController;
     private ForgetPasswordTableViewController forgetPasswordTableViewController;
     private AcademicController academicController; // ⭐ 新增 AcademicController 的引用
+    private ProductManagementViewController productManagementViewController;
+    private ProductAddViewController productAddViewController;
+    private ProductEditViewController productEditViewController;
+    private OrderManagementViewController orderManagementViewController;
+    private FavoriteManagementViewController favoriteManagementViewController;
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -52,6 +62,21 @@ public class MessageController {
     }
     public void setForgetPasswordTableViewController(ForgetPasswordTableViewController controller) {
         this.forgetPasswordTableViewController = controller;
+    }
+    public void setProductManagementViewController(ProductManagementViewController controller) {
+        this.productManagementViewController = controller;
+    }
+    public void setProductAddViewController(ProductAddViewController controller) {
+        this.productAddViewController = controller;
+    }
+    public void setProductEditViewController(ProductEditViewController controller) {
+        this.productEditViewController = controller;
+    }
+    public void setOrderManagementViewController(OrderManagementViewController controller) {
+        this.orderManagementViewController = controller;
+    }
+    public void setFavoriteManagementViewController(FavoriteManagementViewController controller) {
+        this.favoriteManagementViewController = controller;
     }
     /**
      * 处理服务端消息
@@ -159,10 +184,13 @@ public class MessageController {
                 break;
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
-                    if (shopController != null) {
+                    // 优先分发给商店管理员控制器，如果没有则分发给普通商店控制器
+                    if (productManagementViewController != null) {
+                        productManagementViewController.handleSearchProductsResponse(message);
+                    } else if (shopController != null) {
                         shopController.handleProductListResponse(message);
                     } else {
-                        System.err.println("路由警告：收到商品列表响应，但ShopController未注册。");
+                        System.err.println("路由警告：收到商品列表响应，但相关控制器未注册。");
                     }
                     break;
 
@@ -186,6 +214,57 @@ public class MessageController {
                         shopController.handleGetProductDetailResponse(message);
                     }else {
                         System.err.println("路由警告：收到商品详情响应，但ShopController未注册。");
+                    }
+                    break;
+
+                // 商店管理员相关响应处理
+                case SHOP_ADMIN_ADD_PRODUCT:
+                    if (productAddViewController != null) {
+                        productAddViewController.handleAddProductResponse(message);
+                    } else {
+                        System.err.println("ProductAddViewController未设置，无法处理添加商品响应");
+                    }
+                    break;
+                case SHOP_ADMIN_DELETE_PRODUCT:
+                    if (productManagementViewController != null) {
+                        productManagementViewController.handleDeleteProductResponse(message);
+                    } else {
+                        System.err.println("ProductManagementViewController未设置，无法处理删除商品响应");
+                    }
+                    break;
+                case SHOP_ADMIN_UPDATE_PRODUCT:
+                    if (productEditViewController != null) {
+                        productEditViewController.handleUpdateProductResponse(message);
+                    } else {
+                        System.err.println("ProductEditViewController未设置，无法处理更新商品响应");
+                    }
+                    break;
+                case SHOP_ADMIN_GET_ALL_ORDERS:
+                    if (orderManagementViewController != null) {
+                        orderManagementViewController.handleGetAllOrdersResponse(message);
+                    } else {
+                        System.err.println("OrderManagementViewController未设置，无法处理获取所有订单响应");
+                    }
+                    break;
+                case SHOP_ADMIN_GET_ALL_FAVORITES:
+                    if (favoriteManagementViewController != null) {
+                        favoriteManagementViewController.handleGetAllFavoritesResponse(message);
+                    } else {
+                        System.err.println("FavoriteManagementViewController未设置，无法处理获取所有收藏响应");
+                    }
+                    break;
+                case SHOP_ADMIN_GET_ORDERS_BY_USER:
+                    if (orderManagementViewController != null) {
+                        orderManagementViewController.handleGetAllOrdersResponse(message);
+                    } else {
+                        System.err.println("OrderManagementViewController未设置，无法处理根据用户ID获取订单响应");
+                    }
+                    break;
+                case SHOP_ADMIN_GET_FAVORITES_BY_USER:
+                    if (favoriteManagementViewController != null) {
+                        favoriteManagementViewController.handleGetAllFavoritesResponse(message);
+                    } else {
+                        System.err.println("FavoriteManagementViewController未设置，无法处理根据用户ID获取收藏响应");
                     }
                     break;
 
