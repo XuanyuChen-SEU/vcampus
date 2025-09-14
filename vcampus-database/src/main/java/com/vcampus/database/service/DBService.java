@@ -1,17 +1,19 @@
 package com.vcampus.database.service;
 
-import com.vcampus.database.mapper.Mapper;
-import com.vcampus.database.mapper.StudentMapper;
-import com.vcampus.database.mapper.PasswordResetApplicationMapper;
-import com.vcampus.database.mapper.UserMapper;
-import com.vcampus.database.utils.MyBatisUtil;
-import org.apache.ibatis.session.SqlSession;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.apache.ibatis.session.SqlSession;
+
+import com.vcampus.database.mapper.Mapper;
+import com.vcampus.database.mapper.PasswordResetApplicationMapper;
+import com.vcampus.database.mapper.ShopMapper;
+import com.vcampus.database.mapper.StudentMapper;
+import com.vcampus.database.mapper.UserMapper;
+import com.vcampus.database.utils.MyBatisUtil;
 
 public class DBService {
 
@@ -27,6 +29,9 @@ public class DBService {
         File userCsvTempFile = null;
         File studentCsvTempFile = null;
         File passwordResetApplicationCsvTempFile = null;
+        File productCsvTempFile = null;
+        File orderCsvTempFile = null;
+        File favoriteCsvTempFile = null;
 
         try {
             Mapper mapper = sqlSession.getMapper(Mapper.class);
@@ -41,7 +46,9 @@ public class DBService {
             mapper.createUserTable();
             mapper.createStudentTable();
             mapper.createPasswordResetApplicationTable();
-            
+            mapper.createProductTable();
+            mapper.createOrderTable();
+            mapper.createFavoriteTable();
             
             System.out.println("成功在数据库 " + dbName + " 中创建表结构。");
             System.out.println("准备从CSV文件加载数据...");
@@ -50,30 +57,44 @@ public class DBService {
             String userCSVPath = "db/tb_user.csv";
             String studentCSVPath = "db/tb_student.csv";
             String passwordResetApplicationCSVPath = "db/tb_password_reset_application.csv";
+            String productCSVPath = "db/tb_product.csv";
+            String orderCSVPath = "db/tb_order.csv";
+            String favoriteCSVPath = "db/tb_favorite.csv";
 
             // 2. 将资源文件写入临时文件，并获取其路径
             userCsvTempFile = createTempFileFromResource(userCSVPath);
             studentCsvTempFile = createTempFileFromResource(studentCSVPath);
             passwordResetApplicationCsvTempFile = createTempFileFromResource(passwordResetApplicationCSVPath);
-
+            productCsvTempFile = createTempFileFromResource(productCSVPath);
+            orderCsvTempFile = createTempFileFromResource(orderCSVPath);
+            favoriteCsvTempFile = createTempFileFromResource(favoriteCSVPath);
 
             String userPath = userCsvTempFile.getAbsolutePath();
             String studentPath = studentCsvTempFile.getAbsolutePath();
             String passwordResetApplicationPath = passwordResetApplicationCsvTempFile.getAbsolutePath();
-
+            String productPath = productCsvTempFile.getAbsolutePath();
+            String orderPath = orderCsvTempFile.getAbsolutePath();
+            String favoritePath = favoriteCsvTempFile.getAbsolutePath();
 
             System.out.println("正在从临时文件加载: " + userPath);
             System.out.println("正在从临时文件加载: " + studentPath);
             System.out.println("正在从临时文件加载: " + passwordResetApplicationPath);
-
+            System.out.println("正在从临时文件加载: " + productPath);
+            System.out.println("正在从临时文件加载: " + orderPath);
+            System.out.println("正在从临时文件加载: " + favoritePath);
+            
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
             PasswordResetApplicationMapper passwordResetApplicationMapper = sqlSession.getMapper(PasswordResetApplicationMapper.class);
+            ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
 
             // 3. 调用Mapper方法执行批量加载，传入临时文件的路径
             userMapper.loadUsersFromCsv(userPath);
             studentMapper.loadStudentsFromCsv(studentPath);
             passwordResetApplicationMapper.loadPasswordResetApplicationsFromCsv(passwordResetApplicationPath);
+            shopMapper.loadProductsFromCsv(productPath);
+            shopMapper.loadOrdersFromCsv(orderPath);
+            shopMapper.loadFavoritesFromCsv(favoritePath);
             sqlSession.commit(); // 提交事务
 
             System.out.println("CSV数据批量加载成功！");
@@ -99,6 +120,15 @@ public class DBService {
             }
             if (passwordResetApplicationCsvTempFile != null && passwordResetApplicationCsvTempFile.exists()) {
                 passwordResetApplicationCsvTempFile.delete();
+            }
+            if (productCsvTempFile != null && productCsvTempFile.exists()) {
+                productCsvTempFile.delete();
+            }
+            if (orderCsvTempFile != null && orderCsvTempFile.exists()) {
+                orderCsvTempFile.delete();
+            }
+            if (favoriteCsvTempFile != null && favoriteCsvTempFile.exists()) {
+                favoriteCsvTempFile.delete();
             }
             if (sqlSession != null) {
                 sqlSession.close();

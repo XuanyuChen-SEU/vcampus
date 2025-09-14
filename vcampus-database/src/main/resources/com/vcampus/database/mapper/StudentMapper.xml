@@ -9,66 +9,7 @@
 -->
 <mapper namespace="com.vcampus.database.mapper.StudentMapper">
 
-    <update id="createDatabase">
-        CREATE DATABASE IF NOT EXISTS vcampus_db
-        CHARACTER SET utf8mb4
-        COLLATE utf8mb4_unicode_ci
-    </update>
-
-    <update id="dropDatabase">
-        DROP DATABASE IF EXISTS vcampus_db
-    </update>
-
-
-    <update id="createStuTable">
-        CREATE TABLE IF NOT EXISTS vcampus_db.`tb_student`(
-            `userId` VARCHAR(64) NOT NULL PRIMARY KEY COMMENT '用户ID（主键）',
-            `studentId` CHAR(8) COMMENT '学号（8位数字）',
-            `cardId` CHAR(9) COMMENT '一卡通号（9位数字）',
-            `name` VARCHAR(50) NOT NULL COMMENT '姓名',
-            `gender` VARCHAR(10) COMMENT '性别',
-            `college` VARCHAR(100) COMMENT '学院',
-            `major` VARCHAR(100) COMMENT '专业',
-            `grade` INT COMMENT '年级（如 2023）',
-            `birth_date` DATE COMMENT '出生日期',
-            `native_place` VARCHAR(100) COMMENT '籍贯',
-            `politics_status` VARCHAR(50) COMMENT '政治面貌',
-            `student_status` VARCHAR(50) COMMENT '学籍状态'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生信息表（以userId为主键）';
-</update>
-
-
-
-    <update id="dropStuTable">
-        DROP TABLE IF EXISTS vcampus_db.tb_student
-    </update>
-
-
-
-
-    <insert id="InsertTempData">
-        INSERT INTO tb_student (userId, studentId, cardId, name, gender, college, major, grade, birth_date, native_place, politics_status, student_status)
-        VALUES
-            ('1234567', '20210001', '123456789', '张三', '男', '计算机学院', '计算机科学与技术', 2021, '2003-09-01', '北京市', '共青团员', '在读'),
-            ('2345678', '20210002', '987654321', '李四', '女', '电子工程学院', '电子信息工程', 2021, '2003-10-15', '上海市', '共青团员', '在读'),
-            ('3456789', '20220001', '112233445', '王五', '男', '数学学院', '数学与应用数学', 2022, '2004-05-20', '广州市', '群众', '在读'),
-            ('4567890', '20230001', '556677889', '赵六', '女', '文学院', '汉语言文学', 2023, '2005-02-10', '成都市', '共青团员', '在读')
-    </insert>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 
 
 

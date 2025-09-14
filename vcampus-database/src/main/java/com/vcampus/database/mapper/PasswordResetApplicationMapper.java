@@ -11,26 +11,12 @@ import com.vcampus.common.dto.PasswordResetApplication;
  */
 public interface PasswordResetApplicationMapper {
     
-    /**
-     * 创建密码重置申请表
-     */
-    void createPasswordResetApplicationTable();
-    
-    /**
-     * 删除密码重置申请表
-     * @param dbName 数据库名称
-     */
-    void dropPasswordResetApplicationTable(String dbName);
+   
 
     /*
      * 加载数据
      */
     void loadPasswordResetApplicationsFromCsv(String filePath);
-
-    /**
-     * 删除所有表
-     */
-    void dropTables(String dbName);
     
     /**
      * 查询所有密码重置申请
