@@ -11,7 +11,8 @@ public class MyBatisUtil {
     private static InputStream inputStream;
     private static String resource;
 
-    public MyBatisUtil(){
+    // 静态代码块，在类加载时初始化
+    static {
         try {
             resource = "mybatis-config.xml";
             inputStream = Resources.getResourceAsStream(resource);

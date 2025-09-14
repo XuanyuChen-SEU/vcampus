@@ -37,7 +37,7 @@ public class ForgetPasswordTableViewController implements IClientController {
         com.vcampus.client.controller.MessageController messageController = 
             MainApp.getGlobalSocketClient().getMessageController();
         if (messageController != null) {
-            //messageController.setForgetPasswordTableViewController(this);
+            messageController.setForgetPasswordTableViewController(this);
         }
     }
 

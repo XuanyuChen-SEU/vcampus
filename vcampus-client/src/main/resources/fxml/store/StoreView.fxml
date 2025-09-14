@@ -58,14 +58,4 @@
         </StackPane>
     </center>
 
-    <!-- ===== 底部区域：用户信息与状态 (保持不变) ===== -->
-    <bottom>
-        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" spacing="20.0" style="-fx-background-color: #E0E0E0;">
-            <padding> <Insets right="20.0" /> </padding>
-            <children>
-                <Label fx:id="userInfoLabel" text="用户: 未登录" />
-                <Label fx:id="balanceLabel" text="余额: ￥0.00" />
-            </children>
-        </HBox>
-    </bottom>
 </BorderPane>

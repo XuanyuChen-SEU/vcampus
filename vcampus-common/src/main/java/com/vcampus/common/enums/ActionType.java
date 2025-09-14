@@ -50,6 +50,7 @@ public enum ActionType {
     SHOP_ADMIN_DELETE_PRODUCT("管理员删除商品"),
     SHOP_ADMIN_GET_ALL_RETURNS("管理员获取所有退货申请"),
     SHOP_ADMIN_REVIEW_RETURN("管理员审核退货"),// <-- 确保最后一个是分号
+
     // === 选课相关操作 ===
 
     // 客户端 -> 服务端 (请求)

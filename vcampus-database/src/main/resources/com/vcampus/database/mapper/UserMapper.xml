@@ -3,56 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
-
-
-
-
 <!--
     namespace：名称空间
 -->
 <mapper namespace="com.vcampus.database.mapper.UserMapper">
-
-
-
-
-    <update id="createDatabase" parameterType="java.lang.String">
-        CREATE DATABASE IF NOT EXISTS vcampus_db
-        CHARACTER SET utf8mb4
-        COLLATE utf8mb4_unicode_ci
-    </update>
-
-    <update id="dropDatabase" parameterType="java.lang.String">
-        DROP DATABASE IF EXISTS vcampus_db
-    </update>
-
-    <update id="createUserTable" parameterType="java.lang.String">
-            <!-- 显式指定在 Vcampus_db 数据库下创建 user 表 -->
-            CREATE TABLE IF NOT EXISTS vcampus_db.`tb_user` (
-            `userId` VARCHAR(50) NOT NULL COMMENT '用户ID（7位数字字符串）',
-            `password` VARCHAR(50) NOT NULL COMMENT '密码（7位数字字符串）',
-            PRIMARY KEY (`userId`) -- 建议加主键，避免重复插入
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    </update>
-
-
-    <update id="dropUserTable" parameterType="java.lang.String">
-        DROP TABLE IF EXISTS vcampus_db.tb_user
-    </update>
-
-
-    <insert id="InsertTempData">
-
-        <!-- 批量插入固定用户数据（userId和password均为7位数字字符串） -->
-        INSERT INTO vcampus_db.tb_user (userId, password)
-        VALUES
-        ('1234567', '7654321'),  <!-- 字符串类型需用单引号包裹 -->
-        ('2345678', '8765432'),
-        ('3456789', '9876543'),
-        ('4567890', '0987654'),
-        ('5678901', '1098765')
-    </insert>
-
 
     <update id="loadUsersFromCsv" parameterType="java.lang.String">
         LOAD DATA LOCAL INFILE #{filePath}
@@ -61,23 +15,9 @@
         FIELDS TERMINATED BY ','
         LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
-        (userId, password)
+        (userId, @passwordVar)
+        SET password = REPLACE(@passwordVar, '\r', '')
     </update>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <!-- 查询所有用户 -->
     <select id="selectAll" resultType="com.vcampus.common.dto.User">

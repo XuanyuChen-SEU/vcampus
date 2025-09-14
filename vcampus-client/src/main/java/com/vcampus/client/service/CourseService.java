@@ -52,7 +52,8 @@ public class CourseService {
      */
     public void selectCourse(String sessionId) {
         if (!checkConnectionAndLogin()) return;
-
+        String userId = UserSession.getInstance().getCurrentUserId();
+        System.out.println("当前登录用户ID: " + userId); // 新增日志，若打印null则问题坐实
         // 创建一个 Map 作为数据载荷
         Map<String, Object> payload = new HashMap<>();
         // ⭐ 从 UserSession 获取当前用户ID，并放入 Map
