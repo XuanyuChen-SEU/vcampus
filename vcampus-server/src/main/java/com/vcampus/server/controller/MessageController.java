@@ -76,7 +76,9 @@ public class MessageController {
                     return courseController.handleDropCourse(request);
                 case GET_MY_COURSES:
                     return courseController.handleGetMyCourses(request);
-
+// 在服务端的 MessageController.java 的 switch 语句中添加:
+                case SEARCH_COURSES:
+                    return courseController.handleSearchCourses(request);
 
                 // --- 商店相关 ---
                 case SHOP_GET_ALL_PRODUCTS:

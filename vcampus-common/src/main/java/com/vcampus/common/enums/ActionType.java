@@ -65,8 +65,10 @@ public enum ActionType {
 
     // ⭐ 新增：获取我的课表
     GET_MY_COURSES("获取我的课表"),
-    GET_MY_COURSES_RESPONSE("对获取我的课表请求的响应");
+    GET_MY_COURSES_RESPONSE("对获取我的课表请求的响应"),
 
+    // ⭐ 新增
+    SEARCH_COURSES("搜索响应课程");
 
     private final String description;
 

@@ -99,6 +99,22 @@ public class CourseService {
         socketClient.sendMessage(request);
     }
 
+    /**
+     * ⭐ 新增：发送“搜索课程”的请求到服务器
+     * @param keyword 搜索关键词
+     */
+    public void searchCourses(String keyword) {
+        if (!checkConnectionAndLogin()) return;
+
+        // 将 userId 和 keyword 一起打包发送
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", UserSession.getInstance().getCurrentUserId());
+        payload.put("keyword", keyword);
+
+        Message request = new Message(ActionType.SEARCH_COURSES, payload);
+        socketClient.sendMessage(request);
+    }
+
 
 
 

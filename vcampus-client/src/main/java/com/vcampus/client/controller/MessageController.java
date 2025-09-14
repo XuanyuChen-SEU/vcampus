@@ -218,6 +218,7 @@ public class MessageController {
                 case GET_MY_COURSES_RESPONSE:
                     if (myTimetableController != null) {
                         myTimetableController.handleMyCoursesResponse(message);
+                    }else {
                         System.err.println("路由警告：收到我的课程响应，但 MyTimetableController 未注册！");
                     }
                     break;

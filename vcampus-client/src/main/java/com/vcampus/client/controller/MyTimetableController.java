@@ -139,9 +139,20 @@ public class MyTimetableController  implements IClientController{
                             row.setScheduleInfo(session.getScheduleInfo());
                             // ... (设置其他属性)
                             // TODO: 确保 MyCourse DTO 中有这些 setter 方法
-                             row.setCredits(String.valueOf(course.getCredits()));
-                             row.setCourseType(course.getCourseType());
-                             row.setCategory(course.getCategory());
+                            row.setCredits(String.valueOf(course.getCredits()));
+                            row.setCourseType(course.getCourseType());
+                            row.setCategory(course.getCategory());
+                                                        // ⭐ 添加校区设置的调试日志
+                            String campus = course.getCampus();
+                            System.out.println("设置校区: 原始值='" + campus + "', " + 
+                                            "是否为null=" + (campus == null) + 
+                                            ", 是否为空字符串=" + (campus != null && campus.isEmpty()));
+                            
+                            // ⭐ 如果校区为空，设置默认值
+                            if (campus == null || campus.trim().isEmpty()) {
+                                campus = "九龙湖"; // 设置默认校区
+                                System.out.println("校区为空，设置默认值：九龙湖");
+                        }
                              row.setCampus(course.getCampus());
                              row.setConflictStatus("不冲突");
                             row.setSessionId(session.getSessionId()); // 关键！保存 sessionId 用于退课
