@@ -82,8 +82,9 @@ public class StudentAdminService {
      * 更新学生信息（管理员可用）
      * @param student 修改后的学生对象
      */
-    public void updateStudentInfo(Student student) {
+    public void updateStudent(Student student) {
         Message request = new Message(ActionType.UPDATE_STUDENT, student);
         socketClient.sendMessage(request);
     }
+
 }

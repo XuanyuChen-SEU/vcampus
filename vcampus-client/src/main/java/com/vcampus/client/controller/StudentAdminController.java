@@ -11,6 +11,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 
 import java.util.List;
 
@@ -22,7 +23,6 @@ public class StudentAdminController implements IClientController {
 
     @FXML private TableColumn<Student, String> colUserId;
     @FXML private TableColumn<Student, String> colStudentId;
-    @FXML private TableColumn<Student, String> colCardId;
     @FXML private TableColumn<Student, String> colName;
     @FXML private TableColumn<Student, String> colGender;
     @FXML private TableColumn<Student, String> colCollege;
@@ -41,28 +41,34 @@ public class StudentAdminController implements IClientController {
         // 绑定表格列
         colUserId.setCellValueFactory(new PropertyValueFactory<>("userId"));
         colStudentId.setCellValueFactory(new PropertyValueFactory<>("studentId"));
-        colCardId.setCellValueFactory(new PropertyValueFactory<>("cardId"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colGender.setCellValueFactory(new PropertyValueFactory<>("gender"));
         colCollege.setCellValueFactory(new PropertyValueFactory<>("college"));
         colMajor.setCellValueFactory(new PropertyValueFactory<>("major"));
         colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
 
-        // 操作列
+        // 操作列 - 查看详细 + 修改
         colAction.setCellFactory(param -> new TableCell<Student, Void>() {
-            private final Button btn = new Button("查看详细");
+            private final Button btnDetail = new Button("查看详细");
+            private final Button btnEdit = new Button("修改");
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(5, btnDetail, btnEdit);
 
             {
-                btn.setOnAction(event -> {
+                btnDetail.setOnAction(event -> {
                     Student student = getTableView().getItems().get(getIndex());
                     showStudentDetail(student);
+                });
+
+                btnEdit.setOnAction(event -> {
+                    Student student = getTableView().getItems().get(getIndex());
+                    showEditDialog(student);
                 });
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
+                setGraphic(empty ? null : box);
             }
         });
 
@@ -91,13 +97,13 @@ public class StudentAdminController implements IClientController {
         }
     }
 
+    /** 查看学生详细信息 */
     private void showStudentDetail(Student s) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("学生详细信息");
         alert.setHeaderText("学号：" + s.getStudentId() + " - " + s.getName());
         alert.setContentText(
                 "用户ID: " + s.getUserId() + "\n" +
-                        "一卡通号: " + s.getCardId() + "\n" +
                         "姓名: " + s.getName() + "\n" +
                         "性别: " + s.getGender() + "\n" +
                         "学院: " + s.getCollege() + "\n" +
@@ -123,6 +129,54 @@ public class StudentAdminController implements IClientController {
                         "  工作单位: " + s.getMotherWorkUnit()
         );
         alert.showAndWait();
+    }
+
+    /** 修改学生信息对话框 */
+    private void showEditDialog(Student s) {
+        Dialog<Student> dialog = new Dialog<>();
+        dialog.setTitle("修改学生信息");
+        dialog.setHeaderText("修改学生: " + s.getStudentId() + " - " + s.getName());
+
+        ButtonType saveButtonType = new ButtonType("保存", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new javafx.geometry.Insets(20, 150, 10, 10));
+
+        TextField nameField = new TextField(s.getName());
+        TextField genderField = new TextField(s.getGender());
+        TextField collegeField = new TextField(s.getCollege());
+        TextField majorField = new TextField(s.getMajor());
+        TextField gradeField = new TextField(String.valueOf(s.getGrade()));
+
+        grid.add(new Label("姓名:"), 0, 0); grid.add(nameField, 1, 0);
+        grid.add(new Label("性别:"), 0, 1); grid.add(genderField, 1, 1);
+        grid.add(new Label("学院:"), 0, 2); grid.add(collegeField, 1, 2);
+        grid.add(new Label("专业:"), 0, 3); grid.add(majorField, 1, 3);
+        grid.add(new Label("年级:"), 0, 4); grid.add(gradeField, 1, 4);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                s.setName(nameField.getText());
+                s.setGender(genderField.getText());
+                s.setCollege(collegeField.getText());
+                s.setMajor(majorField.getText());
+                try {
+                    s.setGrade(Integer.parseInt(gradeField.getText()));
+                } catch (NumberFormatException ignored) {}
+                return s;
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(updatedStudent -> {
+            studentAdminService.updateStudent(updatedStudent);
+            studentTable.refresh();
+        });
     }
 
     /** 处理服务端返回的全部学生信息 */
@@ -164,6 +218,18 @@ public class StudentAdminController implements IClientController {
         });
     }
 
+    /** 处理服务端返回的更新结果 */
+    public void handleUpdateStudentResponse(Message message) {
+        Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                showAlert("更新成功", message.getMessage());
+                loadAllStudent();
+            } else {
+                showAlert("更新失败", message.getMessage());
+            }
+        });
+    }
+
     @Override
     public void registerToMessageController() {
         if (studentAdminService.getGlobalSocketClient() != null &&
@@ -173,7 +239,7 @@ public class StudentAdminController implements IClientController {
     }
 
     private void showAlert(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(msg);

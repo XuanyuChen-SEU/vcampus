@@ -89,5 +89,6 @@ public class StudentAdminController {
             return Message.failure(ActionType.UPDATE_STUDENT, "服务端异常: " + e.getMessage());
         }
     }
+
 }
 

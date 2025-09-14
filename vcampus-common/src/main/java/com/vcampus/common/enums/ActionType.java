@@ -23,7 +23,6 @@ public enum ActionType {
     SEARCH_STUDENT("姓名模糊搜索"),
     INFO_STUDENT_ADMIN("查看学生详细信息"),
     UPDATE_STUDENT_ADMIN("更新学生信息"),
-
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
     DELETE_USER("删除用户"),                   // 删除用户
@@ -31,16 +30,7 @@ public enum ActionType {
     SEARCH_USERS("搜索用户"),                  // 搜索用户
     GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请  
     APPROVE_FORGET_PASSWORD_APPLICATION("批准忘记密码申请"),        // 批准忘记密码申请
-    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请  
-
-    // === 用户管理相关操作 ===
-    CREATE_USER("创建用户"),                   // 创建新用户
-    DELETE_USER("删除用户"),                   // 删除用户
-    RESET_USER_PASSWORD("重置用户密码"),        // 重置用户密码
-    SEARCH_USERS("搜索用户"),                  // 搜索用户
-    GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请  
-    APPROVE_FORGET_PASSWORD_APPLICATION("批准忘记密码申请"),        // 批准忘记密码申请
-    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请  
+    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请// 拒绝忘记密码申请
 
 
     // --- 商店模块 - 用户端 ---

@@ -22,7 +22,6 @@
         <columns>
             <TableColumn fx:id="colUserId" text="用户ID" prefWidth="100"/>
             <TableColumn fx:id="colStudentId" text="学号" prefWidth="100"/>
-            <TableColumn fx:id="colCardId" text="一卡通号" prefWidth="120"/>
             <TableColumn fx:id="colName" text="姓名" prefWidth="80"/>
             <TableColumn fx:id="colGender" text="性别" prefWidth="60"/>
             <TableColumn fx:id="colCollege" text="学院" prefWidth="120"/>
@@ -32,6 +31,7 @@
         </columns>
     </TableView>
 </VBox>
+
 
 
 

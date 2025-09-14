@@ -30,5 +30,6 @@ public class StudentAdminService {
     public boolean updateStudentInfo(Student student) {
         return studentDao.update(student) ; // update 返回受影响行数
     }
+
 }
 

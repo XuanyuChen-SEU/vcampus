@@ -12,7 +12,6 @@ public class Student implements Serializable {
     // 基本信息
     private String userId;
     private String studentId;
-    private String cardId;
     private String name;
     private String gender;
     private String college;
@@ -51,7 +50,6 @@ public class Student implements Serializable {
                    String motherName, String motherPhone, String motherPoliticsStatus, String motherWorkUnit) {
         this.userId = userId;
         this.studentId = studentId;
-        this.cardId = cardId;
         this.name = name;
         this.gender = gender;
         this.college = college;
@@ -85,12 +83,6 @@ public class Student implements Serializable {
     public void setStudentId(String studentId) {
         if (studentId != null && studentId.matches("\\d{8}")) this.studentId = studentId;
         else throw new IllegalArgumentException("学号必须为8位纯数字字符串");
-    }
-
-    public String getCardId() { return cardId; }
-    public void setCardId(String cardId) {
-        if (cardId != null && cardId.matches("\\d{9}")) this.cardId = cardId;
-        else throw new IllegalArgumentException("一卡通号必须为9位纯数字字符串");
     }
 
     public String getName() { return name; }
