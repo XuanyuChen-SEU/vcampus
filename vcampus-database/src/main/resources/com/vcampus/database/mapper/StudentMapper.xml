@@ -229,7 +229,7 @@
         LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
         (userId, studentId, cardId, name, gender, college, major, grade, @birth_date_var, native_place, politics_status, student_status)
-        SET birth_date = STR_TO_DATE(@birth_date_var, '%d/%m/%Y');
+        SET birth_date = STR_TO_DATE(REPLACE(@birth_date_var, '\r', ''), '%d/%m/%Y')
     </update>
 
 

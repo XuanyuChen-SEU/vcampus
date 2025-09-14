@@ -52,7 +52,7 @@ public class UserCreateViewController implements IClientController{
         com.vcampus.client.controller.MessageController messageController = 
             MainApp.getGlobalSocketClient().getMessageController();
         if (messageController != null) {
-            //messageController.setUserCreateViewController(this);
+            messageController.setUserCreateViewController(this);
         }
         
     }
