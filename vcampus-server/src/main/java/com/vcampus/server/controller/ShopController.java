@@ -43,9 +43,37 @@ public class ShopController {
             if (!(message.getData() instanceof String)) {
                 return Message.failure(ActionType.SHOP_SEARCH_PRODUCTS, "无效的请求数据：搜索关键词必须为字符串。");
             }
-            String keyword = (String) message.getData();
+            String searchData = (String) message.getData();
+            
+            // 2. 解析搜索数据：格式为 "关键词|状态"
+            String keyword = "";
+            final String status;
+            if (searchData != null && !searchData.isEmpty()) {
+                String[] parts = searchData.split("\\|");
+                if (parts.length >= 1) {
+                    keyword = parts[0];
+                }
+                if (parts.length >= 2) {
+                    status = parts[1];
+                } else {
+                    status = "全部";
+                }
+            } else {
+                status = "全部";
+            }
+            
+            System.out.println("搜索商品 - 关键词: '" + keyword + "', 状态: '" + status + "'");
 
             List<Product> products = shopService.searchProducts(keyword);
+            
+            // 3. 如果指定了状态筛选，进行额外过滤
+            if (!"全部".equals(status) && products != null) {
+                products = products.stream()
+                    .filter(p -> p.getStatus().toString().equals(status))
+                    .collect(java.util.stream.Collectors.toList());
+            }
+            
+            System.out.println("搜索结果数量: " + (products != null ? products.size() : 0));
             return Message.success(ActionType.SHOP_SEARCH_PRODUCTS, products, "搜索成功");
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,4 +168,170 @@ public class ShopController {
     }
 
 
+    // ==========================================================
+    // 商店管理员相关方法
+    // ==========================================================
+
+    /**
+     * 处理"添加商品"的请求
+     * @param message 客户端请求 (data 部分为 Product 对象)
+     * @return 包含操作结果的响应 Message
+     */
+    public Message handleAddProduct(Message message) {
+        try {
+            // 1. 验证传入的数据是否是 Product 类型
+            if (!(message.getData() instanceof Product)) {
+                return Message.failure(ActionType.SHOP_ADMIN_ADD_PRODUCT, "无效的请求数据：商品信息必须为Product对象。");
+            }
+            Product product = (Product) message.getData();
+
+            // 2. 调用 Service 层处理业务逻辑
+            boolean success = shopService.addProduct(product);
+            
+            if (success) {
+                return Message.success(ActionType.SHOP_ADMIN_ADD_PRODUCT, "商品添加成功");
+            } else {
+                return Message.failure(ActionType.SHOP_ADMIN_ADD_PRODUCT, "商品添加失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_ADMIN_ADD_PRODUCT, "添加商品失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理"更新商品"的请求
+     * @param message 客户端请求 (data 部分为 Product 对象)
+     * @return 包含操作结果的响应 Message
+     */
+    public Message handleUpdateProduct(Message message) {
+        try {
+            // 1. 验证传入的数据是否是 Product 类型
+            if (!(message.getData() instanceof Product)) {
+                return Message.failure(ActionType.SHOP_ADMIN_UPDATE_PRODUCT, "无效的请求数据：商品信息必须为Product对象。");
+            }
+            Product product = (Product) message.getData();
+
+            // 2. 调用 Service 层处理业务逻辑
+            boolean success = shopService.updateProduct(product);
+            
+            if (success) {
+                return Message.success(ActionType.SHOP_ADMIN_UPDATE_PRODUCT, "商品更新成功");
+            } else {
+                return Message.failure(ActionType.SHOP_ADMIN_UPDATE_PRODUCT, "商品更新失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_ADMIN_UPDATE_PRODUCT, "更新商品失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理"删除商品"的请求
+     * @param message 客户端请求 (data 部分为 String 类型的商品ID)
+     * @return 包含操作结果的响应 Message
+     */
+    public Message handleDeleteProduct(Message message) {
+        try {
+            // 1. 验证传入的数据是否是 String 类型
+            if (!(message.getData() instanceof String)) {
+                return Message.failure(ActionType.SHOP_ADMIN_DELETE_PRODUCT, "无效的请求数据：商品ID必须为字符串。");
+            }
+            String productId = (String) message.getData();
+
+            // 2. 调用 Service 层处理业务逻辑
+            boolean success = shopService.deleteProduct(productId);
+            
+            if (success) {
+                return Message.success(ActionType.SHOP_ADMIN_DELETE_PRODUCT, "商品删除成功");
+            } else {
+                return Message.failure(ActionType.SHOP_ADMIN_DELETE_PRODUCT, "商品删除失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_ADMIN_DELETE_PRODUCT, "删除商品失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理"获取所有订单"的请求
+     * @param message 客户端请求 (data 部分应为 null)
+     * @return 包含订单列表的响应 Message
+     */
+    public Message handleGetAllOrders(Message message) {
+        try {
+            List<ShopTransaction> orders = shopService.getAllOrders();
+            return Message.success(ActionType.SHOP_ADMIN_GET_ALL_ORDERS, orders, "获取所有订单成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_ADMIN_GET_ALL_ORDERS, "获取所有订单失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理"获取所有收藏"的请求
+     * @param message 客户端请求 (data 部分应为 null)
+     * @return 包含收藏列表的响应 Message
+     */
+    public Message handleGetAllFavorites(Message message) {
+        try {
+            List<ShopTransaction> favorites = shopService.getAllFavorites();
+            return Message.success(ActionType.SHOP_ADMIN_GET_ALL_FAVORITES, favorites, "获取所有收藏成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_ADMIN_GET_ALL_FAVORITES, "获取所有收藏失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理"管理员根据用户ID获取订单"的请求
+     * @param message 客户端请求 (data 部分为 String 类型的用户ID)
+     * @return 包含订单列表的响应 Message
+     */
+    public Message handleGetOrdersByUser(Message message) {
+        try {
+            // 1. 验证传入的数据是否是 String 类型
+            if (!(message.getData() instanceof String)) {
+                return Message.failure(ActionType.SHOP_ADMIN_GET_ORDERS_BY_USER, "无效的请求数据：用户ID必须为字符串。");
+            }
+            String userId = (String) message.getData();
+
+            // 2. 验证 userId 是否为空
+            if (userId == null || userId.trim().isEmpty()) {
+                return Message.failure(ActionType.SHOP_ADMIN_GET_ORDERS_BY_USER, "无效的请求数据：用户ID不能为空。");
+            }
+
+            List<ShopTransaction> orders = shopService.getOrdersByUserIdForAdmin(userId);
+            return Message.success(ActionType.SHOP_ADMIN_GET_ORDERS_BY_USER, orders, "根据用户ID获取订单成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_ADMIN_GET_ORDERS_BY_USER, "根据用户ID获取订单失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理"管理员根据用户ID获取收藏"的请求
+     * @param message 客户端请求 (data 部分为 String 类型的用户ID)
+     * @return 包含收藏列表的响应 Message
+     */
+    public Message handleGetFavoritesByUser(Message message) {
+        try {
+            // 1. 验证传入的数据是否是 String 类型
+            if (!(message.getData() instanceof String)) {
+                return Message.failure(ActionType.SHOP_ADMIN_GET_FAVORITES_BY_USER, "无效的请求数据：用户ID必须为字符串。");
+            }
+            String userId = (String) message.getData();
+
+            // 2. 验证 userId 是否为空
+            if (userId == null || userId.trim().isEmpty()) {
+                return Message.failure(ActionType.SHOP_ADMIN_GET_FAVORITES_BY_USER, "无效的请求数据：用户ID不能为空。");
+            }
+
+            List<ShopTransaction> favorites = shopService.getFavoritesByUserIdForAdmin(userId);
+            return Message.success(ActionType.SHOP_ADMIN_GET_FAVORITES_BY_USER, favorites, "根据用户ID获取收藏成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_ADMIN_GET_FAVORITES_BY_USER, "根据用户ID获取收藏失败: " + e.getMessage());
+        }
+    }
 }

@@ -56,6 +56,13 @@ public interface ShopMapper {
      * @return 符合条件的商品列表
      */
     List<Product> searchProducts(String keyword);
+
+    /*
+     * 添加一个新的商品
+     * @param product 包含新商品信息的商品对象
+     * @return 如果添加成功，返回 true；否则返回 false
+     */
+    boolean addProduct(Product product);
     
     /*
      * 更新商品信息
@@ -63,6 +70,13 @@ public interface ShopMapper {
      * @return 如果更新成功，返回 true；否则返回 false
      */
     boolean updateProductById(Product product);
+    
+    /*
+     * 删除一个商品
+     * @param productId 商品ID
+     * @return 如果删除成功，返回 true；否则返回 false
+     */
+    boolean deleteProductById(String productId);
     
     // ==========================================================
     // 订单(Order)相关操作

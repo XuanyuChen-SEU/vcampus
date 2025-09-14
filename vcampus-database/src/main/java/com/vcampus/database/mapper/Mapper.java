@@ -10,6 +10,8 @@ public interface Mapper {
     // 创建表
     void createUserTable();
     void createStudentTable();
+    void createBookTable();
+    void createBorrowLogTable();
     void createPasswordResetApplicationTable();
 
     void createProductTable();
@@ -21,7 +23,4 @@ public interface Mapper {
     void createClassSessionsTable();
     void createCourseSelectionsTable();
 
-    // 删除所有表
-    void dropTables(String dbName);
-    void InsertTempData();
 }

@@ -15,16 +15,18 @@ public enum ActionType {
     SYSTEM_BROADCAST("系统广播"),
     EMERGENCY_NOTIFICATION("紧急通知"),
     INFO_STUDENT("获取学生信息"),
-    UPDATE_STUDENT("修改学生信息"),
+    UPDATE_STUDENT("更新学生信息"),
+    INFO_BOOK("获取图书信息"),
+    UPDATE_BOOK("更新图书信息"),
 
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
     DELETE_USER("删除用户"),                   // 删除用户
     RESET_USER_PASSWORD("重置用户密码"),        // 重置用户密码
     SEARCH_USERS("搜索用户"),                  // 搜索用户
-    GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请  
+    GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请
     APPROVE_FORGET_PASSWORD_APPLICATION("批准忘记密码申请"),        // 批准忘记密码申请
-    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请  
+    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请
 
 
     // --- 商店模块 - 用户端 ---
@@ -48,9 +50,13 @@ public enum ActionType {
     SHOP_ADMIN_ADD_PRODUCT("管理员添加商品"),
     SHOP_ADMIN_UPDATE_PRODUCT("管理员更新商品"),
     SHOP_ADMIN_DELETE_PRODUCT("管理员删除商品"),
-    SHOP_ADMIN_GET_ALL_RETURNS("管理员获取所有退货申请"),
-    SHOP_ADMIN_REVIEW_RETURN("管理员审核退货"),// <-- 确保最后一个是分号
+    SHOP_ADMIN_GET_ALL_ORDERS("管理员获取所有订单"),
+    SHOP_ADMIN_GET_ALL_FAVORITES("管理员获取所有收藏"),
+    SHOP_ADMIN_GET_ORDERS_BY_USER("管理员根据用户ID获取订单"),
+    SHOP_ADMIN_GET_FAVORITES_BY_USER("管理员根据用户ID获取收藏"),
+    
 
+    
     // === 选课相关操作 ===
 
     // 客户端 -> 服务端 (请求)
@@ -61,11 +67,34 @@ public enum ActionType {
     // 服务端 -> 客户端 (响应)
     GET_ALL_COURSES_RESPONSE("对获取课程请求的响应"),   // 对获取课程请求的响应
     SELECT_COURSE_RESPONSE("对选课请求的响应"),     // 对选课请求的响应
-    DROP_COURSE_RESPONSE("对退课请求的响应"),      // 对退课请求的响应
+    DROP_COURSE_RESPONSE("对退课请求的响应"),     // 对退课请求的响应
+
 
     // ⭐ 新增：获取我的课表
     GET_MY_COURSES("获取我的课表"),
     GET_MY_COURSES_RESPONSE("对获取我的课表请求的响应"),
+
+    // --- 图书馆模块 - 通用端 ---
+
+    LIBRARY_GET_ALL_BOOKS("获取所有图书"),
+    LIBRARY_SEARCH_BOOKS("搜索所有图书"),
+    LIBRARY_GET_MY_BORROWS("获取我的借阅记录"),
+    LIBRARY_GET_ADMIN_BORROW_HISTORY ("获取管理员借阅记录"),
+    LIBRARY_GET_ALL_USERS_STATUS("获取所有用户借阅状态"),
+    // --- 图书馆模块 - 用户端 ---
+    LIBRARY_RENEW_ALL("续借所有图书"),
+    LIBRARY_SEARCH_MY_BORROWS("搜索我的借阅记录"),
+    LIBRARY_BORROW_BOOK("用户借阅图书"),
+    LIBRARY_RETURN_BOOK("用户归还图书"),
+    LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
+
+
+    // --- 图书馆模块 - 管理员端 ---
+    LIBRARY_ADD_BOOK("管理员添加图书"),
+    LIBRARY_DELETE_BOOK("管理员删除图书"),
+    LIBRARY_MODIFY_BOOK("管理员修改图书"),
+    LIBRARY_SEARCH_HISTORY   ("搜索借阅历史"),
+    LIBRARY_SEARCH_USERS("搜索用户借阅历史"),
 
     // ⭐ 新增
     SEARCH_COURSES("搜索响应课程");

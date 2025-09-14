@@ -9,14 +9,20 @@ import com.vcampus.common.enums.ActionType;
 public class MessageController {
     private final UserController userController;
     private final StudentController studentController;
-    private final ShopController shopController;
-    private final CourseController courseController;
+    private final CourseController courseController; // 来自远程的修改
+    private final ShopController shopController;     // 来自您的修改
+    private final LibraryController libraryController; // 【新增】图书馆控制器实例
+    // --- 2. 合并构造函数 ---
+    // 在构造函数中，我们需要实例化所有的控制器
+
+
 
     public MessageController() {
         this.userController = new UserController();
-        this.studentController = new StudentController();//自上而下  连续的好几个构造方法    client不用是因为  （小问题）
-        this.courseController = new CourseController();//按照习俗创建应该需要创建的部分
-        this.shopController = new ShopController();
+        this.studentController = new StudentController();
+        this.courseController = new CourseController(); // 保留
+        this.shopController = new ShopController();     // 保留
+        this.libraryController = new LibraryController(); // 【新增】在构造时实例化
     }
 
     /**
@@ -89,8 +95,40 @@ public class MessageController {
                     return shopController.handleGetMyOrders(request);
                 case SHOP_GET_MY_FAVORITES:
                     return shopController.handleGetMyFavorites(request);
-                case SHOP_GET_PRODUCT_DETAIL: // <-- 【新增】添加这一行 case
+                case SHOP_GET_PRODUCT_DETAIL:
                     return shopController.handleGetProductDetail(request);
+                // --- 商店管理员相关 ---
+                case SHOP_ADMIN_ADD_PRODUCT:
+                    return shopController.handleAddProduct(request);
+                case SHOP_ADMIN_UPDATE_PRODUCT:
+                    return shopController.handleUpdateProduct(request);
+                case SHOP_ADMIN_DELETE_PRODUCT:
+                    return shopController.handleDeleteProduct(request);
+                case SHOP_ADMIN_GET_ALL_ORDERS:
+                    return shopController.handleGetAllOrders(request);
+                case SHOP_ADMIN_GET_ALL_FAVORITES:
+                    return shopController.handleGetAllFavorites(request);
+                case SHOP_ADMIN_GET_ORDERS_BY_USER:
+                    return shopController.handleGetOrdersByUser(request);
+                case SHOP_ADMIN_GET_FAVORITES_BY_USER:
+                    return shopController.handleGetFavoritesByUser(request);
+                // --- 图书馆相关 ---
+                case LIBRARY_BORROW_BOOK:
+                case LIBRARY_GET_ALL_BOOKS:
+                case LIBRARY_SEARCH_BOOKS:
+                case LIBRARY_GET_MY_BORROWS:
+                case LIBRARY_GET_ADMIN_BORROW_HISTORY:
+                case LIBRARY_GET_ALL_USERS_STATUS:
+                case LIBRARY_RENEW_ALL:
+                case LIBRARY_SEARCH_MY_BORROWS:
+                case LIBRARY_ADD_BOOK:
+                case LIBRARY_DELETE_BOOK:
+                case LIBRARY_MODIFY_BOOK:
+                case LIBRARY_SEARCH_HISTORY:
+                case LIBRARY_SEARCH_USERS:
+                case LIBRARY_RETURN_BOOK:
+                case LIBRARY_GET_BOOK_PDF:
+                    return libraryController.dispatch(request);
 
                 // --- 添加结束 ---
 

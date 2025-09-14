@@ -10,21 +10,25 @@
 
 ### **1. 数据库初始化**
 
-请先以管理员生效身份登录MySQL，执行命令：
 
+设置配置文件以设置MySQL**永久**访问权限：
 
+**Windows 系统**：通常在 MySQL 安装目录下的 my.ini（如 C:\ProgramData\MySQL\MySQL Server 8.0\my.ini）
+**Mac 系统**：通过 brew 安装的 MySQL 可能在 /usr/local/etc/my.cnf 或 /etc/my.cnf
+
+文本编辑器（需管理员权限）打开配置文件，在 [mysqld] 区块下添加以下配置：
+```bash
+[mysqld]
+local_infile = 1  # 1 表示开启，0 表示关闭
+```
+以管理员生效身份登录MySQL，执行命令：
 ```bash
 SHOW GLOBAL VARIABLES LIKE 'local_infile';
 ```
-
-```bash
-SET GLOBAL local_infile = 1;
-```
-
+如果输出结果中 local_infile 的值是 1，则表示设置成功。
 
 之后打开项目以下配置文件：
 - `vcampus-database/src/main/resources/mybatis-config.xml`
-- `vcampus-server/src/main/resources/mybatis-config.xml`
 
 在这部分设置：
 ```xml

@@ -69,6 +69,40 @@ public class ShopDao implements IShopDao {
         }
     }
 
+    /**
+     * 添加新商品
+     * @param product 商品信息
+     * @return 是否添加成功
+     */
+    public boolean addProduct(Product product) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
+            boolean result = shopMapper.addProduct(product);
+            sqlSession.commit();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 删除商品
+     * @param productId 商品ID
+     * @return 是否删除成功
+     */
+    public boolean deleteProductById(String productId) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
+            boolean result = shopMapper.deleteProductById(productId);
+            sqlSession.commit();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // ==========================================================
     // 订单 (Order) 相关操作
     // ==========================================================

@@ -16,12 +16,17 @@
             <!-- 数据库连接池，这里使用mybatis自带的数据库连接池  -->
             <dataSource type="POOLED">
                 <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/vcampus_db?serverTimezone=UTC&amp;allowLoadLocalInfile=true"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/?serverTimezone=UTC&amp;allowLoadLocalInfile=true"/>
                 <property name="username" value="root"/>
                 <property name="password" value="lxc181973"/>
+
             </dataSource>
+
         </environment>
+
     </environments>
+
+
 <!--    <mappers>-->
 <!--        &lt;!&ndash; 加载sql的映射文件 &ndash;&gt;-->
 <!--&lt;!&ndash;        <mapper resource="com/itheima/mapper/UserMapper.xml"/>&ndash;&gt;-->
@@ -33,4 +38,6 @@
         <!--  包扫描的方式加载sql的映射文件    上面这句就不用了，下面这句就可以了    -->
         <package name="com.vcampus.database.mapper"/>
     </mappers>
+
 </configuration>
+
