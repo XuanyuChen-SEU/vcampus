@@ -24,10 +24,10 @@
             <!-- 数据库连接池，这里使用mybatis自带的数据库连接池  -->
             <dataSource type="POOLED">
                 <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/vcampus_db?serverTimezone=UTC&amp;allowLoadLocalInfile=true"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/?serverTimezone=UTC&amp;allowLoadLocalInfile=true"/>
                 <property name="username" value="root"/>
 
-                <property name="password" value="lxc181973"/>
+                <property name="password" value="Abcd0410"/>
 
             </dataSource>
         </environment>
