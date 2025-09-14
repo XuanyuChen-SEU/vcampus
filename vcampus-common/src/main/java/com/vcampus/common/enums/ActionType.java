@@ -19,6 +19,14 @@ public enum ActionType {
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
 
+    // === 用户管理相关操作 ===
+    CREATE_USER("创建用户"),                   // 创建新用户
+    DELETE_USER("删除用户"),                   // 删除用户
+    RESET_USER_PASSWORD("重置用户密码"),        // 重置用户密码
+    SEARCH_USERS("搜索用户"),                  // 搜索用户
+    GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请
+    APPROVE_FORGET_PASSWORD_APPLICATION("批准忘记密码申请"),        // 批准忘记密码申请
+    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请
 
 
     // --- 商店模块 - 用户端 ---
@@ -58,6 +66,7 @@ public enum ActionType {
 //    // 课程详情相关
 //    GET_COURSE_ENROLLMENT_STATUS("获取课程报名状态"), // 获取课程的报名状态（已选人数等）
 //
+
     // === 选课相关操作 ===
 
     // 客户端 -> 服务端 (请求)
@@ -71,7 +80,9 @@ public enum ActionType {
     DROP_COURSE_RESPONSE("对退课请求的响应"),     // 对退课请求的响应
 
 
-
+    // ⭐ 新增：获取我的课表
+    GET_MY_COURSES("获取我的课表"),
+    GET_MY_COURSES_RESPONSE("对获取我的课表请求的响应"),
     // --- 图书馆模块 - 通用端 ---
 
     LIBRARY_GET_ALL_BOOKS("获取所有图书"),

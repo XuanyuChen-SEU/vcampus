@@ -52,7 +52,8 @@ public class CourseService {
      */
     public void selectCourse(String sessionId) {
         if (!checkConnectionAndLogin()) return;
-
+        String userId = UserSession.getInstance().getCurrentUserId();
+        System.out.println("当前登录用户ID: " + userId); // 新增日志，若打印null则问题坐实
         // 创建一个 Map 作为数据载荷
         Map<String, Object> payload = new HashMap<>();
         // ⭐ 从 UserSession 获取当前用户ID，并放入 Map
@@ -69,6 +70,7 @@ public class CourseService {
 
     /**
      * 请求退选一个教学班。
+     * \
      * @param sessionId 要退选的教学班 ID
      */
     public void dropCourse(String sessionId) {
@@ -89,8 +91,13 @@ public class CourseService {
     }
 
 
-
-
+    public void getMySelectedCourses() {
+        if (!checkConnectionAndLogin()) return;
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", UserSession.getInstance().getCurrentUserId());
+        Message request = new Message(ActionType.GET_MY_COURSES, payload);
+        socketClient.sendMessage(request);
+    }
 
 
 
@@ -195,6 +202,13 @@ public class CourseService {
     public SocketClient getGlobalSocketClient() {
         return socketClient;
     }
+
+    /**
+     * 获取学生信息：我随便创造一组数据
+     */
+//    public String getLoginInfoForDisplay(String userId, String password) {
+//        return String.format("用户名: %s, 密码: %s", userId, password);
+//
 
      //调试用：
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vcampus.database.mapper.CourseSelectionMapper">
+    <update id="loadCourseSelectionsFromCsv">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_course_selections
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (studentId, sessionId, status);
+    </update>
+
+
+    <select id="selectByStudentId" resultType="com.vcampus.common.dto.CourseSelection">
+        SELECT studentId, sessionId, status FROM vcampus_db.tb_course_selections WHERE studentId = #{studentId}
+    </select>
+
+    <select id="selectByStudentAndSession" resultType="com.vcampus.common.dto.CourseSelection">
+        SELECT studentId, sessionId, status FROM vcampus_db.tb_course_selections WHERE studentId = #{studentId} AND sessionId = #{sessionId}
+    </select>
+
+    <insert id="insert" parameterType="com.vcampus.common.dto.CourseSelection">
+        INSERT INTO vcampus_db.tb_course_selections (studentId, sessionId, status) VALUES (#{studentId}, #{sessionId}, #{status})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM vcampus_db.tb_course_selections WHERE studentId = #{studentId} AND sessionId = #{sessionId}
+    </delete>
+</mapper>

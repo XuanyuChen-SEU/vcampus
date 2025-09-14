@@ -8,10 +8,6 @@ import java.util.Map;
 public interface StudentMapper {
 
 
-    void createStuTable();
-    // 删除用户表
-    void dropStuTable();
-
 
     void loadStudentsFromCsv(String filePath);
 

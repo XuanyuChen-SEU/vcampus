@@ -1,13 +1,12 @@
 package com.vcampus.server.dao.impl;
 
-import com.vcampus.common.dao.IShopDao;
-import com.vcampus.common.dto.Product;
-import com.vcampus.common.dto.ShopTransaction;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.vcampus.common.dao.IShopDao;
+import com.vcampus.common.dto.Product;
+import com.vcampus.common.dto.ShopTransaction;
 
 /**
  * 【重构版】一个模拟的 ShopDao 实现。
@@ -46,8 +45,6 @@ public class FakeShopDao implements IShopDao {
 
     // --- 下面的所有数据操作方法保持不变 ---
 
-    @Override
-    public void SDInit() { System.out.println("Fake DAO Initialized."); }
 
     @Override
     public List<Product> getAllProducts() {
@@ -80,6 +77,30 @@ public class FakeShopDao implements IShopDao {
     }
 
     @Override
+    public List<ShopTransaction> getAllFavorites() {
+        System.out.println("FAKE DAO: 获取所有收藏...");
+        return favoriteTable;
+    }
+
+    @Override
+    public List<ShopTransaction> getAllOrders() {
+        System.out.println("FAKE DAO: 获取所有订单...");
+        return orderTable;
+    }
+
+    @Override
+    public ShopTransaction getOrderById(String orderId) {
+        System.out.println("FAKE DAO: 根据ID获取订单: " + orderId);
+        return orderTable.stream()
+                .filter(o -> o.getOrderId().equals(orderId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public boolean updateProductById(Product product) { return true; }
+
+    @Override
     public Product getProductById(String productId) { return null; }
     @Override
     public boolean saveOrder(ShopTransaction order) { return true; }
@@ -87,6 +108,5 @@ public class FakeShopDao implements IShopDao {
     public boolean addFavorite(ShopTransaction favorite) { return true; }
     @Override
     public boolean removeFavorite(String favoriteId) { return true; }
-    @Override
-    public void SDClose() { System.out.println("Fake DAO Closed."); }
+
 }

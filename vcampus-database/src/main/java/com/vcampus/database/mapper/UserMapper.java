@@ -16,10 +16,6 @@ public interface   UserMapper {
 
     void loadUsersFromCsv(String filePath);
 
-
-
-
-
     List<User> selectAll();
     User selectById(String userId);
     List<User> selectByCondition(Map map);

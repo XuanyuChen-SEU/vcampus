@@ -22,58 +22,43 @@ public class StudentService {
 
     /**
      * 根据学生ID查询学生信息
+     *
      * @param studentId 学生ID（userId）
      * @return Message 消息对象，用于返回给客户端
      */
-    /**
     public Message getStudentById(String studentId) {
-        Message message = new Message();
         try {
-            Student student = studentDao.findStudentById(studentId);
-            if (student != null) {
-                message.setSuccess(true);
-                message.setData(student);
-            } else {
-                message.setSuccess(false);
-                message.setMessage("未找到对应的学生信息");
-            }
-        } catch (SQLException e) {
-            message.setSuccess(false);
-            message.setMessage("数据库查询失败：" + e.getMessage());
-        }
-        return message;
-    }
-     */
+            Student student = studentDao.findByUserId(studentId);
 
-        /**
-         * 根据学生ID查询学生信息（模拟数据）
-         * @param studentId 学生ID（userId）
-         * @return Message 消息对象，用于返回给客户端
-         */
-        public Student getStudentById(String studentId) {
-            if (studentId == null || studentId.isEmpty()) {
-                return null;
+            if (student == null) {
+                return Message.failure(ActionType.INFO_STUDENT, "未找到对应的学生信息");
             }
 
+            // 这里可以考虑对敏感信息处理，比如置空密码字段（如果有的话）
+            return Message.success(ActionType.INFO_STUDENT, student, "查询成功");
 
-            // 构建一个固定的学生信息对象
-            Student student = new Student();
-            student.setUserId(studentId);       // 用户ID
-            student.setStudentId("20250001");   // 学号
-            student.setCardId("100200300");    // 一卡通号
-            student.setName("张三");            // 姓名
-            student.setGender("男");            // 性别
-            student.setCollege("计算机学院");     // 学院
-            student.setMajor("软件工程");        // 专业
-            student.setGrade(2025);
-            student.setStudent_status("在读");// 学籍状态
-            student.setBirth_date("2005-1-1");
-            student.setNative_place("江苏南京");
-            student.setPolitics_status("共青团员");
-
-            // 使用Message静态方法封装成功消息
-            return student;
+        } catch (Exception e) {
+            System.err.println("查询学生信息过程中发生异常: " + e.getMessage());
+            return Message.failure(ActionType.INFO_STUDENT, "服务器内部错误");
         }
     }
+
+    public boolean updateStudent(Student student) {
+        try {
+            if (student == null || student.getUserId() == null || student.getUserId().isEmpty()) {
+                return false;
+            }
+
+            return studentDao.update(student);
+
+        } catch (Exception e) {
+            System.err.println("更新学生信息时发生异常: " + e.getMessage());
+            return false;
+        }
+    }
+
+
+}
+
 
 

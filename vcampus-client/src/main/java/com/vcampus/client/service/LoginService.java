@@ -39,7 +39,7 @@ public class LoginService {
      * @return 登录结果消息
      */
     public Message login(String username, String password) {
-        // 基础验证
+        // 基础验证·
         if (!validateInputFormat(username, password)) {
             return Message.failure(ActionType.LOGIN, "用户名和密码不能为空");
         }

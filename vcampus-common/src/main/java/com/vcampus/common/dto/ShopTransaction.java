@@ -1,10 +1,10 @@
 package com.vcampus.common.dto;
 
 // 确保这些 import 语句是正确的
-import com.vcampus.common.enums.OrderStatus;
-import com.vcampus.common.enums.ShopApplicationStatus; // 修正为您项目中的正确类名
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDateTime; // 修正为您项目中的正确类名
+
+import com.vcampus.common.enums.OrderStatus;
 
 /**
  * 一个“多功能复合体”，用于承载所有和用户个人交易相关的记录。(最终修正版)
@@ -20,7 +20,7 @@ public class ShopTransaction implements Serializable {
     private String userId;
 
     // --- 订单(Order) 和 订单项(OrderItem) 相关字段 ---
-    private Long orderId;
+    private String orderId;
     private Product product;
     private Integer quantity;
     private Double priceAtPurchase;
@@ -31,14 +31,6 @@ public class ShopTransaction implements Serializable {
 
     // --- 收藏(Favorite) 相关字段 ---
     private LocalDateTime addTime;
-
-    // --- 退货(ReturnRequest) 相关字段 ---
-    private Long relatedOrderId;
-    private String reason;
-    private ShopApplicationStatus returnStatus; // 已修正为 ShopApplicationStatus
-    private LocalDateTime submitTime;  // 明确的退货申请提交时间
-    private LocalDateTime reviewTime;
-    private String reviewerId;
 
     // --- 商店用户信息(ShopUser) 相关字段 ---
     private String cardNumber;
@@ -91,7 +83,7 @@ public class ShopTransaction implements Serializable {
     /**
      * 用于创建/加载订单项的构造函数
      */
-    public ShopTransaction(Long orderId, Product product, Integer quantity, Double priceAtPurchase) {
+    public ShopTransaction(String orderId, Product product, Integer quantity, Double priceAtPurchase) {
         this.id = null; // 订单项通常在数据库中有自己的ID，这里设为null表示是新创建的内存对象
         this.orderId = orderId;
         this.product = product;
@@ -119,32 +111,6 @@ public class ShopTransaction implements Serializable {
         this.addTime = addTime;
     }
 
-    // --- 退货申请 (ReturnRequest) ---
-    /**
-     * 用于创建新退货申请的构造函数
-     */
-    public ShopTransaction(String userId, Long relatedOrderId, String reason) {
-        this.userId = userId;
-        this.relatedOrderId = relatedOrderId;
-        this.reason = reason;
-        this.returnStatus = ShopApplicationStatus.PENDING;
-        this.submitTime = LocalDateTime.now();
-    }
-
-    /**
-     * 用于从数据库完整加载退货申请的构造函数
-     */
-    public ShopTransaction(Long id, String userId, Long relatedOrderId, String reason, ShopApplicationStatus returnStatus, LocalDateTime submitTime, LocalDateTime reviewTime, String reviewerId) {
-        this.id = id;
-        this.userId = userId;
-        this.relatedOrderId = relatedOrderId;
-        this.reason = reason;
-        this.returnStatus = returnStatus;
-        this.submitTime = submitTime;
-        this.reviewTime = reviewTime;
-        this.reviewerId = reviewerId;
-    }
-
 
     // --- 所有字段的 Getter 和 Setter 方法 ---
 
@@ -152,8 +118,8 @@ public class ShopTransaction implements Serializable {
     public void setId(Long id) { this.id = id; }
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
-    public Long getOrderId() { return orderId; }
-    public void setOrderId(Long orderId) { this.orderId = orderId; }
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
     public Integer getQuantity() { return quantity; }
@@ -170,18 +136,7 @@ public class ShopTransaction implements Serializable {
     public void setPayTime(LocalDateTime payTime) { this.payTime = payTime; }
     public LocalDateTime getAddTime() { return addTime; }
     public void setAddTime(LocalDateTime addTime) { this.addTime = addTime; }
-    public Long getRelatedOrderId() { return relatedOrderId; }
-    public void setRelatedOrderId(Long relatedOrderId) { this.relatedOrderId = relatedOrderId; }
-    public String getReason() { return reason; }
-    public void setReason(String reason) { this.reason = reason; }
-    public ShopApplicationStatus getReturnStatus() { return returnStatus; }
-    public void setReturnStatus(ShopApplicationStatus returnStatus) { this.returnStatus = returnStatus; }
-    public LocalDateTime getSubmitTime() { return submitTime; }
-    public void setSubmitTime(LocalDateTime submitTime) { this.submitTime = submitTime; }
-    public LocalDateTime getReviewTime() { return reviewTime; }
-    public void setReviewTime(LocalDateTime reviewTime) { this.reviewTime = reviewTime; }
-    public String getReviewerId() { return reviewerId; }
-    public void setReviewerId(String reviewerId) { this.reviewerId = reviewerId; }
+
     public String getCardNumber() { return cardNumber; }
     public void setCardNumber(String cardNumber) { this.cardNumber = cardNumber; }
     public Double getBalance() { return balance; }

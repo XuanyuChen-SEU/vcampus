@@ -1,15 +1,15 @@
 package com.vcampus.server.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vcampus.common.dao.IShopDao;
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.enums.OrderStatus;
 import com.vcampus.common.enums.ProductStatus;
 import com.vcampus.server.dao.impl.FakeShopDao;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 【重构版】商店模块的服务层 (ShopService)
@@ -36,10 +36,10 @@ public class ShopService {
         List<ShopTransaction> favoriteTable = new ArrayList<>();
 
         // 初始化商品
-        productTable.add(new Product(1L, "高品质笔记本", "文具", 15.50, 100, "非常适合记笔记的本子", "https://via.placeholder.com/160", 1.0, ProductStatus.ON_SALE));
-        productTable.add(new Product(2L, "多功能中性笔", "文具", 5.00, 200, "书写流畅，不断墨", "https://via.placeholder.com/160", 1.0, ProductStatus.ON_SALE));
-        productTable.add(new Product(3L, "二手教科书《Java核心技术》", "图书", 50.00, 10, "九成新，几乎无笔记", "https://via.placeholder.com/160", 1.0, ProductStatus.ON_SALE));
-        productTable.add(new Product(4L, "校园纪念T恤", "纪念品", 99.00, 50, "纯棉材质，舒适透气", "https://via.placeholder.com/160", 0.8, ProductStatus.ON_SALE));
+        productTable.add(new Product(1L, "高品质笔记本", 15.50, 100, "非常适合记笔记的本子", "https://via.placeholder.com/160", ProductStatus.ON_SALE));
+        productTable.add(new Product(2L, "多功能中性笔", 5.00, 200, "书写流畅，不断墨", "https://via.placeholder.com/160", ProductStatus.ON_SALE));
+        productTable.add(new Product(3L, "二手教科书《Java核心技术》", 50.00, 10, "九成新，几乎无笔记", "https://via.placeholder.com/160", ProductStatus.ON_SALE));
+        productTable.add(new Product(4L, "校园纪念T恤", 99.00, 50, "纯棉材质，舒适透气", "https://via.placeholder.com/160", ProductStatus.ON_SALE));
 
         // 初始化订单
         ShopTransaction order1 = new ShopTransaction(1001L, "1234567", 15.50, OrderStatus.PAID, LocalDateTime.now().minusDays(1), null);
@@ -79,5 +79,15 @@ public class ShopService {
 
     public List<ShopTransaction> getMyFavorites(String userId) {
         return shopDao.getFavoritesByUserId(userId);
+    }
+    public Product getProductDetail(String productId) {
+        // 1. 在 Service 层进行业务逻辑校验
+        if (productId == null || productId.trim().isEmpty()) {
+            // 抛出异常，由 Controller 层捕获并处理
+            throw new IllegalArgumentException("无效的请求数据：商品ID不能为空。");
+        }
+
+        // 2. 调用 DAO 层获取数据
+        return shopDao.getProductById(productId);
     }
 }

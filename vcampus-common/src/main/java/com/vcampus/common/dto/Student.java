@@ -5,36 +5,42 @@ import java.io.Serializable;
 /**
  * 学生学籍信息 DTO
  * 与 User 账号体系通过 userId 关联
- * 编写人：周蔚钺
- *
- * 字段说明：
- *   - userId: 与 User 对象关联的 7 位用户ID
- *   - studentId: 学号，8 位数字
- *   - cardId: 一卡通号，9 位数字
- *   - name: 姓名
- *   - gender: 性别
- *   - college: 学院
- *   - major: 专业
- *   - grade: 年级（如 2023）
  */
 public class Student implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String userId;     // 7位用户ID（关联 User.userId）
-    private String studentId;  // 学号（8位数字）
-    private String cardId;     // 一卡通号（9位数字）
+    // 基本信息
+    private String userId;
+    private String studentId;
+    private String cardId;
+    private String name;
+    private String gender;
+    private String college;
+    private String major;
+    private int grade;
+    private String birth_date;
+    private String native_place;
+    private String politics_status;
+    private String student_status;
 
-    private String name;       // 姓名
-    private String gender;     // 性别
-    private String college;    // 学院
-    private String major;      // 专业
-    private int grade;         // 年级（如 2023）
-    private String birth_date; // 出生日期
-    private String native_place; //籍贯
-    private String politics_status;   //政治面貌
-    private String student_status;  //学籍状态
+    // 新增联系方式
+    private String phone;           // 手机号
+    private String email;           // 电子邮箱
+    private String dormAddress;     // 宿舍地址
 
-    // 默认构造方法（反序列化必需）
+    // 父亲信息
+    private String fatherName;
+    private String fatherPhone;
+    private String fatherPoliticsStatus;
+    private String fatherWorkUnit;
+
+    // 母亲信息
+    private String motherName;
+    private String motherPhone;
+    private String motherPoliticsStatus;
+    private String motherWorkUnit;
+
+    // 默认构造
     public Student() {}
 
     public Student(String userId, String studentId, String cardId,
@@ -51,115 +57,85 @@ public class Student implements Serializable {
     }
 
     // Getter & Setter
-    public String getUserId() {
-        return userId;
-    }
-
+    public String getUserId() { return userId; }
     public void setUserId(String userId) {
-        if (userId != null && userId.matches("\\d{7}")) {
-            this.userId = userId;
-        } else {
-            throw new IllegalArgumentException("用户ID必须为7位纯数字字符串");
-        }
+        if (userId != null && userId.matches("\\d{7}")) this.userId = userId;
+        else throw new IllegalArgumentException("用户ID必须为7位纯数字字符串");
     }
 
-    public String getStudentId() {
-        return studentId;
-    }
-
+    public String getStudentId() { return studentId; }
     public void setStudentId(String studentId) {
-        if (studentId != null && studentId.matches("\\d{8}")) {
-            this.studentId = studentId;
-        } else {
-            throw new IllegalArgumentException("学号必须为8位纯数字字符串");
-        }
+        if (studentId != null && studentId.matches("\\d{8}")) this.studentId = studentId;
+        else throw new IllegalArgumentException("学号必须为8位纯数字字符串");
     }
 
-    public String getCardId() {
-        return cardId;
-    }
-
+    public String getCardId() { return cardId; }
     public void setCardId(String cardId) {
-        if (cardId != null && cardId.matches("\\d{9}")) {
-            this.cardId = cardId;
-        } else {
-            throw new IllegalArgumentException("一卡通号必须为9位纯数字字符串");
-        }
+        if (cardId != null && cardId.matches("\\d{9}")) this.cardId = cardId;
+        else throw new IllegalArgumentException("一卡通号必须为9位纯数字字符串");
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public String getGender() {
-        return gender;
-    }
+    public String getCollege() { return college; }
+    public void setCollege(String college) { this.college = college; }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
+    public String getMajor() { return major; }
+    public void setMajor(String major) { this.major = major; }
 
-    public String getCollege() {
-        return college;
-    }
+    public int getGrade() { return grade; }
+    public void setGrade(int grade) { this.grade = grade; }
 
-    public void setCollege(String college) {
-        this.college = college;
-    }
+    public String getBirth_date() { return birth_date; }
+    public void setBirth_date(String birth_date) { this.birth_date = birth_date; }
 
-    public String getMajor() {
-        return major;
-    }
+    public String getNative_place() { return native_place; }
+    public void setNative_place(String native_place) { this.native_place = native_place; }
 
-    public void setMajor(String major) {
-        this.major = major;
-    }
+    public String getPolitics_status() { return politics_status; }
+    public void setPolitics_status(String politics_status) { this.politics_status = politics_status; }
 
-    public int getGrade() {
-        return grade;
-    }
+    public String getStudent_status() { return student_status; }
+    public void setStudent_status(String student_status) { this.student_status = student_status; }
 
-    public void setGrade(int grade) {
-        this.grade = grade;
-    }
+    // 联系方式
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getBirth_date() {
-        return birth_date;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setBirth_date(String birth_date) {
-        this.birth_date = birth_date;
-    }
+    public String getDormAddress() { return dormAddress; }
+    public void setDormAddress(String dormAddress) { this.dormAddress = dormAddress; }
 
-    // native_place
-    public String getNative_place() {
-        return native_place;
-    }
+    // 父亲信息
+    public String getFatherName() { return fatherName; }
+    public void setFatherName(String fatherName) { this.fatherName = fatherName; }
 
-    public void setNative_place(String native_place) {
-        this.native_place = native_place;
-    }
+    public String getFatherPhone() { return fatherPhone; }
+    public void setFatherPhone(String fatherPhone) { this.fatherPhone = fatherPhone; }
 
-    // politics_status
-    public String getPolitics_status() {
-        return politics_status;
-    }
+    public String getFatherPoliticsStatus() { return fatherPoliticsStatus; }
+    public void setFatherPoliticsStatus(String fatherPoliticsStatus) { this.fatherPoliticsStatus = fatherPoliticsStatus; }
 
-    public void setPolitics_status(String politics_status) {
-        this.politics_status = politics_status;
-    }
+    public String getFatherWorkUnit() { return fatherWorkUnit; }
+    public void setFatherWorkUnit(String fatherWorkUnit) { this.fatherWorkUnit = fatherWorkUnit; }
 
-    // student_status
-    public String getStudent_status() {
-        return student_status;
-    }
+    // 母亲信息
+    public String getMotherName() { return motherName; }
+    public void setMotherName(String motherName) { this.motherName = motherName; }
 
-    public void setStudent_status(String student_status) {
-        this.student_status = student_status;
-    }
+    public String getMotherPhone() { return motherPhone; }
+    public void setMotherPhone(String motherPhone) { this.motherPhone = motherPhone; }
 
+    public String getMotherPoliticsStatus() { return motherPoliticsStatus; }
+    public void setMotherPoliticsStatus(String motherPoliticsStatus) { this.motherPoliticsStatus = motherPoliticsStatus; }
+
+    public String getMotherWorkUnit() { return motherWorkUnit; }
+    public void setMotherWorkUnit(String motherWorkUnit) { this.motherWorkUnit = motherWorkUnit; }
 }
+

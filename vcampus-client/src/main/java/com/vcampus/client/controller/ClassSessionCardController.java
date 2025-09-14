@@ -16,7 +16,7 @@ public class ClassSessionCardController {
     @FXML private Label scheduleLabel;
     @FXML private Label capacityLabel;
     @FXML private Label enrolledLabel;
-    @FXML private Button actionButton;//选择或退选按钮
+    @FXML private Button actionButton;
 
     // 每个卡片控制器都持有 Service 的实例
     private final CourseService courseService = new CourseService();
@@ -26,16 +26,24 @@ public class ClassSessionCardController {
      * 由上层(CourseCardController)调用，用于填充数据
      * @param session 该卡片代表的教学班数据
      */
+    //这个回调我觉得后期可以换成message,就是怎么通过message来实现回调
     public void setData(ClassSession session) {
+//        this.session = session;
+//
+//        teacherNameLabel.setText(session.getTeacherName());
+//        //scheduleLabel.setText(session.getScheduleInfo());
+//        capacityLabel.setText("课容量: " + session.getCapacity() + "人");
+//        enrolledLabel.setText("已选人数: " + session.getEnrolledCount() + "人");
+//
+//        selectedTagLabel.setVisible(session.isSelectedByStudent());
+//        selectedTagLabel.setManaged(session.isSelectedByStudent());
+//        updateButtonState();
         this.session = session;
-
+        // ⭐ 每次都用最新的 session 对象数据来完全重置UI
         teacherNameLabel.setText(session.getTeacherName());
-        //scheduleLabel.setText(session.getScheduleInfo());
+        scheduleLabel.setText(session.getScheduleInfo());
         capacityLabel.setText("课容量: " + session.getCapacity() + "人");
         enrolledLabel.setText("已选人数: " + session.getEnrolledCount() + "人");
-
-        selectedTagLabel.setVisible(session.isSelectedByStudent());
-        selectedTagLabel.setManaged(session.isSelectedByStudent());
         updateButtonState();
     }
 
@@ -45,43 +53,25 @@ public class ClassSessionCardController {
      */
     @FXML
     private void handleSelectAction() {
+        // ⭐ 串联的触发点：执行回调，将自己的 session 数据传递出去
+        //将session传给service，调用serbice层的东西传输给服务层
         // 安全检查，防止在数据未设置时被调用
-        if (session == null) {
-            return;
-        }
 
-        // 显示确认对话框
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
-        alert.setTitle("确认操作");
-        alert.setHeaderText(null);
+        // 1. 提供即时UI反馈：禁用按钮并显示“处理中”，防止用户重复点击
+        actionButton.setDisable(true);
+        actionButton.setText("处理中...");
 
+        // 2. 直接调用 CourseService 发送网络请求
+        // 这是职责分离的核心：本控制器只负责“发起”，不关心“结果”
         if (session.isSelectedByStudent()) {
-            alert.setContentText("确定要退选该课程吗？");
+            // 如果当前是“已选”状态，则执行退课操作
+            courseService.dropCourse(session.getSessionId());
         } else {
-            alert.setContentText("确定要选择该课程吗？");
+            // 否则，执行选课操作
+            courseService.selectCourse(session.getSessionId());
         }
-
-        // 等待用户响应
-        java.util.Optional<javafx.scene.control.ButtonType> result = alert.showAndWait();
-
-        // 如果用户确认
-        if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK) {
-            // 1. 提供即时UI反馈：禁用按钮并显示“处理中”，防止用户重复点击
-            actionButton.setDisable(true);
-            actionButton.setText("处理中...");
-
-            // 2. 直接调用 CourseService 发送网络请求
-            // 这是职责分离的核心：本控制器只负责“发起”，不关心“结果”
-            if (session.isSelectedByStudent()) {
-                // 如果当前是“已选”状态，则执行退课操作
-                courseService.dropCourse(session.getSessionId());
-            } else {
-                // 否则，执行选课操作
-                courseService.selectCourse(session.getSessionId());
-            }
-            // 请求发送后，本控制器的任务就完成了。
-            // 它会静静等待顶层 AcademicController 刷新整个列表，从而获得新的状态。
-        }
+        // 请求发送后，本控制器的任务就完成了。
+        // 它会静静等待顶层 AcademicController 刷新整个列表，从而获得新的状态。
     }
 
     //这里我要设置session为一个类

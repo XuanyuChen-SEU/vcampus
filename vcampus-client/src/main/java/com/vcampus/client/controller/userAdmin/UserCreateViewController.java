@@ -1,27 +1,31 @@
 package com.vcampus.client.controller.userAdmin;
 
-import javafx.collections.FXCollections;
+import com.vcampus.client.MainApp;
+import com.vcampus.client.controller.IClientController;
+import com.vcampus.client.service.userAdmin.UserCreateService;
+import com.vcampus.common.dto.Message;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 /**
  * 用户创建控制器
  * 负责创建新用户的功能
- * 编写人：AI Assistant
+ * 编写人：谌宣羽
  */
-public class UserCreateViewController {
+public class UserCreateViewController implements IClientController{
 
+    // Service层
+    private final UserCreateService userCreateService;
+    
     // 表单组件
     @FXML
     private TextField userIdField;
     
-    @FXML
-    private ComboBox<String> roleCombo;
     
     @FXML
     private PasswordField passwordField;
@@ -35,27 +39,34 @@ public class UserCreateViewController {
     
     @FXML
     private Button resetButton;
+    
+    /**
+     * 构造函数
+     */
+    public UserCreateViewController() {
+        this.userCreateService = new UserCreateService();
+    }
+
+    @Override
+    public void registerToMessageController() {
+        com.vcampus.client.controller.MessageController messageController = 
+            MainApp.getGlobalSocketClient().getMessageController();
+        if (messageController != null) {
+            messageController.setUserCreateViewController(this);
+        }
+        
+    }
 
     /**
      * 初始化方法
      */
     @FXML
     public void initialize() {
-        // 初始化角色选择下拉框
-        initializeRoleCombo();
-        
         // 设置输入验证
         setupInputValidation();
+        registerToMessageController();
     }
     
-    /**
-     * 初始化角色选择下拉框
-     */
-    private void initializeRoleCombo() {
-        roleCombo.setItems(FXCollections.observableArrayList(
-            "学生", "教师", "管理员"
-        ));
-    }
     
     /**
      * 设置输入验证
@@ -67,29 +78,22 @@ public class UserCreateViewController {
                 userIdField.setText(oldValue);
             }
         });
-        
-        // 角色选择后自动设置ID前缀
-        roleCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && !newValue.isEmpty()) {
-                String currentId = userIdField.getText();
-                if (currentId.length() <= 1) {
-                    String prefix = getRolePrefix(newValue);
-                    userIdField.setText(prefix + currentId.substring(Math.min(1, currentId.length())));
-                }
-            }
-        });
     }
     
     /**
-     * 获取角色对应的ID前缀
+     * 根据用户ID获取角色描述
      */
-    private String getRolePrefix(String role) {
-        switch (role) {
-            case "学生": return "1";
-            case "教师": return "2";
-            case "管理员": return "3";
-            default: return "";
+    private String getRoleDescription(String userId) {
+        if (userId.length() >= 1) {
+            String firstChar = userId.substring(0, 1);
+            switch (firstChar) {
+                case "1": return "学生";
+                case "2": return "教师";
+                case "3": return "用户管理员";
+                default: return "未知";
+            }
         }
+        return "";
     }
     
     /**
@@ -104,21 +108,44 @@ public class UserCreateViewController {
         
         // 获取表单数据
         String userId = userIdField.getText().trim();
-        String role = roleCombo.getValue();
         String password = passwordField.getText();
+        String roleDescription = getRoleDescription(userId);
         
-        // TODO: 发送创建用户请求到服务器
-        System.out.println("创建用户 - ID: " + userId + ", 角色: " + role);
-        
-        // 显示成功消息
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("创建成功");
-        alert.setHeaderText("用户创建成功");
-        alert.setContentText("用户 " + userId + " (" + role + ") 已成功创建！");
-        alert.showAndWait();
-        
-        // 重置表单
-        resetForm();
+        try {
+            // 使用Service层发送创建用户请求
+            Message result = userCreateService.createUser(userId, password);
+            
+            if (result.isSuccess()) {
+                // 发送请求成功
+                System.out.println("成功发送创建用户请求: " + userId);
+                // 注意：这里只确认请求发送成功，实际创建结果会在后续的响应处理中处理
+                
+                // 显示发送成功消息
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("请求已发送");
+                alert.setHeaderText("创建用户请求已发送");
+                alert.setContentText("用户 " + userId + " (" + roleDescription + ") 的创建请求已发送到服务器，请等待处理结果。");
+                alert.showAndWait();
+                
+                // 重置表单
+                resetForm();
+            } else {
+                // 发送请求失败
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("发送失败");
+                alert.setHeaderText("创建用户请求发送失败");
+                alert.setContentText(result.getMessage());
+                alert.showAndWait();
+                System.err.println("发送创建用户请求失败: " + result.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println("发送创建用户请求时发生异常: " + e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("发送失败");
+            alert.setHeaderText("创建用户请求发送失败");
+            alert.setContentText("发送请求时发生异常: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
     
     /**
@@ -134,7 +161,6 @@ public class UserCreateViewController {
      */
     private boolean validateInput() {
         String userId = userIdField.getText().trim();
-        String role = roleCombo.getValue();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
         
@@ -157,10 +183,11 @@ public class UserCreateViewController {
             return false;
         }
         
-        // 验证角色
-        if (role == null || role.isEmpty()) {
-            showError("请选择用户角色");
-            roleCombo.requestFocus();
+        // 验证ID首位是否有效
+        String firstChar = userId.substring(0, 1);
+        if (!firstChar.matches("[1-2]")) {
+            showError("用户ID首位必须是1（学生）、2（教师）");
+            userIdField.requestFocus();
             return false;
         }
         
@@ -171,23 +198,10 @@ public class UserCreateViewController {
             return false;
         }
         
-        if (password.length() < 6) {
-            showError("密码长度不能少于6位");
-            passwordField.requestFocus();
-            return false;
-        }
         
         if (!password.equals(confirmPassword)) {
             showError("两次输入的密码不一致");
             confirmPasswordField.requestFocus();
-            return false;
-        }
-        
-        // 验证ID前缀与角色是否匹配
-        String expectedPrefix = getRolePrefix(role);
-        if (!userId.startsWith(expectedPrefix)) {
-            showError("用户ID前缀与选择的角色不匹配");
-            userIdField.requestFocus();
             return false;
         }
         
@@ -199,7 +213,6 @@ public class UserCreateViewController {
      */
     private void resetForm() {
         userIdField.clear();
-        roleCombo.setValue(null);
         passwordField.clear();
         confirmPasswordField.clear();
         userIdField.requestFocus();
@@ -214,5 +227,13 @@ public class UserCreateViewController {
         alert.setHeaderText("请检查输入信息");
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public void handleCreateUserResponse(Message message) {
+        if (message.isSuccess()) {
+            System.out.println("创建用户成功: " + message.getMessage());
+        } else {
+            System.err.println("创建用户失败: " + message.getMessage());
+        }
     }
 }

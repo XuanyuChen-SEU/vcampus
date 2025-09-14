@@ -1,9 +1,12 @@
 package com.vcampus.common.dto;
 
-import com.vcampus.common.enums.CourseStatus;
-
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * 注意：为了避免枚举序列化/反序列化问题，状态字段已从枚举改为字符串
+ */
 
 /**
  * 课程数据传输对象（DTO）
@@ -25,22 +28,56 @@ public class Course implements Serializable {
     private int sessionnum;
 
 
-    private CourseStatus status; // 选课状态
-    private List<ClassSession> sessions;
+    private String status; // 选课状态 (使用字符串代替枚举以避免序列化问题)
+    private List<ClassSession> sessions;//特色班
+
+    //新增字段
+    private double credits;//学分
+    private String category;//课程类型（校公选课类型）
+    private String campus;//校区
 
     // 默认构造方法（反序列化必需）
     public Course() {}
 
-    // 带参构造方法
-    public Course(String courseId, String courseName, String courseType, String department, CourseStatus status, List<ClassSession> sessions) {
+    // 带参构造方法 - 兼容旧的枚举参数
+    public Course(String courseId, String courseName, String courseType, String department, Object status, List<ClassSession> sessions,double credits,String category,String campus) {
         this.courseId = courseId;
         this.courseName = courseName;
         this.courseType = courseType;
         this.department = department;
-        this.status = status;
+        this.status = (status instanceof String) ? (String)status : status.toString();
         this.sessions = sessions;
-        this.sessionnum = sessions.size() ;
+        this.sessionnum = sessions.size();
+        // 新增字段
+        this.credits = credits;
+        this.category = category;
+        this.campus = campus;
     }
+
+    //进行一项深拷贝
+    // 在 Course.java (common DTO) 中添加
+    public Course(Course other) {
+        this.courseId = other.courseId;
+        this.courseName = other.courseName;
+        this.courseType = other.courseType;
+        this.department = other.department;
+        this.status = other.status;
+        this.sessionnum = other.sessionnum;
+        // 新增字段
+        this.credits = other.credits;
+        this.category = other.category;
+        this.campus = other.campus;
+        // 对 sessions 列表也进行深拷贝
+        if (other.sessions != null) {
+            this.sessions = other.sessions.stream().map(ClassSession::new).collect(Collectors.toList());
+        }
+    }
+
+
+
+
+
+
 
     // Getter & Setter方法
     // --- 构造方法, Getters, Setters ---
@@ -49,17 +86,26 @@ public class Course implements Serializable {
     public String getCourseName() { return courseName; }
     public String getCourseType() { return courseType; }
     public String getDepartment() { return department; }
-    public CourseStatus getStatus() { return status; }
+    public String getStatus() { return status; }
     public List<ClassSession> getSessions() { return sessions; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
     public void setCourseName(String courseName) { this.courseName = courseName; }
     public void setCourseType(String courseType) { this.courseType = courseType; }
     public void setDepartment(String department) { this.department = department; }
-    public void setStatus(CourseStatus status) { this.status = status; }
+    public void setStatus(String status) { this.status = status; }
     public void setSessions(List<ClassSession> sessions) { this.sessions = sessions; }
     public int getSessionnum() { return sessionnum; }
-    public void setSessionnum(int sessionnum) { this.sessionnum = sessions.size(); }
+    public void setSessionnum(int sessionnum) { this.sessionnum = sessionnum; }
 
+    // --- Getters and Setters for new fields ---
+    public double getCredits() { return credits; }
+    public void setCredits(double credits) { this.credits = credits; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getCampus() { return campus; }
+    public void setCampus(String campus) { this.campus = campus; }
 
     @Override
     public String toString() {
@@ -68,7 +114,11 @@ public class Course implements Serializable {
                 ", courseName='" + courseName + '\'' +
                 ", courseType='" + courseType + '\'' +
                 ", department='" + department + '\'' +
-                ", status=" + status +
+                ", status=" + status +'\'' +
+                ", sessionnum=" + sessionnum +'\'' +
+                ", credits=" + credits +'\'' +
+                ", category='" + category + '\'' +
+                ", campus='" + campus + '\'' +
                 ", sessions=" + sessions +
                 '}';
     }

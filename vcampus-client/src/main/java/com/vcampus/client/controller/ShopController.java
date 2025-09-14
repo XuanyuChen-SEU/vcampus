@@ -1,5 +1,10 @@
 package com.vcampus.client.controller;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.vcampus.client.MainApp;
 import com.vcampus.client.service.ShopService;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Product;
@@ -12,20 +17,26 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ShopController implements IClientController{
 
@@ -35,8 +46,6 @@ public class ShopController implements IClientController{
     @FXML private ScrollPane productScrollPane; // 包裹 TilePane 的滚动面板
     @FXML private TableView<ShopTransaction> orderTable; // 新增：用于展示订单的表格
     @FXML private StackPane centerStackPane; // 新增：用于切换视图的 StackPane
-    @FXML private Label userInfoLabel;
-    @FXML private Label balanceLabel;
 
     // --- 表格列定义 ---
     @FXML private TableColumn<ShopTransaction, String> orderIdColumn;
@@ -52,14 +61,11 @@ public class ShopController implements IClientController{
     @FXML
     void initialize() {
         System.out.println("商店控制器初始化完成！");
-
-        // 1. 配置UI相关的组件
+        currentUser = new User(MainApp.getGlobalUserSession().getCurrentUserId(),"");        // 1. 配置UI相关的组件
         setupOrderTable();
-
+        
         // 2. 将自己注册到消息中心，以便接收异步消息
         registerToMessageController();
-
-
     }
 
     @Override
@@ -76,53 +82,29 @@ public class ShopController implements IClientController{
         }
     }
 
-
-    /**
-     * 【重构后的方法，取代了之前的 load... 方法】
-     * 这个方法由外部调用（比如 MainViewController 或 initialize 自身），
-     * 用于设置当前用户，并触发初始数据的加载。
-     * @param user 当前登录的用户对象
-     */
-    public void setCurrentUser(User user) {
-        this.currentUser = user;
-        updateUserInfo();
-
-        // 【关键逻辑】在设置完用户信息后，立即主动向服务器请求所有商品
-        loadInitialProducts();
-    }
-
-    // ==========================================================
-    // FXML 事件处理方法
-    // ==========================================================
-
     @FXML
     void handleSearch(ActionEvent event) {
-        switchToProductView(); // 确保显示的是商品视图
+        // 1. 确保当前显示的是商品列表视图，而不是订单表格
+        switchToProductView();
+
+        // 2. 从界面的搜索输入框 (searchField) 中获取用户输入的文本
         String searchText = searchField.getText();
+
+        // 3. 在控制台打印日志，方便调试，确认函数被触发
         System.out.println("用户正在搜索: " + searchText);
+
+        // 4. 调用 shopService 的 searchProducts 方法，将搜索词发送给后端进行查询
         Message response = shopService.searchProducts(searchText);
+
+        // 5. 根据后端返回的结果，更新界面
         if (response.isSuccess()) {
+            // 如果成功，就调用 updateProductDisplay 方法，用返回的商品列表刷新界面
             updateProductDisplay((List<Product>) response.getData());
         } else {
+            // 如果失败，就弹出一个错误提示框
             showError("搜索失败: " + response.getMessage());
         }
     }
-
-    @FXML
-    void handleShowMyOrders(ActionEvent event) {
-        System.out.println("用户点击了“我的订单”");
-        switchToOrderView(); // 切换到订单视图
-        if (currentUser == null) { return; }
-
-        Message response = shopService.getMyOrders(currentUser.getUserId());
-        if (response.isSuccess()) {
-            List<ShopTransaction> orders = (List<ShopTransaction>) response.getData();
-            Platform.runLater(() -> orderTable.getItems().setAll(orders));
-        } else {
-            showError("获取订单失败: " + response.getMessage());
-        }
-    }
-
     @FXML
     void handleShowMyFavorites(ActionEvent event) {
         System.out.println("用户点击了“我的收藏”");
@@ -138,6 +120,40 @@ public class ShopController implements IClientController{
             updateProductDisplay(favoriteProducts);
         } else {
             showError("获取收藏失败: " + response.getMessage());
+        }
+    }
+    @FXML
+    void handleShowMyOrders(ActionEvent event) {
+        // 1. 在控制台打印日志，方便调试
+        System.out.println("用户点击了“我的订单”");
+
+        // 2. 确保切换到商品显示视图，与“我的收藏”功能保持界面一致
+        switchToProductView();
+
+        // 3. 检查用户是否登录
+        if (currentUser == null) {
+            showError("用户未登录，无法查看订单。");
+            return;
+        }
+
+        // 4. 调用服务获取订单数据
+        Message response = shopService.getMyOrders(currentUser.getUserId());
+
+        // 5. 处理返回结果
+        if (response.isSuccess()) {
+            // 成功时，先将返回的 Object 数据转换为订单列表 (List<ShopTransaction>)
+            List<ShopTransaction> orders = (List<ShopTransaction>) response.getData();
+
+            // 然后，像“我的收藏”一样，从订单列表中提取出商品列表 (List<Product>)
+            List<Product> orderedProducts = orders.stream()
+                    .map(ShopTransaction::getProduct) // 假设 ShopTransaction 类有 getProduct() 方法
+                    .collect(Collectors.toList());
+
+            // 最后，调用您已有的 updateProductDisplay 方法来显示这些已购商品
+            updateProductDisplay(orderedProducts);
+        } else {
+            // 失败时，显示错误信息
+            showError("获取订单失败: " + response.getMessage());
         }
     }
 
@@ -186,14 +202,6 @@ public class ShopController implements IClientController{
         });
     }
 
-    private void updateUserInfo() {
-        Platform.runLater(() -> {
-            if (currentUser != null) {
-                userInfoLabel.setText("用户ID: " + currentUser.getUserId());
-                balanceLabel.setText(String.format("余额: ¥ %.2f", currentUser.getBalance()));
-            }
-        });
-    }
 
     private void updateProductDisplay(List<Product> products) {
         Platform.runLater(() -> {
@@ -238,13 +246,77 @@ public class ShopController implements IClientController{
         priceBox.getChildren().addAll(currencyLabel, priceLabel);
 
         Button actionButton = new Button("查看详情");
-        actionButton.setOnAction(event -> {
-            // TODO: 实现查看商品详情的逻辑
-            System.out.println("查看详情: " + product.getName());
-        });
+        actionButton.setOnAction(event -> handleViewDetails(product)); // 修改这里
 
         card.getChildren().addAll(imageView, nameLabel, priceBox, actionButton);
         return card;
+    }
+
+    // --- 请将这个完整的方法添加到你的 ShopController.java 中 ---
+
+    // --- 这是修改后的 handleViewDetails ---
+    private void handleViewDetails(Product product) {
+        System.out.println("用户请求查看商品详情: " + product.getName());
+        // 【核心修正】只调用 service 发送请求，不接收返回值
+        shopService.getProductDetail(String.valueOf(product.getId()));
+    }
+
+
+    /**
+     * 【新增方法，作为异步响应入口】
+     * 处理“获取商品详情”的异步响应。
+     * 这个方法会被 MessageController 在后台线程中调用。
+     */
+    public void handleGetProductDetailResponse(Message message) {
+        System.out.println("客户端 ShopController：收到异步商品详情响应。");
+
+        // 【关键】所有UI更新都必须在 JavaFX Application Thread 中执行
+        Platform.runLater(() -> {
+            if (message.isSuccess() && message.getData() instanceof Product) {
+                Product detailProduct = (Product) message.getData();
+
+                // --- 创建和显示对话框的逻辑和之前完全一样 ---
+                Dialog<Product> dialog = new Dialog<>();
+                dialog.setTitle("商品详情");
+                dialog.setHeaderText(detailProduct.getName());
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                ImageView imageView = new ImageView();
+                imageView.setFitWidth(200);
+                imageView.setFitHeight(200);
+                imageView.setPreserveRatio(true);
+                try {
+                    Image image = new Image(detailProduct.getImageUrl(), true);
+                    imageView.setImage(image);
+                } catch (Exception e) {
+                    imageView.setImage(new Image("https://via.placeholder.com/200", true));
+                }
+
+                Label priceLabel = new Label(String.format("价格: ¥ %.2f", detailProduct.getPrice()));
+                Label stockLabel = new Label("库存: " + detailProduct.getStock() + " 件");
+                Label descriptionLabel = new Label(detailProduct.getDescription());
+                descriptionLabel.setWrapText(true);
+                descriptionLabel.setPrefWidth(300);
+
+                grid.add(imageView, 0, 0, 1, 3);
+                grid.add(priceLabel, 1, 0);
+                grid.add(stockLabel, 1, 1);
+                grid.add(new Label("描述:"), 0, 3);
+                grid.add(descriptionLabel, 0, 4, 2, 1);
+
+                dialog.getDialogPane().setContent(grid);
+                dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+                dialog.showAndWait();
+
+            } else {
+                showError("（异步）获取详情失败: " + message.getMessage());
+            }
+        });
     }
 
     private void switchToProductView() {

@@ -15,6 +15,13 @@ public class CourseController {
     public Message handleGetAllCourses(Message request) {
         Map<String, Object> payload = (Map<String, Object>) request.getData();
         String userId = (String) payload.get("userId");
+//        Object courseParam = payload.get("course");
+
+        // 打印当前用户的选课记录
+//        System.out.println("\n--- [客户端请求] 获取所有课程 ---");
+//        System.out.println("  请求用户ID: " + userId);
+//        System.out.println("  请求参数: " + payload);
+//        System.out.println("  course参数值: " + courseParam);
         return courseService.getAllCourses(userId);
     }
 
@@ -22,13 +29,21 @@ public class CourseController {
         Map<String, Object> payload = (Map<String, Object>) request.getData();
         String studentId = (String) payload.get("userId");
         String sessionId = (String) payload.get("sessionId");
-        return courseService.selectCourse(studentId, sessionId);
+        //String courseId = (String) payload.get("courseId");
+        return courseService.selectCourse(studentId,sessionId);
     }
 
     public Message handleDropCourse(Message request) {
         Map<String, Object> payload = (Map<String, Object>) request.getData();
         String studentId = (String) payload.get("userId");
         String sessionId = (String) payload.get("sessionId");
-        return courseService.dropCourse(studentId, sessionId);
+        //String courseId = (String) payload.get("courseId");
+        return courseService.dropCourse(studentId,sessionId);
+    }
+
+    public Message handleGetMyCourses(Message request) {
+        Map<String, Object> payload = (Map<String, Object>) request.getData();
+        String studentId = (String) payload.get("userId");
+        return courseService.getMyCourses(studentId);
     }
 }

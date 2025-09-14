@@ -3,6 +3,7 @@ package com.vcampus.server.controller;
 import com.vcampus.common.dto.ChangePassword;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.User;
+import com.vcampus.common.dto.UserSearch;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.UserService;
 
@@ -70,14 +71,17 @@ public class UserController {
         }
     }
 
+    /**
+     * 处理修改密码请求
+     * @param message
+     * @return
+     */
     public Message handleChangePassword(Message message) {
         try {
             // 获取用户信息
             ChangePassword changePassword = (ChangePassword) message.getData();
-            
             // 调用用户服务处理修改密码申请
             Message result = userService.handleChangePassword(changePassword);
-
             if (result.isSuccess()) {
                 return Message.success(ActionType.CHANGE_PASSWORD, result.getMessage());
             } else {
@@ -86,6 +90,147 @@ public class UserController {
         } catch (Exception e) {
             System.err.println("处理修改密码请求时发生错误: " + e.getMessage());
             return Message.failure(ActionType.CHANGE_PASSWORD, "服务器内部错误");
+        }
+    }
+
+    /** 
+     * 处理搜索用户请求
+     * @param message 搜索用户请求消息
+     * @return 搜索用户响应消息
+     */
+    public Message handleSearchUsers(Message message) {
+        try {
+            // 获取搜索关键词
+            UserSearch userSearch = (UserSearch) message.getData();
+            
+            // 调用用户服务进行搜索
+            Message result = userService.searchUsers(userSearch);
+            
+            if (result.isSuccess()) {
+                return Message.success(ActionType.SEARCH_USERS, result.getData(), result.getMessage());
+            } else {
+                return Message.failure(ActionType.SEARCH_USERS, result.getMessage());
+            }
+            
+        } catch (Exception e) {
+            System.err.println("处理搜索用户请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.SEARCH_USERS, "服务器内部错误");
+        }
+    }
+
+    /**
+     * 处理删除用户请求
+     * @param message 删除用户请求消息
+     * @return 删除用户响应消息
+     */
+    public Message handleDeleteUser(Message message) {
+        try {
+            // 获取用户ID
+            String userId = (String) message.getData();
+            
+            // 调用用户服务进行删除
+            Message result = userService.deleteUser(userId);
+            
+            if (result.isSuccess()) {
+                return Message.success(ActionType.DELETE_USER, result.getMessage());
+            } else {
+                return Message.failure(ActionType.DELETE_USER, result.getMessage());
+            }
+            
+        } catch (Exception e) {
+            System.err.println("处理删除用户请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.DELETE_USER, "服务器内部错误");
+        }
+    }
+
+    /**
+     * 处理重置用户密码请求
+     * @param message 重置用户密码请求消息
+     * @return 重置用户密码响应消息
+     */
+    public Message handleResetUserPassword(Message message) {
+        try {
+            User user = (User) message.getData();   
+            
+            // 调用用户服务进行密码重置
+            Message result = userService.resetUserPassword(user);
+            
+            if (result.isSuccess()) {
+                return Message.success(ActionType.RESET_USER_PASSWORD, result.getMessage());
+            } else {
+                return Message.failure(ActionType.RESET_USER_PASSWORD, result.getMessage());
+            }
+            
+        } catch (Exception e) {
+            System.err.println("处理重置用户密码请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.RESET_USER_PASSWORD, "服务器内部错误");
+        }
+    }
+
+    /**
+     * 处理创建用户请求
+     * @param message 创建用户请求消息
+     * @return 创建用户响应消息
+     */
+    public Message handleCreateUser(Message message) {
+        try {
+            // 获取用户信息
+            User user = (User) message.getData();
+            
+            // 调用用户服务进行创建
+            Message result = userService.createUser(user);
+            
+            if (result.isSuccess()) {
+                return Message.success(ActionType.CREATE_USER, result.getMessage());
+            } else {
+                return Message.failure(ActionType.CREATE_USER, result.getMessage());
+            }
+            
+        } catch (Exception e) {
+            System.err.println("处理创建用户请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.CREATE_USER, "服务器内部错误");
+        }
+    }
+
+    /*  
+     * 处理获取忘记密码申请请求
+     * @param message 获取忘记密码申请请求消息
+     * @return 获取忘记密码申请响应消息
+     */
+    public Message handleGetForgetPasswordTable(Message message) {
+        try {
+            return userService.getForgetPasswordTable();
+        } catch (Exception e) {
+            System.err.println("处理获取忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.GET_FORGET_PASSWORD_TABLE, "服务器内部错误");
+        }
+    }
+
+    /*  
+     * 处理批准忘记密码申请请求
+     * @param message 批准忘记密码申请请求消息
+     * @return 批准忘记密码申请响应消息
+     */
+    public Message handleApproveForgetPasswordApplication(Message message) {
+        try {
+            return userService.approveForgetPasswordApplication((String) message.getData());
+        } catch (Exception e) {
+            System.err.println("处理批准忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.APPROVE_FORGET_PASSWORD_APPLICATION, "服务器内部错误");
+        }
+    }
+
+    /*  
+     * 处理拒绝忘记密码申请请求
+     * @param message 拒绝忘记密码申请请求消息
+     * @return 拒绝忘记密码申请响应消息
+     */
+    public Message handleRejectForgetPasswordApplication(Message message) {
+        try {
+            return userService.rejectForgetPasswordApplication((String)message.getData());
+        } catch (Exception e) {
+            System.err.println("处理拒绝忘记密码申请请求时发生错误: " + e.getMessage());
+            return Message.failure(ActionType.REJECT_FORGET_PASSWORD_APPLICATION, "服务器内部错误");
         }
     }
 }
