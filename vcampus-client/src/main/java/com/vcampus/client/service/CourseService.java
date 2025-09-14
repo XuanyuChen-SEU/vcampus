@@ -91,6 +91,16 @@ public class CourseService {
     }
 
 
+    public void getMySelectedCourses() {
+        if (!checkConnectionAndLogin()) return;
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", UserSession.getInstance().getCurrentUserId());
+        Message request = new Message(ActionType.GET_MY_COURSES, payload);
+        socketClient.sendMessage(request);
+    }
+
+
+
 
     //我想了一下这个是请求，也就是说客户端向服务端拉取课表（根据前端学生id)
 //    public Message getCourseTable() {

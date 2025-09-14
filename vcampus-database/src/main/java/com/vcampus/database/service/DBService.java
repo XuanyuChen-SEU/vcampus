@@ -1,5 +1,11 @@
 package com.vcampus.database.service;
 
+import com.vcampus.database.mapper.LibraryMapper;
+import com.vcampus.database.mapper.Mapper;
+import com.vcampus.database.mapper.StudentMapper;
+import com.vcampus.database.mapper.UserMapper;
+import com.vcampus.database.mapper.ShopMapper;
+import com.vcampus.database.mapper.PasswordResetApplicationMapper;
 import com.vcampus.database.mapper.*;
 import com.vcampus.database.utils.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
@@ -11,15 +17,18 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import org.apache.ibatis.session.SqlSession;
 
-import com.vcampus.database.mapper.Mapper;
-import com.vcampus.database.mapper.PasswordResetApplicationMapper;
-import com.vcampus.database.mapper.ShopMapper;
-import com.vcampus.database.mapper.StudentMapper;
-import com.vcampus.database.mapper.UserMapper;
-import com.vcampus.database.utils.MyBatisUtil;
+
+
+
+
+
+
+
 
 public class DBService {
 
@@ -30,10 +39,13 @@ public class DBService {
      * 初始化整个数据库
      */
     public void initializeDatabase() {
-        MyBatisUtil myBatisUtil = new MyBatisUtil();
-        SqlSession sqlSession = myBatisUtil.openSession();
+        // 使用 try-with-resources 确保 sqlSession 总能被关闭
+        // MyBatisUtil 实例的创建也放入 try 中
+        SqlSession sqlSession = null;
         File userCsvTempFile = null;
         File studentCsvTempFile = null;
+        File bookCsvTempFile = null;
+        File borrowLogCsvTempFile = null;
         File passwordResetApplicationCsvTempFile = null;
         File productCsvTempFile = null;
         File orderCsvTempFile = null;
@@ -43,6 +55,8 @@ public class DBService {
         File classSessionCsvTempFile = null;
 
         try {
+            MyBatisUtil myBatisUtil = new MyBatisUtil();
+            sqlSession = myBatisUtil.openSession();
             Mapper mapper = sqlSession.getMapper(Mapper.class);
 
             String dbName = "vcampus_db";
@@ -61,13 +75,15 @@ public class DBService {
             mapper.createCoursesTable();
             mapper.createClassSessionsTable();
             mapper.createCourseSelectionsTable();
-            
+            mapper.createBookTable();
+            mapper.createBorrowLogTable();
             System.out.println("成功在数据库 " + dbName + " 中创建表结构。");
             System.out.println("准备从CSV文件加载数据...");
 
-            // 1. 定义资源路径
             String userCSVPath = "db/tb_user.csv";
             String studentCSVPath = "db/tb_student.csv";
+            String BookCSVPath = "db/tb_book.csv";
+            String BorrowLogCSVPath = "db/tb_borrow_log.csv";
             String passwordResetApplicationCSVPath = "db/tb_password_reset_application.csv";
             String productCSVPath = "db/tb_product.csv";
             String orderCSVPath = "db/tb_order.csv";
@@ -76,14 +92,23 @@ public class DBService {
             String ClassSessionCSVPath = "db/tb_class_sessions.csv";
             String CourseSelectionCSVPath = "db/tb_course_selections.csv";
 
+
+
+
+
+
+
+
             // ★ 修改点 1: 指定临时文件存放的目录
             // 在当前程序运行目录下创建一个名为 "temp_csv" 的子目录
             Path tempDirectory = Paths.get(System.getProperty("user.dir"), "temp_csv");
             Files.createDirectories(tempDirectory); // 如果目录不存在，则创建它
 
-            // 2. 将资源文件写入临时文件，并获取其路径
-            userCsvTempFile = createTempFileFromResource(userCSVPath,tempDirectory.toFile());
-            studentCsvTempFile = createTempFileFromResource(studentCSVPath,tempDirectory.toFile());
+            // 将资源文件写入我们指定的临时目录中
+            userCsvTempFile = createTempFileFromResource(userCSVPath, tempDirectory.toFile());
+            studentCsvTempFile = createTempFileFromResource(studentCSVPath, tempDirectory.toFile());
+            bookCsvTempFile = createTempFileFromResource(BookCSVPath, tempDirectory.toFile());
+            borrowLogCsvTempFile = createTempFileFromResource(BorrowLogCSVPath, tempDirectory.toFile());
             passwordResetApplicationCsvTempFile = createTempFileFromResource(passwordResetApplicationCSVPath,tempDirectory.toFile());
             productCsvTempFile = createTempFileFromResource(productCSVPath,tempDirectory.toFile());
             orderCsvTempFile = createTempFileFromResource(orderCSVPath,tempDirectory.toFile());
@@ -92,8 +117,18 @@ public class DBService {
             classSessionCsvTempFile = createTempFileFromResource(ClassSessionCSVPath,tempDirectory.toFile());
             courseSelectionCsvTempFile = createTempFileFromResource(CourseSelectionCSVPath,tempDirectory.toFile());
 
-            String userPath = userCsvTempFile.getAbsolutePath();
-            String studentPath = studentCsvTempFile.getAbsolutePath();
+
+
+
+
+
+
+
+            // getAbsolutePath() 在某些系统上可能包含'..'，改用 getCanonicalPath() 获取更规范的路径
+            String userPath = userCsvTempFile.getCanonicalPath().replace('\\', '/');
+            String studentPath = studentCsvTempFile.getCanonicalPath().replace('\\', '/');
+            String bookPath = bookCsvTempFile.getCanonicalPath().replace('\\', '/');
+            String borrowLogPath = borrowLogCsvTempFile.getCanonicalPath().replace('\\', '/');
             String passwordResetApplicationPath = passwordResetApplicationCsvTempFile.getAbsolutePath();
             String productPath = productCsvTempFile.getAbsolutePath();
             String orderPath = orderCsvTempFile.getAbsolutePath();
@@ -111,9 +146,15 @@ public class DBService {
             System.out.println("正在从临时文件加载: " + coursePath);
             System.out.println("正在从临时文件加载: " + courseSelectionPath);
             System.out.println("正在从临时文件加载: " + classSessionPath);
-            
+
+            System.out.println("正在从临时文件加载: " + bookPath);
+            System.out.println("正在从临时文件加载: " + borrowLogPath);
+
+
+
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
+            LibraryMapper libraryMapper = sqlSession.getMapper(LibraryMapper.class);
             PasswordResetApplicationMapper passwordResetApplicationMapper = sqlSession.getMapper(PasswordResetApplicationMapper.class);
             ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
             CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
@@ -121,9 +162,11 @@ public class DBService {
             CourseSelectionMapper courseSelectionMapper = sqlSession.getMapper(CourseSelectionMapper.class);
 
 
-            // 3. 调用Mapper方法执行批量加载，传入临时文件的路径
+
             userMapper.loadUsersFromCsv(userPath);
             studentMapper.loadStudentsFromCsv(studentPath);
+            libraryMapper.loadBooksFromCsv(bookPath);
+            libraryMapper.loadBorrowLogsFromCsv(borrowLogPath);
             passwordResetApplicationMapper.loadPasswordResetApplicationsFromCsv(passwordResetApplicationPath);
             shopMapper.loadProductsFromCsv(productPath);
             shopMapper.loadOrdersFromCsv(orderPath);
@@ -140,15 +183,13 @@ public class DBService {
             System.out.println("数据库初始化成功，所有数据已提交。");
 
         } catch (IOException e) {
-            // 捕获创建临时文件时可能发生的IO异常
-            System.err.println("从资源创建临时文件失败: " + e.getMessage());
+            System.err.println("从资源创建临时文件或文件IO失败: " + e.getMessage());
             e.printStackTrace();
-            sqlSession.rollback(); // 出现异常，回滚事务
+            if (sqlSession != null) sqlSession.rollback();
         } catch (Exception e) {
-            // 捕获其他所有异常
             System.err.println("数据库初始化过程中发生错误: " + e.getMessage());
             e.printStackTrace();
-            sqlSession.rollback(); // 出现异常，回滚事务
+            if (sqlSession != null) sqlSession.rollback();
         } finally {
             // 4. 确保临时文件在操作结束后被删除
             if (userCsvTempFile != null && userCsvTempFile.exists()) {
@@ -156,6 +197,22 @@ public class DBService {
             }
             if (studentCsvTempFile != null && studentCsvTempFile.exists()) {
                 studentCsvTempFile.delete();
+            }
+            if (bookCsvTempFile != null) {
+                bookCsvTempFile.delete();
+            }
+            if (borrowLogCsvTempFile != null) {
+                borrowLogCsvTempFile.delete();
+            }
+            // 尝试删除临时目录，如果目录为空则会被删除
+            Path tempDirPath = Paths.get(System.getProperty("user.dir"), "temp_csv");
+            if(Files.exists(tempDirPath)) {
+                try {
+                    // 仅当目录为空时才能删除成功
+                    Files.deleteIfExists(tempDirPath);
+                } catch (IOException e) {
+                    System.err.println("临时目录 temp_csv 不为空，无法删除。可能需要手动清理。");
+                }
             }
             if (passwordResetApplicationCsvTempFile != null && passwordResetApplicationCsvTempFile.exists()) {
                 passwordResetApplicationCsvTempFile.delete();
@@ -185,9 +242,10 @@ public class DBService {
     }
 
     /**
-     * 从classpath的资源路径创建一个临时文件
+     * 从classpath的资源路径创建一个临时文件到【指定目录】
      *
      * @param resourcePath 资源文件的路径 (例如 "db/tb_user.csv")
+     * @param directory    用于存放临时文件的目录
      * @return 创建的临时文件对象
      * @throws IOException 如果资源找不到或文件写入失败
      */

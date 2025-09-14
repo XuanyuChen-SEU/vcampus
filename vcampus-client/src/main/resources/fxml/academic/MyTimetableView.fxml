@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Label?>
+<?import java.net.URL?>
+
+<VBox spacing="15.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.MyTimetableController">
+
+    <stylesheets>
+        <URL value="@/css/academic-styles.css" />
+    </stylesheets>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+    <children>
+
+        <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <tabs>
+                <Tab text="已选课程">
+                    <content>
+                        <!-- ⭐ 添加ScrollPane来支持横向滚动 -->
+                        <ScrollPane fitToHeight="true" fitToWidth="false" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
+                            <content>
+                                <TableView fx:id="myCoursesTable" style="-fx-font-size: 13px;">
+                                    <columns>
+                                        <TableColumn fx:id="colCourseIdAndName" prefWidth="200.0" text="课程号/课程名" />
+                                        <TableColumn fx:id="colTeacher" prefWidth="120.0" text="教师名" />
+                                        <TableColumn fx:id="colSchedule" prefWidth="280.0" text="时间地点" />
+                                        <TableColumn fx:id="colCredits" prefWidth="80.0" text="学分" />
+                                        <TableColumn fx:id="colType" prefWidth="100.0" text="课程性质" />
+                                        <TableColumn fx:id="colCategory" prefWidth="200.0" text="校公选类别" />
+                                        <TableColumn fx:id="colCampus" prefWidth="100.0" text="校区" />
+                                        <TableColumn fx:id="colConflict" prefWidth="100.0" text="是否冲突" />
+                                        <TableColumn fx:id="colAction" prefWidth="100.0" text="操作" />
+                                    </columns>
+                                </TableView>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab text="退课日志">
+                    <content>
+                        <VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml/1">
+                            <children>
+                                <Label text="退课日志功能正在开发中..." />
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</VBox>

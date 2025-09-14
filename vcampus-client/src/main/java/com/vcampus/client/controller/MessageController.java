@@ -20,7 +20,11 @@ public class MessageController {
 
     private LoginController loginController;
     private StudentController studentController;
+
+    private LibraryController libraryController;
+
     private ShopController shopController;
+
     private ChangePasswordController changePasswordController;
     private UserListViewController userListViewController;
     private UserPasswordResetViewController userPasswordResetViewController;
@@ -32,6 +36,8 @@ public class MessageController {
     private ProductEditViewController productEditViewController;
     private OrderManagementViewController orderManagementViewController;
     private FavoriteManagementViewController favoriteManagementViewController;
+    private MyTimetableController myTimetableController; // ⭐ 新增
+
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -45,12 +51,19 @@ public class MessageController {
     public void setStudentController(StudentController controller){
         this.studentController=controller;
     }
+
+    public void setLibraryController(LibraryController controller){this.libraryController=controller;}
+
     public void setShopController(ShopController controller){this.shopController=controller;}
     // ⭐ 新增 AcademicController 的注册方法
     public void setAcademicController(AcademicController controller) {
         this.academicController = controller;
         System.out.println("INFO: AcademicController 已成功注册到 MessageController。");
     }
+    public void setMyTimetableController(MyTimetableController controller) {
+        this.myTimetableController = controller;
+    }
+
     public void setUserListViewController(UserListViewController controller) {
         this.userListViewController = controller;
     }
@@ -98,6 +111,7 @@ public class MessageController {
             //其实这个更像分发层，最先接受到服务器传来的消息，然后分配给各个Controller进行操作
             // 这里可以根据实际需求添加更多的case，哥哥controller根据消息进行处理，进而回传给终端进行改变
             switch (message.getAction()) {
+                // --- 登录与密码模块 ---
                 case LOGIN:
                     if (loginController != null) {
                         loginController.handleLoginResponse(message);
@@ -168,20 +182,20 @@ public class MessageController {
                         System.err.println("ForgetPasswordTableViewController未设置，无法处理拒绝忘记密码申请响应");
                     }
                     break;
+                // --- 学生信息模块 ---
                 case INFO_STUDENT:
                     if (studentController != null) {
                     studentController.handleStudentInfoResponse(message);
                 } else {
                     System.err.println("StudentController未设置，无法处理学生信息获取响应");
-                }
-                break;
+                }break;
                 case UPDATE_STUDENT:
                     if (studentController != null) {
                         studentController.handleUpdateStudentResponse(message);
                     } else {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
-                break;
+                // --- 商店模块 ---
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
                     // 优先分发给商店管理员控制器，如果没有则分发给普通商店控制器
@@ -193,7 +207,6 @@ public class MessageController {
                         System.err.println("路由警告：收到商品列表响应，但相关控制器未注册。");
                     }
                     break;
-
                 case SHOP_GET_MY_ORDERS:
                     if (shopController != null) {
                         shopController.handleGetMyOrdersResponse(message);
@@ -280,6 +293,7 @@ public class MessageController {
                     break;
 
                 case SELECT_COURSE_RESPONSE:
+
                 case DROP_COURSE_RESPONSE:
                     if (academicController != null) {
                         academicController.handleSelectOrDropCourseResponse(message);
@@ -287,6 +301,56 @@ public class MessageController {
                         System.err.println("路由警告：收到选/退课响应，但 AcademicController 未注册！");
                     }
                     break;
+
+                case GET_MY_COURSES_RESPONSE:
+                    if (myTimetableController != null) {
+                        myTimetableController.handleMyCoursesResponse(message);
+                        System.err.println("路由警告：收到我的课程响应，但 MyTimetableController 未注册！");
+                    }
+                    break;
+
+                    // --- 图书馆模块 ---
+                case LIBRARY_GET_ALL_BOOKS:
+                case LIBRARY_SEARCH_BOOKS: // 获取全部/搜索书籍，都返回书籍列表
+                    if (libraryController != null) {
+                        libraryController.handleBookListResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到书籍列表响应，但LibraryController未注册。");
+                    }
+                    break;
+
+                case LIBRARY_GET_MY_BORROWS: // 获取“我的借阅”
+                    if (libraryController != null) {
+                        libraryController.handleBorrowLogResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到我的借阅响应，但LibraryController未注册。");
+                    }
+                    break;
+
+                case LIBRARY_GET_ADMIN_BORROW_HISTORY: // 管理员获取“所有借阅记录”
+                    if (libraryController != null) {
+                        libraryController.handleBorrowLogResponse(message); // 也返回借阅记录，可复用同一个处理器
+                    } else {
+                        System.err.println("路由警告：收到借阅历史响应，但LibraryController未注册。");
+                    }
+                    break;
+
+                case LIBRARY_GET_ALL_USERS_STATUS: // 管理员获取“所有人借阅情况”
+                    if (libraryController != null) {
+                        libraryController.handleUserStatusResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到用户借阅情况响应，但LibraryController未注册。");
+                    }
+                    break;
+                case LIBRARY_GET_BOOK_PDF:
+                    if (libraryController != null) {
+                        libraryController.handleGetBookPdfResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到打开PDF文件响应，但LibraryController未注册。");
+                    }
+                    break;
+
+
 
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
