@@ -66,6 +66,7 @@ public class MessageController {
                 System.err.println("接收到无效的消息格式");
                 return;
             }
+            System.out.println("接收到消息: " + message.getAction() + " " + message.isStatus() + " " + message.getMessage());
 
             
             // 根据ActionType调用对应的子控制器

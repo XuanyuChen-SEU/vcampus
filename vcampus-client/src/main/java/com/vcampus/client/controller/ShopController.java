@@ -66,9 +66,6 @@ public class ShopController implements IClientController{
         
         // 2. 将自己注册到消息中心，以便接收异步消息
         registerToMessageController();
-        
-        // 3. 初始化完成后自动加载所有商品
-        loadInitialProducts();
     }
 
     @Override
