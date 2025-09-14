@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vcampus.database.mapper.CourseMapper">
+    <update id="loadCoursesFromCsv">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_courses
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (courseId, courseName, courseType, department);
+    </update>
+
+    <resultMap id="CourseWithSessionsResultMap" type="com.vcampus.common.dto.Course">
+        <id property="courseId" column="c_courseId"/>
+        <result property="courseName" column="courseName"/>
+        <result property="courseType" column="courseType"/>
+        <result property="department" column="department"/>
+        <collection property="sessions" ofType="com.vcampus.common.dto.ClassSession">
+            <id property="sessionId" column="s_sessionId"/>
+            <result property="teacherName" column="teacherName"/>
+            <result property="scheduleInfo" column="scheduleInfo"/>
+            <result property="capacity" column="capacity"/>
+            <result property="enrolledCount" column="enrolledCount"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectAllCoursesWithSessions" resultMap="CourseWithSessionsResultMap">
+        SELECT
+            c.courseId AS c_courseId, c.courseName, c.courseType, c.department,
+            s.sessionId AS s_sessionId, s.teacherName, s.scheduleInfo, s.capacity, s.enrolledCount
+        FROM
+            vcampus_db.tb_courses c
+                LEFT JOIN
+            vcampus_db.tb_class_sessions s ON c.courseId = s.courseId
+        ORDER BY
+            c.courseId;
+    </select>
+</mapper>

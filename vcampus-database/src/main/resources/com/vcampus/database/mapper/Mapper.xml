@@ -81,6 +81,7 @@
         ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic COMMENT = '密码重置申请表';
     </update>
 
+
     <!-- 创建商品表 -->
     <update id="createProductTable">
         CREATE TABLE IF NOT EXISTS vcampus_db.`tb_product` (
@@ -136,5 +137,39 @@
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户收藏表';
     </update>
 
+    <!-- 创建课程表 -->
+    <update id="createCoursesTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_courses (
+                                               courseId    VARCHAR(255) PRIMARY KEY,
+            courseName  VARCHAR(255) NOT NULL,
+            courseType  VARCHAR(50),
+            department  VARCHAR(255)
+            );
+    </update>
+
+    <!-- 创建教学班表 -->
+    <update id="createClassSessionsTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_class_sessions (
+                                                      sessionId     VARCHAR(255) PRIMARY KEY,
+            courseId      VARCHAR(255) NOT NULL,
+            teacherName   VARCHAR(255),
+            scheduleInfo  TEXT,
+            capacity      INT DEFAULT 0,
+            enrolledCount INT DEFAULT 0,
+            FOREIGN KEY (courseId) REFERENCES tb_courses(courseId) ON DELETE CASCADE
+            );
+    </update>
+
+    <!-- 创建课程选择表 -->
+    <update id="createCourseSelectionsTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_course_selections (
+                                                         selectionId INT AUTO_INCREMENT PRIMARY KEY,
+                                                         studentId   VARCHAR(255) NOT NULL,
+            sessionId   VARCHAR(255) NOT NULL,
+            status      VARCHAR(50),
+            UNIQUE KEY uk_student_session (studentId, sessionId),
+            FOREIGN KEY (sessionId) REFERENCES tb_class_sessions(sessionId) ON DELETE CASCADE
+            );
+    </update>
 
 </mapper>

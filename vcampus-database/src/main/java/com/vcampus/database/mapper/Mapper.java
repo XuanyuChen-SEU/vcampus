@@ -11,7 +11,17 @@ public interface Mapper {
     void createUserTable();
     void createStudentTable();
     void createPasswordResetApplicationTable();
+
     void createProductTable();
     void createOrderTable();
     void createFavoriteTable();
+
+    //课程选择模块
+    void createCoursesTable();
+    void createClassSessionsTable();
+    void createCourseSelectionsTable();
+
+    // 删除所有表
+    void dropTables(String dbName);
+    void InsertTempData();
 }
