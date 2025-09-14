@@ -86,9 +86,60 @@
     </update>
 
 
+    <update id="createCoursesTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_courses (
+                                               courseId    VARCHAR(255) PRIMARY KEY,
+            courseName  VARCHAR(255) NOT NULL,
+            courseType  VARCHAR(50),
+            department  VARCHAR(255)
+            );
+    </update>
+
+    <update id="createClassSessionsTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_class_sessions (
+                                                      sessionId     VARCHAR(255) PRIMARY KEY,
+            courseId      VARCHAR(255) NOT NULL,
+            teacherName   VARCHAR(255),
+            scheduleInfo  TEXT,
+            capacity      INT DEFAULT 0,
+            enrolledCount INT DEFAULT 0,
+            FOREIGN KEY (courseId) REFERENCES tb_courses(courseId) ON DELETE CASCADE
+            );
+    </update>
+
+    <update id="createCourseSelectionsTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_course_selections (
+                                                         selectionId INT AUTO_INCREMENT PRIMARY KEY,
+                                                         studentId   VARCHAR(255) NOT NULL,
+            sessionId   VARCHAR(255) NOT NULL,
+            status      VARCHAR(50),
+            UNIQUE KEY uk_student_session (studentId, sessionId),
+            FOREIGN KEY (sessionId) REFERENCES tb_class_sessions(sessionId) ON DELETE CASCADE
+            );
+    </update>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <update id="loadStudentsFromCsv">
         LOAD DATA LOCAL INFILE #{filePath}
-        INTO TABLE tb_student
+        INTO TABLE vcampus_db.tb_student
         CHARACTER SET utf8mb4
         FIELDS TERMINATED BY ','
         LINES TERMINATED BY '\n'
@@ -98,12 +149,42 @@
     </update>
     <update id="loadUsersFromCsv">
         LOAD DATA LOCAL INFILE #{filePath}
-        INTO TABLE tb_user
+        INTO TABLE vcampus_db.tb_user
         FIELDS TERMINATED BY ','
         LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
         (userId, password)
     </update>
+    <update id="loadCoursesFromCsv">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_courses
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (courseId, courseName, courseType, department);
+    </update>
+    <update id="loadClassSessionsFromCsv">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_class_sessions
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        OPTIONALLY ENCLOSED BY '"' -- 添加此行以支持带引号的字段
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (sessionId, courseId, teacherName, scheduleInfo, capacity, enrolledCount);
+    </update>
+    <update id="loadCourseSelectionsFromCsv">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_course_selections
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (studentId, sessionId, status);
+    </update>
+
+
 
 
 </mapper>

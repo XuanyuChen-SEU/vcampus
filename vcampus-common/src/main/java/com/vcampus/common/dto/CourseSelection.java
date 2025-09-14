@@ -11,18 +11,20 @@ public class CourseSelection implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String studentId;      // 学生ID
-    private String courseId;       // 课程ID
+//    private String courseId;       // 课程ID
     //private Date enrollTime;       // 选课时间(目前先不考虑时间⌚️）
+    private String sessionId;
     private String status;         // 状态（选修中、退选中等）
 
     // 默认构造方法
     public CourseSelection() {}
 
     // 带参构造方法
-    public CourseSelection(String studentId, String courseId, String status) {
+    public CourseSelection(String studentId, String sessionId,String status) {
         this.studentId = studentId;
-        this.courseId = courseId;
+//        this.courseId = courseId;
         //this.enrollTime = new Date();
+        this.sessionId = sessionId;
         this.status = status;
     }
 
@@ -30,11 +32,13 @@ public class CourseSelection implements Serializable {
     public String getStudentId() { return studentId; }
     public void setStudentId(String studentId) { this.studentId = studentId; }
 
-    public String getCourseId() { return courseId; }
-    public void setCourseId(String courseId) { this.courseId = courseId; }
+//    public String getCourseId() { return courseId; }
+//    public void setCourseId(String courseId) { this.courseId = courseId; }
 
 //    public Date getEnrollTime() { return enrollTime; }
 //    public void setEnrollTime(Date enrollTime) { this.enrollTime = enrollTime; }
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
@@ -44,7 +48,7 @@ public class CourseSelection implements Serializable {
     public String toString() {
         return "CourseSelection{" +
                 "studentId='" + studentId + '\'' +
-                ", courseId='" + courseId + '\'' +
+                ", sessionId='" + sessionId + '\'' +
                 ", status='" + status + '\'' +
                 '}';
     }

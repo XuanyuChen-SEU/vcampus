@@ -1,10 +1,12 @@
 package com.vcampus.common.dto;
 
-import com.vcampus.common.enums.CourseStatus;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
+
+/**
+ * 注意：为了避免枚举序列化/反序列化问题，状态字段已从枚举改为字符串
+ */
 
 /**
  * 课程数据传输对象（DTO）
@@ -26,21 +28,21 @@ public class Course implements Serializable {
     private int sessionnum;
 
 
-    private CourseStatus status; // 选课状态
+    private String status; // 选课状态 (使用字符串代替枚举以避免序列化问题)
     private List<ClassSession> sessions;
 
     // 默认构造方法（反序列化必需）
     public Course() {}
 
-    // 带参构造方法
-    public Course(String courseId, String courseName, String courseType, String department, CourseStatus status, List<ClassSession> sessions) {
+    // 带参构造方法 - 兼容旧的枚举参数
+    public Course(String courseId, String courseName, String courseType, String department, Object status, List<ClassSession> sessions) {
         this.courseId = courseId;
         this.courseName = courseName;
         this.courseType = courseType;
         this.department = department;
-        this.status = status;
+        this.status = (status instanceof String) ? (String)status : status.toString();
         this.sessions = sessions;
-        this.sessionnum = sessions.size() ;
+        this.sessionnum = sessions.size();
     }
 
     //进行一项深拷贝
@@ -71,16 +73,16 @@ public class Course implements Serializable {
     public String getCourseName() { return courseName; }
     public String getCourseType() { return courseType; }
     public String getDepartment() { return department; }
-    public CourseStatus getStatus() { return status; }
+    public String getStatus() { return status; }
     public List<ClassSession> getSessions() { return sessions; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
     public void setCourseName(String courseName) { this.courseName = courseName; }
     public void setCourseType(String courseType) { this.courseType = courseType; }
     public void setDepartment(String department) { this.department = department; }
-    public void setStatus(CourseStatus status) { this.status = status; }
+    public void setStatus(String status) { this.status = status; }
     public void setSessions(List<ClassSession> sessions) { this.sessions = sessions; }
     public int getSessionnum() { return sessionnum; }
-    public void setSessionnum(int sessionnum) { this.sessionnum = sessions.size(); }
+    public void setSessionnum(int sessionnum) { this.sessionnum = sessionnum; }
 
 
     @Override

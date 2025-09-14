@@ -1,5 +1,9 @@
 package com.vcampus.client.controller;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.vcampus.client.MainApp;
 import com.vcampus.client.service.ShopService;
 import com.vcampus.common.dto.Message;
@@ -8,34 +12,31 @@ import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.OrderStatus;
 
-// 确保在文件顶部有这些 import 语句
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ButtonType;
-import javafx.scene.layout.GridPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.geometry.Insets;
-
-
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ShopController implements IClientController{
 
@@ -45,8 +46,6 @@ public class ShopController implements IClientController{
     @FXML private ScrollPane productScrollPane; // 包裹 TilePane 的滚动面板
     @FXML private TableView<ShopTransaction> orderTable; // 新增：用于展示订单的表格
     @FXML private StackPane centerStackPane; // 新增：用于切换视图的 StackPane
-    @FXML private Label userInfoLabel;
-    @FXML private Label balanceLabel;
 
     // --- 表格列定义 ---
     @FXML private TableColumn<ShopTransaction, String> orderIdColumn;
@@ -64,10 +63,9 @@ public class ShopController implements IClientController{
         System.out.println("商店控制器初始化完成！");
         currentUser = new User(MainApp.getGlobalUserSession().getCurrentUserId(),"");        // 1. 配置UI相关的组件
         setupOrderTable();
-
+        
         // 2. 将自己注册到消息中心，以便接收异步消息
         registerToMessageController();
-
     }
 
     @Override
@@ -82,21 +80,6 @@ public class ShopController implements IClientController{
         } else {
             System.err.println("严重错误：ShopController 注册失败，无法获取 MessageController 实例！");
         }
-    }
-
-
-    /**
-     * 【重构后的方法，取代了之前的 load... 方法】
-     * 这个方法由外部调用（比如 MainViewController 或 initialize 自身），
-     * 用于设置当前用户，并触发初始数据的加载。
-     * @param user 当前登录的用户对象
-     */
-    public void setCurrentUser(User user) {
-        this.currentUser = user;
-        updateUserInfo();
-
-        // 【关键逻辑】在设置完用户信息后，立即主动向服务器请求所有商品
-        loadInitialProducts();
     }
 
     @FXML
@@ -219,14 +202,6 @@ public class ShopController implements IClientController{
         });
     }
 
-    private void updateUserInfo() {
-        Platform.runLater(() -> {
-            if (currentUser != null) {
-                userInfoLabel.setText("用户ID: " + currentUser.getUserId());
-                balanceLabel.setText(String.format("余额: ¥ %.2f", currentUser.getBalance()));
-            }
-        });
-    }
 
     private void updateProductDisplay(List<Product> products) {
         Platform.runLater(() -> {

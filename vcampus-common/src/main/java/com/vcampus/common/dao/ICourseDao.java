@@ -9,6 +9,7 @@ import java.util.List;
  * Service 层将依赖此接口，而不是具体的实现类。
  */
 public interface ICourseDao {
+
     // 获取所有课程的基本信息
     List<Course> getAllCourses();
     // 获取指定学生的所有选课记录
@@ -21,4 +22,6 @@ public interface ICourseDao {
     boolean addCourseSelection(CourseSelection selection);
     // 删除一条选课记录
     boolean removeCourseSelection(String studentId, String sessionId);
+    // 检查学生是否已选过该课程
+    boolean isAlreadyEnrolled(String studentId, String sessionId);
 }

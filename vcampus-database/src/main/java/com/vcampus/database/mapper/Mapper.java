@@ -10,11 +10,20 @@ public interface Mapper {
     void createUserTable();
     void createStudentTable();
     void createPasswordResetApplicationTable();
+    //课程选择模块
+    void createCoursesTable();
+    void createClassSessionsTable();
+    void createCourseSelectionsTable();
+
+
 
 
     //加载数据
     void loadStudentsFromCsv(String filePath);
     void loadUsersFromCsv(String filePath);
+    void loadCoursesFromCsv(String filePath);
+    void loadClassSessionsFromCsv(String filePath);
+    void loadCourseSelectionsFromCsv(String filePath);
 
 
     // 删除所有表

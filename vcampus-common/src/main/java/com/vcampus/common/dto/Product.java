@@ -6,8 +6,9 @@
 
 package com.vcampus.common.dto;
 
-import com.vcampus.common.enums.ProductStatus;
 import java.io.Serializable;
+
+import com.vcampus.common.enums.ProductStatus;
 
 public class Product implements Serializable {
     private Long id;            // 商品唯一标识符
