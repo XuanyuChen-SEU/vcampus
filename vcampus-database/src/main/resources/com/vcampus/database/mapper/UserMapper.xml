@@ -61,7 +61,8 @@
         FIELDS TERMINATED BY ','
         LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
-        (userId, password)
+        (userId, @passwordVar)
+        SET password = REPLACE(@passwordVar, '\r', '')
     </update>
 
 
