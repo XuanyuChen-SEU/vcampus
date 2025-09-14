@@ -40,4 +40,10 @@ public class CourseController {
         //String courseId = (String) payload.get("courseId");
         return courseService.dropCourse(studentId,sessionId);
     }
+
+    public Message handleGetMyCourses(Message request) {
+        Map<String, Object> payload = (Map<String, Object>) request.getData();
+        String studentId = (String) payload.get("userId");
+        return courseService.getMyCourses(studentId);
+    }
 }

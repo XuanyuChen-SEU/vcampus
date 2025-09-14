@@ -50,20 +50,6 @@ public enum ActionType {
     SHOP_ADMIN_DELETE_PRODUCT("管理员删除商品"),
     SHOP_ADMIN_GET_ALL_RETURNS("管理员获取所有退货申请"),
     SHOP_ADMIN_REVIEW_RETURN("管理员审核退货"),// <-- 确保最后一个是分号
-    //新增课程（学生端）相关枚举值
-//    GET_COURSE_TABLE("获取课表"),    // 获取所有可选课程
-//    GET_COURSE_DETAIL("获取课程详情"),           // 获取单个课程的详细信息
-//    ENROLL_COURSE("选课"),                      // 学生选课
-//    DROP_COURSE("退课"),                        // 学生退课
-//    CHECK_COURSE_CONFLICT("检查课程冲突"),       // 检查所选课程是否与已选课程冲突
-//
-//    // 2. 课表功能
-//    GET_STUDENT_TIMETABLE("获取学生课表"),       // 获取学生的完整课表
-//    GET_STUDENT_ENROLLED_COURSES("获取学生已选课程"), // 获取学生已选课程列表（不包含课表格式）
-//
-//    // 课程详情相关
-//    GET_COURSE_ENROLLMENT_STATUS("获取课程报名状态"), // 获取课程的报名状态（已选人数等）
-//
     // === 选课相关操作 ===
 
     // 客户端 -> 服务端 (请求)
@@ -74,8 +60,11 @@ public enum ActionType {
     // 服务端 -> 客户端 (响应)
     GET_ALL_COURSES_RESPONSE("对获取课程请求的响应"),   // 对获取课程请求的响应
     SELECT_COURSE_RESPONSE("对选课请求的响应"),     // 对选课请求的响应
-    DROP_COURSE_RESPONSE("对退课请求的响应");       // 对退课请求的响应
+    DROP_COURSE_RESPONSE("对退课请求的响应"),      // 对退课请求的响应
 
+    // ⭐ 新增：获取我的课表
+    GET_MY_COURSES("获取我的课表"),
+    GET_MY_COURSES_RESPONSE("对获取我的课表请求的响应");
 
 
     private final String description;

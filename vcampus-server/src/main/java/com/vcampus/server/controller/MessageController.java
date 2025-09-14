@@ -74,6 +74,9 @@ public class MessageController {
                     return courseController.handleSelectCourse(request);
                 case DROP_COURSE:
                     return courseController.handleDropCourse(request);
+                case GET_MY_COURSES:
+                    return courseController.handleGetMyCourses(request);
+
 
                 // --- 商店相关 ---
                 case SHOP_GET_ALL_PRODUCTS:

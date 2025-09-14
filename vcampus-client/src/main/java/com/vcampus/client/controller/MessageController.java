@@ -15,6 +15,7 @@ public class MessageController {
     private ShopController shopController;
     private ChangePasswordController changePasswordController;
     private AcademicController academicController; // ⭐ 新增 AcademicController 的引用
+    private MyTimetableController myTimetableController; // ⭐ 新增
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -34,6 +35,10 @@ public class MessageController {
         this.academicController = controller;
         System.out.println("INFO: AcademicController 已成功注册到 MessageController。");
     }
+    public void setMyTimetableController(MyTimetableController controller) {
+        this.myTimetableController = controller;
+    }
+
 
     /**
      * 处理服务端消息
@@ -133,11 +138,19 @@ public class MessageController {
                     break;
 
                 case SELECT_COURSE_RESPONSE:
+
                 case DROP_COURSE_RESPONSE:
                     if (academicController != null) {
                         academicController.handleSelectOrDropCourseResponse(message);
                     } else {
                         System.err.println("路由警告：收到选/退课响应，但 AcademicController 未注册！");
+                    }
+                    break;
+
+                case GET_MY_COURSES_RESPONSE:
+                    if (myTimetableController != null) {
+                        myTimetableController.handleMyCoursesResponse(message);
+                        System.err.println("路由警告：收到我的课程响应，但 MyTimetableController 未注册！");
                     }
                     break;
 
