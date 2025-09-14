@@ -9,15 +9,17 @@ public interface Mapper {
     // 创建用户表（示例表）
     void createUserTable();
     void createStudentTable();
+    void createBookTable();
+    void createBorrowLogTable();
 
-
-    //加载数据
-    void loadStudentsFromCsv(String filePath);
-    void loadUsersFromCsv(String filePath);
+//    //加载数据
+//    void loadStudentsFromCsv(String filePath);
+//    void loadUsersFromCsv(String filePath);
 
 
     // 删除所有表
     void dropTables(String dbName);
-    void InsertTempData();
+//    void InsertTempData();
+
 
 }

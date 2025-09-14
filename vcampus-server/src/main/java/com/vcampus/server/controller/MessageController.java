@@ -16,7 +16,7 @@ public class MessageController {
     private final StudentController studentController;
     private final CourseController courseController; // 来自远程的修改
     private final ShopController shopController;     // 来自您的修改
-
+    private final LibraryController libraryController; // 【新增】图书馆控制器实例
     // --- 2. 合并构造函数 ---
     // 在构造函数中，我们需要实例化所有的控制器
     public MessageController() {
@@ -24,6 +24,7 @@ public class MessageController {
         this.studentController = new StudentController();
         this.courseController = new CourseController(); // 保留
         this.shopController = new ShopController();     // 保留
+        this.libraryController = new LibraryController(); // 【新增】在构造时实例化
     }
 
     /**
@@ -66,9 +67,24 @@ public class MessageController {
                     return shopController.handleGetMyOrders(request);
                 case SHOP_GET_MY_FAVORITES:
                     return shopController.handleGetMyFavorites(request);
-                // 如果您还有 removeFavorite, 也应该加在这里
-                // case SHOP_REMOVE_FAVORITE:
-                //     return shopController.handleRemoveFavorite(request);
+
+                // --- 图书馆相关 ---
+                case LIBRARY_BORROW_BOOK:
+                case LIBRARY_GET_ALL_BOOKS:
+                case LIBRARY_SEARCH_BOOKS:
+                case LIBRARY_GET_MY_BORROWS:
+                case LIBRARY_GET_ADMIN_BORROW_HISTORY:
+                case LIBRARY_GET_ALL_USERS_STATUS:
+                case LIBRARY_RENEW_ALL:
+                case LIBRARY_SEARCH_MY_BORROWS:
+                case LIBRARY_ADD_BOOK:
+                case LIBRARY_DELETE_BOOK:
+                case LIBRARY_MODIFY_BOOK:
+                case LIBRARY_SEARCH_HISTORY:
+                case LIBRARY_SEARCH_USERS:
+                case LIBRARY_RETURN_BOOK:
+                case LIBRARY_GET_BOOK_PDF:
+                    return libraryController.dispatch(request);
 
                 // --- 默认处理 ---
                 default:

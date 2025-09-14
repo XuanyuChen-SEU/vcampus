@@ -14,12 +14,11 @@ public enum ActionType {
     GLOBAL_NOTIFICATION("全局通知"),
     SYSTEM_BROADCAST("系统广播"),
     EMERGENCY_NOTIFICATION("紧急通知"),
-<<<<<<< HEAD
     INFO_STUDENT("获取学生信息"),
     UPDATE_STUDENT("更新学生信息"),
     INFO_BOOK("获取图书信息"),
-    UPDATE_BOOK("更新图书信息");
-=======
+    UPDATE_BOOK("更新图书信息"),
+
 
 
     // --- 商店模块 - 用户端 ---
@@ -59,8 +58,6 @@ public enum ActionType {
 //    // 课程详情相关
 //    GET_COURSE_ENROLLMENT_STATUS("获取课程报名状态"), // 获取课程的报名状态（已选人数等）
 //
-    UPDATE_STUDENT("更新学生信息"),
-    INFO_STUDENT("获取学生信息"),
     // === 选课相关操作 ===
 
     // 客户端 -> 服务端 (请求)
@@ -71,11 +68,31 @@ public enum ActionType {
     // 服务端 -> 客户端 (响应)
     GET_ALL_COURSES_RESPONSE("对获取课程请求的响应"),   // 对获取课程请求的响应
     SELECT_COURSE_RESPONSE("对选课请求的响应"),     // 对选课请求的响应
-    DROP_COURSE_RESPONSE("对退课请求的响应");       // 对退课请求的响应
+    DROP_COURSE_RESPONSE("对退课请求的响应"),     // 对退课请求的响应
 
 
->>>>>>> fb009107c6a3789920ac7e9a00cc8594ef6c32bb
 
+    // --- 图书馆模块 - 通用端 ---
+
+    LIBRARY_GET_ALL_BOOKS("获取所有图书"),
+    LIBRARY_SEARCH_BOOKS("搜索所有图书"),
+    LIBRARY_GET_MY_BORROWS("获取我的借阅记录"),
+    LIBRARY_GET_ADMIN_BORROW_HISTORY ("获取管理员借阅记录"),
+    LIBRARY_GET_ALL_USERS_STATUS("获取所有用户借阅状态"),
+    // --- 图书馆模块 - 用户端 ---
+    LIBRARY_RENEW_ALL("续借所有图书"),
+    LIBRARY_SEARCH_MY_BORROWS("搜索我的借阅记录"),
+    LIBRARY_BORROW_BOOK("用户借阅图书"),
+    LIBRARY_RETURN_BOOK("用户归还图书"),
+    LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
+
+
+    // --- 图书馆模块 - 管理员端 ---
+    LIBRARY_ADD_BOOK("管理员添加图书"),
+    LIBRARY_DELETE_BOOK("管理员删除图书"),
+    LIBRARY_MODIFY_BOOK("管理员修改图书"),
+    LIBRARY_SEARCH_HISTORY   ("搜索借阅历史"),
+    LIBRARY_SEARCH_USERS("搜索用户借阅历史");
 
 
     private final String description;

@@ -1,5 +1,6 @@
 package com.vcampus.database.service;
 
+import com.vcampus.database.mapper.LibraryMapper;
 import com.vcampus.database.mapper.Mapper;
 import com.vcampus.database.mapper.StudentMapper;
 import com.vcampus.database.mapper.UserMapper;
@@ -28,6 +29,13 @@ public class DBService {
         // MyBatisUtil 实例的创建也放入 try 中
         File userCsvTempFile = null;
         File studentCsvTempFile = null;
+        File bookCsvTempFile = null;
+        File borrowLogCsvTempFile = null;
+
+
+
+
+
         SqlSession sqlSession = null;
 
         try {
@@ -44,11 +52,24 @@ public class DBService {
 
             mapper.createUserTable();
             mapper.createStudentTable();
+            mapper.createBookTable();
+            mapper.createBorrowLogTable();
             System.out.println("成功在数据库 " + dbName + " 中创建表结构。");
             System.out.println("准备从CSV文件加载数据...");
 
             String userCSVPath = "db/tb_user.csv";
             String studentCSVPath = "db/tb_student.csv";
+            String BookCSVPath = "db/tb_book.csv";
+            String BorrowLogCSVPath = "db/tb_borrow_log.csv";
+
+
+
+
+
+
+
+
+
 
             // ★ 修改点 1: 指定临时文件存放的目录
             // 在当前程序运行目录下创建一个名为 "temp_csv" 的子目录
@@ -58,19 +79,42 @@ public class DBService {
             // 将资源文件写入我们指定的临时目录中
             userCsvTempFile = createTempFileFromResource(userCSVPath, tempDirectory.toFile());
             studentCsvTempFile = createTempFileFromResource(studentCSVPath, tempDirectory.toFile());
+            bookCsvTempFile = createTempFileFromResource(BookCSVPath, tempDirectory.toFile());
+            borrowLogCsvTempFile = createTempFileFromResource(BorrowLogCSVPath, tempDirectory.toFile());
+
+
+
+
+
+
+
 
             // getAbsolutePath() 在某些系统上可能包含'..'，改用 getCanonicalPath() 获取更规范的路径
             String userPath = userCsvTempFile.getCanonicalPath().replace('\\', '/');
             String studentPath = studentCsvTempFile.getCanonicalPath().replace('\\', '/');
+            String bookPath = bookCsvTempFile.getCanonicalPath().replace('\\', '/');
+            String borrowLogPath = borrowLogCsvTempFile.getCanonicalPath().replace('\\', '/');
+
+
+
 
             System.out.println("正在从临时文件加载: " + userPath);
             System.out.println("正在从临时文件加载: " + studentPath);
+            System.out.println("正在从临时文件加载: " + bookPath);
+            System.out.println("正在从临时文件加载: " + borrowLogPath);
+
+
 
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
+            LibraryMapper libraryMapper = sqlSession.getMapper(LibraryMapper.class);
+
 
             userMapper.loadUsersFromCsv(userPath);
             studentMapper.loadStudentsFromCsv(studentPath);
+            libraryMapper.loadBooksFromCsv(bookPath);
+            libraryMapper.loadBorrowLogsFromCsv(borrowLogPath);
+
             sqlSession.commit();
 
             System.out.println("CSV数据批量加载成功！");
@@ -91,6 +135,12 @@ public class DBService {
             }
             if (studentCsvTempFile != null) {
                 studentCsvTempFile.delete();
+            }
+            if (bookCsvTempFile != null) {
+                bookCsvTempFile.delete();
+            }
+            if (borrowLogCsvTempFile != null) {
+                borrowLogCsvTempFile.delete();
             }
             // 尝试删除临时目录，如果目录为空则会被删除
             Path tempDirPath = Paths.get(System.getProperty("user.dir"), "temp_csv");

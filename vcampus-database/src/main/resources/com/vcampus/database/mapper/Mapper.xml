@@ -74,6 +74,44 @@
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生信息表（以userId为主键）';
 
     </update>
+    <update id="createBookTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.`tb_book` (
+                                                            `book_id`       VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '图书ID',
+            `book_name`     VARCHAR(255) NOT NULL COMMENT '书名',
+            `author`        VARCHAR(100) NOT NULL COMMENT '作者',
+            `isbn`          VARCHAR(20) UNIQUE COMMENT 'ISBN号',
+            `publisher`     VARCHAR(100) COMMENT '出版社',
+            `description`   TEXT COMMENT '描述',
+            `borrow_status` VARCHAR(20) NOT NULL DEFAULT '在馆' COMMENT '借阅状态'
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    </update>
+    <update id="createBorrowLogTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.`tb_borrow_log` (
+                                                                  `log_id`      VARCHAR(50) NOT NULL PRIMARY KEY,
+            `book_id`     VARCHAR(50) NOT NULL,
+            `book_name`   VARCHAR(255) NOT NULL,
+            `user_id`     VARCHAR(50) NOT NULL,
+            `username`    VARCHAR(100) NOT NULL,
+            `borrow_date` DATE NOT NULL,
+            `due_date`    DATE NOT NULL,
+            `return_date` DATE DEFAULT NULL,  -- I strongly recommend adding this column
+
+        -- Move the constraint definition here, before the closing parenthesis
+            CONSTRAINT `fk_borrow_log_user`
+            FOREIGN KEY (`user_id`)
+            REFERENCES `tb_user`(`userId`)
+            ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    </update>
+
+
+
+
+
+
+
+
+
     <update id="loadStudentsFromCsv">
         LOAD DATA LOCAL INFILE #{filePath}
         INTO TABLE tb_student

@@ -1,17 +1,39 @@
 package com.vcampus.common.dto;
 
-public class Book {
+import java.io.Serializable; // 【修复1】导入 Serializable
+
+public class Book implements Serializable { // 【修复1】实现 Serializable 接口
+
+    private static final long serialVersionUID = 1L; // 【推荐】添加 serialVersionUID
 
     private String bookId;
     private String bookName;
     private String author;
-    private int count;
     private String ISBN;
     private String publisher;
     private String description;
-    private String BorrowStatus;
+    private String borrowStatus;
+
+    public Book() {
+    }
+
+    // 这个全参数构造函数是正确的
+    public Book(String bookId, String bookName, String author, String ISBN, String publisher, String description, String borrowStatus) {
+        this.bookId = bookId;
+        this.bookName = bookName;
+        this.author = author;
+        this.ISBN = ISBN;
+        this.publisher = publisher;
+        this.description = description;
+        this.borrowStatus = borrowStatus;
+    }
 
 
+
+    // 【修复2】删除了那个错误的构造函数
+    // public Book(String b001, String 深入理解Java虚拟机, ...) { ... }
+
+    // --- Getters 和 Setters ---
     public String getBookId() {
         return bookId;
     }
@@ -36,13 +58,6 @@ public class Book {
         this.author = author;
     }
 
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
 
     public String getISBN() {
         return ISBN;
@@ -68,11 +83,19 @@ public class Book {
         this.description = description;
     }
 
+    // 【修复4】修正了方法命名
     public String getBorrowStatus() {
-        return BorrowStatus;
+        return borrowStatus;
     }
 
+    // 【修复3 & 4】修正了变量赋值和方法命名
     public void setBorrowStatus(String borrowStatus) {
-        BorrowStatus = borrowStatus;
+        this.borrowStatus = borrowStatus;
+    }
+
+    @Override
+    public String toString() {
+        // ... (toString 方法是好的，无需修改)
+        return "Book{" + "bookId='" + bookId + '\'' + ", bookName='" + bookName + '\'' + '}';
     }
 }

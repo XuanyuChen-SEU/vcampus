@@ -7,15 +7,11 @@ import java.util.Map;
 
 public interface StudentMapper {
 
-    // 创建数据库
-    void createDatabase(String dbName);
-    // 删除数据库
-    void dropDatabase(String dbName);
-    // 创建用户表（示例表）
+
     void createStuTable();
     // 删除用户表
-    void dropStuTable(String dbName);
-    void InsertTempData();
+    void dropStuTable();
+
 
     void loadStudentsFromCsv(String filePath);
 

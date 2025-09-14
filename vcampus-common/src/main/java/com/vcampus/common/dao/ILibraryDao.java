@@ -1,47 +1,43 @@
 package com.vcampus.common.dao;
 
 import com.vcampus.common.dto.Book;
+import com.vcampus.common.dto.BorrowLog;
+import com.vcampus.common.dto.UserBorrowStatus;
 
 import java.util.List;
 
+/**
+ * 【最终版】图书馆数据访问对象接口
+ * 定义了所有与图书馆相关的数据库操作，包括图书管理、借阅记录管理和复合查询。
+ */
 public interface ILibraryDao {
-    /*
-     * 通过书名查询书籍信息
-     *
-     * */
-    Book getBookByName(String bookName);
 
-    /*
-     * 通过书名查询书籍信息
-     *
-     * */
-    Book getBookById(String bookId);
+    // ==========================================================
+    // --- (1) 图书管理 (Book Operations) ---
+    // 您已有的部分，非常完善，基本无需改动
+    // ==========================================================
 
-    /*
-     * 通过作者模糊搜索书籍信息
-     * */
-    List<Book> getBookByAuthor(String author);
+    List<Book> getAllBooks(); // 获取所有图书
+    Book getBookById(String bookId); // 根据ID获取图书
+    List<Book> searchBooks(String keyword);
+    boolean insertBook(Book book); // 插入一本新书
+    boolean updateBook(Book book); // 更新图书信息
+    boolean deleteBookById(String bookId); // 根据ID删除图书
 
-    /*
-     * 插入新的书籍信息
-     * */
-    boolean insertBook(Book book);
 
-    /*
-     *
-     * 更新书籍信息
-     * */
-    boolean updateBook(Book book);
+    List<BorrowLog> getAllBorrowLogs();
+    List<BorrowLog> getBorrowLogsByUserId(String userId);
+    List<BorrowLog> searchAllBorrowLogs(String keyword);
+    boolean insertBorrowLog(BorrowLog log);
+    boolean updateBorrowLog(BorrowLog log);
 
-    /*
-    *
-    删除书籍信息
-    * */
-    boolean deleteBook(Book book);
 
-    /*
-     *
-     * 查询所有书籍信息
-     * */
-    List<Book> getAllBooks();
+    List<UserBorrowStatus> getAllUserBorrowStatus();
+    List<UserBorrowStatus> searchUserBorrowStatus(String keyword);
+
+    String findUsernameByUserId(String userId);
+    boolean borrowBook(String userId, String bookId);
+
+    boolean returnBook(String logId, String bookId);
+
 }
