@@ -5,7 +5,9 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 
 import com.vcampus.common.dao.IUserDao;
-import com.vcampus.common.dto.User; // 引入MyBatisUtil
+import com.vcampus.common.dto.Student; // 引入MyBatisUtil
+import com.vcampus.common.dto.User;
+import com.vcampus.database.mapper.StudentMapper;
 import com.vcampus.database.mapper.UserMapper;
 import com.vcampus.database.utils.MyBatisUtil;
 
@@ -51,6 +53,18 @@ public class UserDao implements IUserDao {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             userMapper.add(user);
+            
+            // 检查是否为学生用户（用户ID以'1'开头）
+            if (user.getUserId() != null && user.getUserId().startsWith("1")) {
+                // 为学生用户创建学生表记录
+                StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
+                Student student = new Student();
+                student.setUserId(user.getUserId());
+                student.setName("待填写"); // 默认姓名，后续可由学籍管理员完善
+                student.setStudent_status("在籍"); // 默认学籍状态
+                studentMapper.add(student);
+            }
+            
             sqlSession.commit();
             return true;
         }

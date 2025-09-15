@@ -98,9 +98,7 @@ public class SocketClient implements IMessageClientSrv {
                 if (obj instanceof Message) {
                     Message message = (Message) obj;
                     // 减少控制台输出，提升性能
-                    if (System.getProperty("debug") != null) {
-                        System.out.println("接收到消息: " + message);
-                    }
+                    System.out.println("接收到消息: " + message);
                     
                     // 使用MessageController处理消息
                     if (messageController != null) {

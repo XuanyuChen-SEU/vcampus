@@ -9,6 +9,7 @@ import com.vcampus.common.enums.ActionType;
 public class MessageController {
     private final UserController userController;
     private final StudentController studentController;
+    private final StudentAdminController studentadminController;
     private final CourseController courseController; // 来自远程的修改
     private final ShopController shopController;     // 来自您的修改
     private final LibraryController libraryController; // 【新增】图书馆控制器实例
@@ -20,6 +21,7 @@ public class MessageController {
     public MessageController() {
         this.userController = new UserController();
         this.studentController = new StudentController();
+        this.studentadminController=new StudentAdminController();
         this.courseController = new CourseController(); // 保留
         this.shopController = new ShopController();     // 保留
         this.libraryController = new LibraryController(); // 【新增】在构造时实例化
@@ -48,11 +50,6 @@ public class MessageController {
                 case CHANGE_PASSWORD:
                     return userController.handleChangePassword(request);
 
-                // --- 学籍相关 ---
-                case INFO_STUDENT:
-                    return studentController.handle(request);
-                case UPDATE_STUDENT:
-                    return studentController.updateStudent(request);
 
                 // --- 用户管理员相关 ---
                 case SEARCH_USERS:
@@ -70,6 +67,21 @@ public class MessageController {
                 case REJECT_FORGET_PASSWORD_APPLICATION:
                     return userController.handleRejectForgetPasswordApplication(request);
 
+                // --- 学籍相关 ---
+                case INFO_STUDENT:
+                    return studentController.handle(request);
+                case UPDATE_STUDENT:
+                    return studentController.updateStudent(request);
+
+                // --- 学籍管理员相关 ---
+                case ALL_STUDENT:
+                    return studentadminController.getAllStudents(request);
+                case SEARCH_STUDENT:
+                    return studentadminController.searchStudents(request);
+                case INFO_STUDENT_ADMIN:
+                    return studentadminController.getStudentById(request);
+                case UPDATE_STUDENT_ADMIN:
+                    return studentadminController.updateStudent(request);
                 // --- 课程相关 ---
 
                 // --- 课程相关 ---调用服务端的controller层相关逻辑部分
@@ -82,7 +94,9 @@ public class MessageController {
                     return courseController.handleDropCourse(request);
                 case GET_MY_COURSES:
                     return courseController.handleGetMyCourses(request);
-
+// 在服务端的 MessageController.java 的 switch 语句中添加:
+                case SEARCH_COURSES:
+                    return courseController.handleSearchCourses(request);
 
                 // --- 商店相关 ---
                 case SHOP_GET_ALL_PRODUCTS:

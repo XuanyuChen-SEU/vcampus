@@ -53,21 +53,30 @@
     </update>
 
     <update id="createStudentTable">
-        CREATE TABLE IF NOT EXISTS vcampus_db.`tb_student`(
-                                                              `userId` VARCHAR(64) NOT NULL PRIMARY KEY COMMENT '用户ID（主键）',
-            `studentId` CHAR(8) COMMENT '学号（8位数字）',
-            `cardId` CHAR(9) COMMENT '一卡通号（9位数字）',
-            `name` VARCHAR(50) NOT NULL COMMENT '姓名',
-            `gender` VARCHAR(10) COMMENT '性别',
-            `college` VARCHAR(100) COMMENT '学院',
-            `major` VARCHAR(100) COMMENT '专业',
-            `grade` INT COMMENT '年级（如 2023）',
-            `birth_date` DATE COMMENT '出生日期',
-            `native_place` VARCHAR(100) COMMENT '籍贯',
-            `politics_status` VARCHAR(50) COMMENT '政治面貌',
-            `student_status` VARCHAR(50) COMMENT '学籍状态'
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生信息表（以userId为主键）';
-
+        CREATE TABLE IF NOT EXISTS vcampus_db.`tb_student` (
+        `userId` VARCHAR(64) NOT NULL PRIMARY KEY COMMENT '用户ID（主键）',
+        `studentId` CHAR(8) COMMENT '学号（8位数字）',
+        `name` VARCHAR(50) NOT NULL COMMENT '姓名',
+        `gender` VARCHAR(10) COMMENT '性别',
+        `college` VARCHAR(100) COMMENT '学院',
+        `major` VARCHAR(100) COMMENT '专业',
+        `grade` INT COMMENT '年级（如 2023）',
+        `birth_date` DATE COMMENT '出生日期',
+        `native_place` VARCHAR(100) COMMENT '籍贯',
+        `politics_status` VARCHAR(50) COMMENT '政治面貌',
+        `student_status` VARCHAR(50) COMMENT '学籍状态',
+        `phone` VARCHAR(20) COMMENT '手机号',
+        `email` VARCHAR(100) COMMENT '电子邮箱',
+        `dormAddress` VARCHAR(200) COMMENT '宿舍地址',
+        `fatherName` VARCHAR(50) COMMENT '父亲姓名',
+        `fatherPhone` VARCHAR(20) COMMENT '父亲电话',
+        `fatherPoliticsStatus` VARCHAR(50) COMMENT '父亲政治面貌',
+        `fatherWorkUnit` VARCHAR(100) COMMENT '父亲工作单位',
+        `motherName` VARCHAR(50) COMMENT '母亲姓名',
+        `motherPhone` VARCHAR(20) COMMENT '母亲电话',
+        `motherPoliticsStatus` VARCHAR(50) COMMENT '母亲政治面貌',
+        `motherWorkUnit` VARCHAR(100) COMMENT '母亲工作单位'
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生信息表（以userId为主键）';
     </update>
     <update id="createBookTable">
         CREATE TABLE IF NOT EXISTS vcampus_db.`tb_book` (
