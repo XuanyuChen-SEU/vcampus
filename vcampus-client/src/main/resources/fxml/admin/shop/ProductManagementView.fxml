@@ -27,7 +27,7 @@
     </HBox>
     
     <!-- 商品表格 -->
-    <TableView fx:id="productTable" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="product-table">
+    <TableView fx:id="productTable" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="data-table">
         <columns>
             <TableColumn fx:id="idColumn" text="商品ID" minWidth="80.0" />
             <TableColumn fx:id="nameColumn" text="商品名称" minWidth="150.0" />

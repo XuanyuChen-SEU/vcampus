@@ -26,7 +26,7 @@
     </HBox>
     
     <!-- 用户表格 -->
-    <TableView fx:id="userTable" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="user-table">
+    <TableView fx:id="userTable" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="data-table">
         <columns>
             <TableColumn fx:id="idColumn" text="用户ID" minWidth="150.0" />
             <TableColumn fx:id="roleColumn" text="角色" minWidth="120.0" />

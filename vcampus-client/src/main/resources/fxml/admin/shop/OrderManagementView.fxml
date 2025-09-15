@@ -26,7 +26,7 @@
     </HBox>
     
     <!-- 订单表格 -->
-    <TableView fx:id="orderTable" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="order-table">
+    <TableView fx:id="orderTable" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="data-table">
         <columns>
             <TableColumn fx:id="orderIdColumn" text="订单ID" minWidth="100.0" />
             <TableColumn fx:id="userIdColumn" text="用户ID" minWidth="100.0" />

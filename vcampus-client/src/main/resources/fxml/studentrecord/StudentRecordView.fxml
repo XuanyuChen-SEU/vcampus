@@ -3,19 +3,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
 
 <AnchorPane prefHeight="700.0" prefWidth="800.0"
             xmlns="http://javafx.com/javafx/19"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.vcampus.client.controller.StudentController"
-            style="-fx-background-color: #f5f7fa;">
+            styleClass="student-record-background">
 
     <children>
         <!-- 顶部标题栏 -->
         <HBox spacing="10" alignment="CENTER_LEFT" prefHeight="60.0"
               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
-              style="-fx-background-color: #2C3E50; -fx-padding: 0 20;">
-            <Label text="学籍管理模块" textFill="white">
+              styleClass="student-record-header">
+            <Label text="学籍管理模块" styleClass="student-record-title">
                 <font>
                     <Font name="Microsoft YaHei Bold" size="22.0"/>
                 </font>
@@ -23,18 +24,20 @@
         </HBox>
 
         <!-- 主内容 -->
-        <VBox layoutX="20.0" layoutY="70.0" spacing="15"
-              prefHeight="600.0" prefWidth="760.0"
-              AnchorPane.topAnchor="70.0" AnchorPane.bottomAnchor="60.0"
-              AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+        <ScrollPane fx:id="mainScrollPane" fitToWidth="true" 
+                    AnchorPane.topAnchor="70.0" AnchorPane.bottomAnchor="60.0"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    styleClass="student-record-scroll-pane">
+            <content>
+                <VBox spacing="15" styleClass="student-record-content">
+                    <padding>
+                        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+                    </padding>
 
             <!-- 基本信息（核心修改区域） -->
-            <TitledPane text="基本信息" expanded="true">
+            <TitledPane text="基本信息" expanded="true" styleClass="student-record-titled-pane">
                 <content>
-                    <GridPane fx:id="studentGridPane" hgap="10" vgap="10"
-                              style="-fx-background-color: white; -fx-padding: 15;
-                 -fx-border-radius: 8; -fx-background-radius: 8;
-                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+                    <GridPane fx:id="studentGridPane" hgap="10" vgap="10" styleClass="student-record-grid">
                         <columnConstraints>
                             <ColumnConstraints prefWidth="100"/>
                             <ColumnConstraints prefWidth="180"/>
@@ -89,11 +92,9 @@
             </TitledPane>
 
             <!-- 联系方式 -->
-            <TitledPane text="联系方式" expanded="true">
+            <TitledPane text="联系方式" expanded="false" styleClass="student-record-titled-pane">
                 <content>
-                    <GridPane fx:id="contactGridPane" hgap="10" vgap="10"
-                              style="-fx-background-color: white; -fx-padding: 15;
-                                     -fx-border-radius: 8; -fx-background-radius: 8;">
+                    <GridPane fx:id="contactGridPane" hgap="10" vgap="10" styleClass="student-record-grid">
                         <columnConstraints>
                             <ColumnConstraints prefWidth="100"/>
                             <ColumnConstraints prefWidth="200"/>
@@ -119,11 +120,9 @@
             </TitledPane>
 
             <!-- 父亲信息 -->
-            <TitledPane text="父亲信息" expanded="false">
+            <TitledPane text="父亲信息" expanded="false" styleClass="student-record-titled-pane">
                 <content>
-                    <GridPane fx:id="fatherGridPane" hgap="10" vgap="10"
-                              style="-fx-background-color: white; -fx-padding: 15;
-                                     -fx-border-radius: 8; -fx-background-radius: 8;">
+                    <GridPane fx:id="fatherGridPane" hgap="10" vgap="10" styleClass="student-record-grid">
                         <columnConstraints>
                             <ColumnConstraints prefWidth="100"/>
                             <ColumnConstraints prefWidth="200"/>
@@ -152,11 +151,9 @@
             </TitledPane>
 
             <!-- 母亲信息 -->
-            <TitledPane text="母亲信息" expanded="false">
+            <TitledPane text="母亲信息" expanded="false" styleClass="student-record-titled-pane">
                 <content>
-                    <GridPane fx:id="motherGridPane" hgap="10" vgap="10"
-                              style="-fx-background-color: white; -fx-padding: 15;
-                                     -fx-border-radius: 8; -fx-background-radius: 8;">
+                    <GridPane fx:id="motherGridPane" hgap="10" vgap="10" styleClass="student-record-grid">
                         <columnConstraints>
                             <ColumnConstraints prefWidth="100"/>
                             <ColumnConstraints prefWidth="200"/>
@@ -184,17 +181,15 @@
                 </content>
             </TitledPane>
 
-        </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
 
         <!-- 按钮 -->
         <HBox spacing="10" alignment="CENTER_RIGHT"
               AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="20.0">
-            <Button fx:id="editOrSaveButton" text="修改"
-                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6;"
-                    prefWidth="80" prefHeight="30"/>
-            <Button fx:id="pdfOrCancelButton" text="导出PDF"
-                    style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 6;"
-                    prefWidth="80" prefHeight="30"/>
+            <Button fx:id="editOrSaveButton" text="修改" styleClass="student-record-button-edit" prefWidth="80" prefHeight="30"/>
+            <Button fx:id="pdfOrCancelButton" text="导出PDF" styleClass="student-record-button-pdf" prefWidth="80" prefHeight="30"/>
         </HBox>
     </children>
 </AnchorPane>

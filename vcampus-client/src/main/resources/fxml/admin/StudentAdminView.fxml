@@ -21,7 +21,11 @@
     </padding>
 
     <!-- 标题 -->
-    <Label text="🎓 学生管理系统" styleClass="admin-title"/>
+    <HBox alignment="CENTER">
+        <children>
+            <Label text="🎓 学生管理系统" styleClass="admin-title"/>
+        </children>
+    </HBox>
 
     <!-- 顶部搜索栏 -->
     <HBox spacing="10" alignment="CENTER_LEFT">
@@ -31,7 +35,7 @@
     </HBox>
 
     <!-- 学生信息表格 -->
-    <TableView fx:id="studentTable" VBox.vgrow="ALWAYS" styleClass="user-table">
+    <TableView fx:id="studentTable" VBox.vgrow="ALWAYS" styleClass="data-table">
         <columns>
             <TableColumn fx:id="colUserId" text="用户ID" prefWidth="100"/>
             <TableColumn fx:id="colStudentId" text="学号" prefWidth="100"/>

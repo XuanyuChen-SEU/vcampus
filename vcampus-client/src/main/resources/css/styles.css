@@ -631,6 +631,56 @@
 
 .user-table .table-row-cell:selected {
     -fx-background-color: #e3f2fd;
+    -fx-text-fill: #333333;
+}
+
+/* === 商店管理表格样式 === */
+.product-table {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+}
+
+.product-table .column-header {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.product-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.product-table .table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #333333;
+}
+
+.order-table {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+}
+
+.order-table .column-header {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.order-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.order-table .table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #333333;
 }
 
 /* === 表单组件样式 === */
@@ -819,6 +869,167 @@
     -fx-border-color: rgba(255, 255, 255, 0.3);
     -fx-border-radius: 10;
     -fx-border-width: 1;
+}
+
+/*
+ * =================================================================
+ *
+ *                  学籍管理模块样式 (StudentRecordView)
+ *
+ * =================================================================
+ */
+
+/* === 学籍管理背景样式 === */
+.student-record-background {
+    -fx-background-color: linear-gradient(to bottom right, #e3f2fd 0%, #bbdefb 100%);
+}
+
+/* === 学籍管理标题栏样式 === */
+.student-record-header {
+    -fx-background-color: rgba(74, 144, 226, 0.2);
+    -fx-padding: 0 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0.0, 0, 1);
+}
+
+.student-record-title {
+    -fx-text-fill: #2c5aa0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0.0, 0, 1);
+}
+
+/* === 学籍管理折叠面板样式 === */
+.student-record-titled-pane {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+}
+
+.student-record-titled-pane .title {
+    -fx-background-color: linear-gradient(to right, #4a90e2, #357abd);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 8 15;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.student-record-titled-pane .title:hover {
+    -fx-background-color: linear-gradient(to right, #357abd, #2c5aa0);
+}
+
+/* === 学籍管理滚动面板样式 === */
+.student-record-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.student-record-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-radius: 5;
+}
+
+.student-record-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+    -fx-background-radius: 5;
+}
+
+.student-record-scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.7);
+}
+
+.student-record-content {
+    -fx-background-color: transparent;
+}
+
+/* === 学籍管理网格样式 === */
+.student-record-grid {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-padding: 15;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0.0, 0, 2);
+}
+
+.student-record-grid .label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+}
+
+/* === 学籍管理按钮样式 === */
+.student-record-button-edit {
+    -fx-background-color: linear-gradient(to right, #4a90e2, #357abd);
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.student-record-button-edit:hover {
+    -fx-background-color: linear-gradient(to right, #357abd, #2c5aa0);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+.student-record-button-pdf {
+    -fx-background-color: linear-gradient(to right, #f39c12, #e67e22);
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.student-record-button-pdf:hover {
+    -fx-background-color: linear-gradient(to right, #e67e22, #d35400);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+/*
+ * =================================================================
+ *
+ *                  教务管理模块样式 (AcademicView)
+ *
+ * =================================================================
+ */
+
+/* === 教务管理背景样式 === */
+.academic-background {
+    -fx-background-color: linear-gradient(to bottom right, #f3e5f5 0%, #e1bee7 100%);
+}
+
+/* === 教务管理标题样式 === */
+.academic-title {
+    -fx-text-fill: #6a1b9a;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0.0, 0, 1);
+}
+
+/* === 教务管理课程头部样式 === */
+.academic-course-header {
+    -fx-padding: 8 20;
+    -fx-background-color: rgba(142, 68, 173, 0.15);
+    -fx-background-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0.0, 0, 1);
+}
+
+.academic-course-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #6a1b9a;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0.0, 0, 1);
+}
+
+/* === 教务管理滚动面板样式 === */
+.academic-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+/* === 教务管理课程容器样式 === */
+.academic-course-container {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.0, 0, 2);
 }
 
 /*
@@ -1112,4 +1323,54 @@
 
 .user-table .table-row-cell:selected {
     -fx-background-color: #e3f2fd;
+    -fx-text-fill: #333333;
+}
+
+/* === 商店管理表格样式 === */
+.product-table {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+}
+
+.product-table .column-header {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.product-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.product-table .table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #333333;
+}
+
+.order-table {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+}
+
+.order-table .column-header {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.order-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.order-table .table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #333333;
 }
