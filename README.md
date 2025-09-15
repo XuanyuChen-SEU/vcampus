@@ -14,6 +14,7 @@
 设置配置文件以设置MySQL**永久**访问权限：
 
 **Windows 系统**：通常在 MySQL 安装目录下的 my.ini（如 C:\ProgramData\MySQL\MySQL Server 8.0\my.ini）
+
 **Mac 系统**：通过 brew 安装的 MySQL 可能在 /usr/local/etc/my.cnf 或 /etc/my.cnf
 
 文本编辑器（需管理员权限）打开配置文件，在 [mysqld] 区块下添加以下配置：
