@@ -36,8 +36,6 @@
     -fx-padding: 15px 10px;
     -fx-background-radius: 8;
     -fx-cursor: hand;
-    /* 添加过渡效果 */
-    -fx-transition: all 0.3s ease;
 }
 
 /* 侧边栏按钮 - 鼠标悬停效果 */
@@ -823,6 +821,145 @@
     -fx-border-width: 1;
 }
 
+/*
+ * =================================================================
+ *
+ *                  欢迎页面样式 (WelcomeView)
+ *
+ * =================================================================
+ */
+
+/* === 欢迎页面背景样式 === */
+.welcome-background {
+    -fx-background-color: linear-gradient(to bottom right, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+/* === Logo图标样式 === */
+.welcome-logo-icon {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 15, 0.0, 0, 0);
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+.welcome-logo-icon:hover {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1.0), 20, 0.0, 0, 0);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+/* === 主标题样式 === */
+.welcome-main-title {
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0.0, 0, 3);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
+/* === 副标题样式 === */
+.welcome-subtitle {
+    -fx-font-size: 18px;
+    -fx-font-weight: normal;
+    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0.0, 0, 2);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
+/* === 欢迎文字样式 === */
+.welcome-text {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0.0, 0, 2);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
+/* === 系统描述样式 === */
+.welcome-description {
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-text-fill: rgba(255, 255, 255, 0.85);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+    -fx-text-alignment: center;
+}
+
+/* === 功能标题样式 === */
+.features-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0.0, 0, 2);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
+/* === 功能卡片样式 === */
+.feature-card {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.0, 0, 3);
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 25 20 25 20;
+    -fx-min-width: 180px;
+    -fx-max-width: 200px;
+    -fx-min-height: 200px;
+    -fx-cursor: hand;
+}
+
+.feature-card:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 15, 0.0, 0, 5);
+    -fx-border-color: rgba(255, 255, 255, 0.6);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* === 功能图标样式 === */
+.feature-icon {
+    -fx-font-size: 48px;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0.0, 0, 2);
+}
+
+/* === 功能卡片标题样式 === */
+.feature-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.0, 0, 1);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
+/* === 功能描述样式 === */
+.feature-description {
+    -fx-font-size: 12px;
+    -fx-font-weight: normal;
+    -fx-text-fill: rgba(255, 255, 255, 0.8);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+    -fx-text-alignment: center;
+}
+
+/* === 底部提示样式 === */
+.bottom-hint {
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-text-fill: rgba(255, 255, 255, 0.8);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
+/* === 版权信息样式 === */
+.copyright {
+    -fx-font-size: 12px;
+    -fx-font-weight: normal;
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0.0, 0, 1);
+    -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
 /* === 响应式设计：小屏幕适配 === */
 @media (max-width: 800px) {
     .admin-title {
@@ -867,5 +1004,37 @@
         -fx-min-width: 100px;
         -fx-padding: 8 16 8 16;
         -fx-font-size: 12px;
+    }
+
+    /* 欢迎页面小屏幕适配 */
+    .welcome-main-title {
+        -fx-font-size: 36px;
+    }
+
+    .welcome-text {
+        -fx-font-size: 22px;
+    }
+
+    .features-title {
+        -fx-font-size: 24px;
+    }
+
+    .feature-card {
+        -fx-min-width: 140px;
+        -fx-max-width: 160px;
+        -fx-min-height: 160px;
+        -fx-padding: 20 15 20 15;
+    }
+
+    .feature-icon {
+        -fx-font-size: 36px;
+    }
+
+    .feature-title {
+        -fx-font-size: 16px;
+    }
+
+    .feature-description {
+        -fx-font-size: 11px;
     }
 }

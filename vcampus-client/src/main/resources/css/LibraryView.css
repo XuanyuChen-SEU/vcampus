@@ -4,23 +4,39 @@
 
 /* --- 全局动态效果定义 --- */
 @keyframes pulse-glow {
-    0% { -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0); }
-    50% { -fx-effect: dropshadow(gaussian, rgba(168, 85, 247, 0.8), 15, 0.5, 0, 0); }
-    100% { -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0); }
+    0% {
+        -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0);
+    }
+
+    50% {
+        -fx-effect: dropshadow(gaussian, rgba(168, 85, 247, 0.8), 15, 0.5, 0, 0);
+    }
+
+    100% {
+        -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0);
+    }
 }
 
 @keyframes gradient-flow {
-    0% { -fx-background-position: 0% 50%; }
-    50% { -fx-background-position: 100% 50%; }
-    100% { -fx-background-position: 0% 50%; }
+    0% {
+        -fx-background-position: 0% 50%;
+    }
+
+    50% {
+        -fx-background-position: 100% 50%;
+    }
+
+    100% {
+        -fx-background-position: 0% 50%;
+    }
 }
 
 /* --- 根节点与全局样式 --- */
 .background {
     -fx-background-color:
-            radial-gradient(circle at 20% 20%, rgba(190, 137, 255, 0.1) 0%, transparent 8%),
-            radial-gradient(circle at 80% 80%, rgba(147, 112, 219, 0.1) 0%, transparent 8%),
-            linear-gradient(135deg, #f8f5ff 0%, #f0e6ff 100%);
+        radial-gradient(circle at 20% 20%, rgba(190, 137, 255, 0.1) 0%, transparent 8%),
+        radial-gradient(circle at 80% 80%, rgba(147, 112, 219, 0.1) 0%, transparent 8%),
+        linear-gradient(135deg, #f8f5ff 0%, #f0e6ff 100%);
     -fx-font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
 }
 
@@ -32,8 +48,8 @@
     -fx-background-color: linear-gradient(to right, #9370db, #7b68ee);
     -fx-background-radius: 15px;
     -fx-effect:
-            dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
-            innershadow(gaussian, rgba(255,255,255,0.3), 5, 0, 0, 1);
+        dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
+        innershadow(gaussian, rgba(255, 255, 255, 0.3), 5, 0, 0, 1);
     animation: pulse-glow 3s infinite;
 }
 
@@ -54,8 +70,8 @@
     -fx-font-size: 15px;
     -fx-padding: 0 20px;
     -fx-effect:
-            innershadow(gaussian, rgba(147, 112, 219, 0.2), 15, 0, 0, 3),
-            dropshadow(gaussian, rgba(190, 137, 255, 0.1), 10, 0, 0, 5);
+        innershadow(gaussian, rgba(147, 112, 219, 0.2), 15, 0, 0, 3),
+        dropshadow(gaussian, rgba(190, 137, 255, 0.1), 10, 0, 0, 5);
     -fx-transition: all 0.3s;
 }
 
@@ -63,24 +79,29 @@
     -fx-border-color: #9370db;
     -fx-border-width: 2px;
     -fx-effect:
-            innershadow(gaussian, rgba(147, 112, 219, 0.3), 20, 0, 0, 5),
-            dropshadow(gaussian, rgba(190, 137, 255, 0.3), 15, 0, 0, 5);
+        innershadow(gaussian, rgba(147, 112, 219, 0.3), 20, 0, 0, 5),
+        dropshadow(gaussian, rgba(190, 137, 255, 0.3), 15, 0, 0, 5);
 }
 
 /* --- 所有按钮统一样式（搜索+功能按钮） --- */
-.search-button, .action-button {
-    -fx-background-color: linear-gradient(45deg, #a855f7, #7e22ce); /* 统一紫色渐变 */
+.search-button,
+.action-button {
+    -fx-background-color: linear-gradient(45deg, #a855f7, #7e22ce);
+    /* 统一紫色渐变 */
     -fx-background-size: 200% 100%;
-    -fx-text-fill: white; /* 白色文字，高对比度 */
+    -fx-text-fill: white;
+    /* 白色文字，高对比度 */
     -fx-background-radius: 15px;
-    -fx-border-color: rgba(255, 255, 255, 0.5); /* 半透明白色边框 */
+    -fx-border-color: rgba(255, 255, 255, 0.5);
+    /* 半透明白色边框 */
     -fx-border-width: 1.5px;
     -fx-border-radius: 15px;
     -fx-font-size: 14px;
     -fx-padding: 8 18 8 18;
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0);
-    animation: gradient-flow 3s ease infinite, pulse-glow 2s infinite; /* 动态渐变+光效 */
+    animation: gradient-flow 3s ease infinite, pulse-glow 2s infinite;
+    /* 动态渐变+光效 */
     -fx-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
@@ -90,16 +111,20 @@
 
 
 
-.search-button:hover, .action-button:hover {
-    -fx-background-color: linear-gradient(135deg, #c084fc, #a855f7); /* hover时渐变反转 */
+.search-button:hover,
+.action-button:hover {
+    -fx-background-color: linear-gradient(135deg, #c084fc, #a855f7);
+    /* hover时渐变反转 */
     -fx-background-size: 200% 100%;
     -fx-scale-x: 1.1;
     -fx-scale-y: 1.1;
-    -fx-border-color: rgba(255, 255, 255, 0.8); /* 边框更亮 */
+    -fx-border-color: rgba(255, 255, 255, 0.8);
+    /* 边框更亮 */
     -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.8), 15, 0.5, 0, 0);
 }
 
-.search-button:pressed, .action-button:pressed {
+.search-button:pressed,
+.action-button:pressed {
     -fx-scale-x: 0.95;
     -fx-scale-y: 0.95;
 }
@@ -116,9 +141,17 @@
 }
 
 /* 按钮个性化颜色（可选，若需细微区分） */
-.add-button { -fx-background-color: linear-gradient(45deg, #8b5cf6, #a855f7); }
-.delete-button { -fx-background-color: linear-gradient(45deg, #ec4899, #f472b6); }
-.modify-button { -fx-background-color: linear-gradient(45deg, #f59e0b, #fbbf24); }
+.add-button {
+    -fx-background-color: linear-gradient(45deg, #8b5cf6, #a855f7);
+}
+
+.delete-button {
+    -fx-background-color: linear-gradient(45deg, #ec4899, #f472b6);
+}
+
+.modify-button {
+    -fx-background-color: linear-gradient(45deg, #f59e0b, #fbbf24);
+}
 
 /* --- 表格 (TableView) 深度定制 --- */
 .table-view {
@@ -128,8 +161,8 @@
     -fx-border-width: 2px;
     -fx-border-radius: 15px;
     -fx-effect:
-            dropshadow(gaussian, rgba(147, 112, 219, 0.2), 20, 0, 0, 10),
-            innershadow(gaussian, rgba(255, 255, 255, 0.5), 10, 0, 0, 5);
+        dropshadow(gaussian, rgba(147, 112, 219, 0.2), 20, 0, 0, 10),
+        innershadow(gaussian, rgba(255, 255, 255, 0.5), 10, 0, 0, 5);
 }
 
 /* 表头：动态渐变 + 发光效果 */
@@ -147,12 +180,13 @@
     -fx-font-weight: bold;
     -fx-alignment: center-left;
     -fx-padding: 0 0 0 20px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
 }
 
 /* 表格行：粉紫斑马纹 + 白字 */
 .table-view .table-row-cell {
-    -fx-text-fill: white; /* 表格文字改为白色 */
+    -fx-text-fill: white;
+    /* 表格文字改为白色 */
     -fx-font-size: 14px;
     -fx-padding: 15px 20px;
     -fx-border-width: 1px 0 0 0;
@@ -181,7 +215,8 @@
 /* 选中行：发光边框 + 白字 */
 .table-view .table-row-cell:selected {
     -fx-background-color: rgba(255, 255, 255, 0.25);
-    -fx-text-fill: white; /* 选中行文字白色 */
+    -fx-text-fill: white;
+    /* 选中行文字白色 */
     -fx-border-color: #9370db;
     -fx-border-width: 2px 0;
     -fx-effect: dropshadow(gaussian, rgba(147, 112, 219, 0.4), 15, 0, 0, 0);
@@ -219,13 +254,14 @@
 
 /* --- 底部用户信息栏 --- */
 #userInfoLabel {
-    -fx-text-fill: white; /* 用户信息文字白色 */
+    -fx-text-fill: white;
+    /* 用户信息文字白色 */
     -fx-font-weight: bold;
     -fx-font-size: 15px;
     -fx-padding: 5px 10px;
     -fx-background-color: linear-gradient(to right, #9370db, #7b68ee);
     -fx-background-radius: 15px;
     -fx-effect:
-            dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
-            innershadow(gaussian, rgba(255,255,255,0.3), 5, 0, 0, 1);
+        dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
+        innershadow(gaussian, rgba(255, 255, 255, 0.3), 5, 0, 0, 1);
 }
