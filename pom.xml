@@ -116,6 +116,13 @@
                 <artifactId>opencsv</artifactId>
                 <version>5.6</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.controlsfx</groupId>
+                <artifactId>controlsfx</artifactId>
+                <version>21.0.8</version> <!-- 版本根据你用的 JavaFX 决定 -->
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 </project>

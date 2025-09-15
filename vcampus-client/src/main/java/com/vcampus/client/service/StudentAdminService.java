@@ -83,7 +83,7 @@ public class StudentAdminService {
      * @param student 修改后的学生对象
      */
     public void updateStudent(Student student) {
-        Message request = new Message(ActionType.UPDATE_STUDENT, student);
+        Message request = new Message(ActionType.UPDATE_STUDENT_ADMIN, student);
         socketClient.sendMessage(request);
     }
 

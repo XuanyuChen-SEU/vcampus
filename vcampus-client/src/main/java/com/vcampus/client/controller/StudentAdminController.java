@@ -3,7 +3,6 @@ package com.vcampus.client.controller;
 import com.vcampus.client.service.StudentAdminService;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
-import com.vcampus.common.enums.ActionType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.geometry.Insets;
+import javafx.scene.layout.HBox;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class StudentAdminController implements IClientController {
     public void initialize() {
         registerToMessageController();
 
-        // 绑定表格列
+        // 表格列绑定（属性名请与 Student 类的 getter 名称匹配）
         colUserId.setCellValueFactory(new PropertyValueFactory<>("userId"));
         colStudentId.setCellValueFactory(new PropertyValueFactory<>("studentId"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -47,20 +48,31 @@ public class StudentAdminController implements IClientController {
         colMajor.setCellValueFactory(new PropertyValueFactory<>("major"));
         colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
 
-        // 操作列 - 查看详细 + 修改
+        // 表格无数据时的占位提示
+        studentTable.setPlaceholder(new Label("暂无学生数据"));
+
+        // 操作列 - 查看详细 + 修改（带索引边界保护）
         colAction.setCellFactory(param -> new TableCell<Student, Void>() {
             private final Button btnDetail = new Button("查看详细");
             private final Button btnEdit = new Button("修改");
-            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(5, btnDetail, btnEdit);
+            private final HBox box = new HBox(6, btnDetail, btnEdit);
 
             {
+                // 给按钮添加样式类（样式在 CSS 中定义）
+                btnDetail.getStyleClass().add("clear-button");
+                btnEdit.getStyleClass().add("create-button");
+
                 btnDetail.setOnAction(event -> {
-                    Student student = getTableView().getItems().get(getIndex());
+                    int idx = getIndex();
+                    if (idx < 0 || idx >= getTableView().getItems().size()) return;
+                    Student student = getTableView().getItems().get(idx);
                     showStudentDetail(student);
                 });
 
                 btnEdit.setOnAction(event -> {
-                    Student student = getTableView().getItems().get(getIndex());
+                    int idx = getIndex();
+                    if (idx < 0 || idx >= getTableView().getItems().size()) return;
+                    Student student = getTableView().getItems().get(idx);
                     showEditDialog(student);
                 });
             }
@@ -72,10 +84,12 @@ public class StudentAdminController implements IClientController {
             }
         });
 
+        // 绑定数据源
         studentTable.setItems(filteredData);
 
-        // 搜索事件
+        // 搜索按钮与回车触发
         searchButton.setOnAction(event -> handleSearch());
+        searchField.setOnAction(event -> handleSearch());
 
         // 初始加载所有学生
         loadAllStudent();
@@ -86,53 +100,48 @@ public class StudentAdminController implements IClientController {
     }
 
     private void handleSearch() {
-        String keyword = searchField.getText().trim();
-
+        String keyword = searchField.getText() == null ? "" : searchField.getText().trim();
         if (keyword.isEmpty()) {
-            filteredData.setPredicate(s -> true); // 显示全部
+            filteredData.setPredicate(s -> true);
         } else {
             filteredData.setPredicate(s ->
-                    s.getStudentId().contains(keyword) || s.getName().contains(keyword)
+                    (s.getStudentId() != null && s.getStudentId().contains(keyword)) ||
+                            (s.getName() != null && s.getName().contains(keyword))
             );
         }
     }
 
     /** 查看学生详细信息 */
     private void showStudentDetail(Student s) {
+        if (s == null) return;
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("学生详细信息");
         alert.setHeaderText("学号：" + s.getStudentId() + " - " + s.getName());
-        alert.setContentText(
-                "用户ID: " + s.getUserId() + "\n" +
-                        "姓名: " + s.getName() + "\n" +
-                        "性别: " + s.getGender() + "\n" +
-                        "学院: " + s.getCollege() + "\n" +
-                        "专业: " + s.getMajor() + "\n" +
-                        "年级: " + s.getGrade() + "\n" +
-                        "出生日期: " + s.getBirth_date() + "\n" +
-                        "籍贯: " + s.getNative_place() + "\n" +
-                        "政治面貌: " + s.getPolitics_status() + "\n" +
-                        "学籍状态: " + s.getStudent_status() + "\n\n" +
-                        "联系方式:\n" +
-                        "  手机号: " + s.getPhone() + "\n" +
-                        "  邮箱: " + s.getEmail() + "\n" +
-                        "  宿舍地址: " + s.getDormAddress() + "\n\n" +
-                        "父亲信息:\n" +
-                        "  姓名: " + s.getFatherName() + "\n" +
-                        "  手机: " + s.getFatherPhone() + "\n" +
-                        "  政治面貌: " + s.getFatherPoliticsStatus() + "\n" +
-                        "  工作单位: " + s.getFatherWorkUnit() + "\n\n" +
-                        "母亲信息:\n" +
-                        "  姓名: " + s.getMotherName() + "\n" +
-                        "  手机: " + s.getMotherPhone() + "\n" +
-                        "  政治面貌: " + s.getMotherPoliticsStatus() + "\n" +
-                        "  工作单位: " + s.getMotherWorkUnit()
-        );
+        StringBuilder sb = new StringBuilder();
+        sb.append("用户ID: ").append(s.getUserId()).append("\n")
+                .append("姓名: ").append(s.getName()).append("\n")
+                .append("性别: ").append(s.getGender()).append("\n")
+                .append("学院: ").append(s.getCollege()).append("\n")
+                .append("专业: ").append(s.getMajor()).append("\n")
+                .append("年级: ").append(s.getGrade()).append("\n")
+                .append("出生日期: ").append(s.getBirth_date()).append("\n")
+                .append("籍贯: ").append(s.getNative_place()).append("\n")
+                .append("政治面貌: ").append(s.getPolitics_status()).append("\n")
+                .append("学籍状态: ").append(s.getStudent_status()).append("\n\n")
+                .append("联系方式:\n  手机号: ").append(s.getPhone()).append("\n  邮箱: ").append(s.getEmail())
+                .append("\n  宿舍地址: ").append(s.getDormAddress()).append("\n\n")
+                .append("父亲信息:\n  姓名: ").append(s.getFatherName()).append("\n  手机: ").append(s.getFatherPhone())
+                .append("\n  政治面貌: ").append(s.getFatherPoliticsStatus()).append("\n  工作单位: ").append(s.getFatherWorkUnit())
+                .append("\n\n母亲信息:\n  姓名: ").append(s.getMotherName()).append("\n  手机: ").append(s.getMotherPhone())
+                .append("\n  政治面貌: ").append(s.getMotherPoliticsStatus()).append("\n  工作单位: ").append(s.getMotherWorkUnit());
+        alert.setContentText(sb.toString());
         alert.showAndWait();
     }
 
     /** 修改学生信息对话框 */
     private void showEditDialog(Student s) {
+        if (s == null) return;
+
         Dialog<Student> dialog = new Dialog<>();
         dialog.setTitle("修改学生信息");
         dialog.setHeaderText("修改学生: " + s.getStudentId() + " - " + s.getName());
@@ -143,24 +152,49 @@ public class StudentAdminController implements IClientController {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new javafx.geometry.Insets(20, 150, 10, 10));
+        grid.setPadding(new Insets(20, 150, 10, 10));
 
+        // 创建输入框
+        TextField userIdField = new TextField(s.getUserId());
+        TextField studentIdField = new TextField(s.getStudentId());
         TextField nameField = new TextField(s.getName());
         TextField genderField = new TextField(s.getGender());
         TextField collegeField = new TextField(s.getCollege());
         TextField majorField = new TextField(s.getMajor());
         TextField gradeField = new TextField(String.valueOf(s.getGrade()));
+        TextField birthDateField = new TextField(s.getBirth_date());
+        TextField nativePlaceField = new TextField(s.getNative_place());
+        TextField politicsStatusField = new TextField(s.getPolitics_status());
+        TextField studentStatusField = new TextField(s.getStudent_status());
 
-        grid.add(new Label("姓名:"), 0, 0); grid.add(nameField, 1, 0);
-        grid.add(new Label("性别:"), 0, 1); grid.add(genderField, 1, 1);
-        grid.add(new Label("学院:"), 0, 2); grid.add(collegeField, 1, 2);
-        grid.add(new Label("专业:"), 0, 3); grid.add(majorField, 1, 3);
-        grid.add(new Label("年级:"), 0, 4); grid.add(gradeField, 1, 4);
+        // 放到网格
+        int row = 0;
+        grid.add(new Label("用户ID:"), 0, row); grid.add(userIdField, 1, row++);
+        grid.add(new Label("学号:"), 0, row); grid.add(studentIdField, 1, row++);
+        grid.add(new Label("姓名:"), 0, row); grid.add(nameField, 1, row++);
+        grid.add(new Label("性别:"), 0, row); grid.add(genderField, 1, row++);
+        grid.add(new Label("学院:"), 0, row); grid.add(collegeField, 1, row++);
+        grid.add(new Label("专业:"), 0, row); grid.add(majorField, 1, row++);
+        grid.add(new Label("年级:"), 0, row); grid.add(gradeField, 1, row++);
+        grid.add(new Label("出生日期:"), 0, row); grid.add(birthDateField, 1, row++);
+        grid.add(new Label("籍贯:"), 0, row); grid.add(nativePlaceField, 1, row++);
+        grid.add(new Label("政治面貌:"), 0, row); grid.add(politicsStatusField, 1, row++);
+        grid.add(new Label("学籍状态:"), 0, row); grid.add(studentStatusField, 1, row++);
 
         dialog.getDialogPane().setContent(grid);
 
+        // 保存按钮逻辑
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
+                try {
+                    s.setUserId(userIdField.getText());
+                    s.setStudentId(studentIdField.getText());
+                } catch (IllegalArgumentException ex) {
+                    // 如果用户输入非法 ID，这里直接报错并不关闭窗口
+                    Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
+                    alert.showAndWait();
+                    return null;
+                }
                 s.setName(nameField.getText());
                 s.setGender(genderField.getText());
                 s.setCollege(collegeField.getText());
@@ -168,6 +202,10 @@ public class StudentAdminController implements IClientController {
                 try {
                     s.setGrade(Integer.parseInt(gradeField.getText()));
                 } catch (NumberFormatException ignored) {}
+                s.setBirth_date(birthDateField.getText());
+                s.setNative_place(nativePlaceField.getText());
+                s.setPolitics_status(politicsStatusField.getText());
+                s.setStudent_status(studentStatusField.getText());
                 return s;
             }
             return null;
@@ -178,6 +216,7 @@ public class StudentAdminController implements IClientController {
             studentTable.refresh();
         });
     }
+
 
     /** 处理服务端返回的全部学生信息 */
     public void handleAllStudentResponse(Message message) {

@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
+<?import java.net.URL?>
 <VBox xmlns="http://javafx.com/javafx/19"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.vcampus.client.controller.StudentAdminController"
-      spacing="10">
+      spacing="15">
+
+    <!-- 引入同目录下的 CSS（把 student-admin.css 与此 FXML 放在同一目录下） -->
+    <stylesheets>
+        <URL value="@student-admin.css"/>
+    </stylesheets>
+
+    <!-- 外边距（padding）必须用嵌套元素设置 -->
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
+        <Insets top="15" right="15" bottom="15" left="15"/>
     </padding>
 
+    <!-- 标题 -->
+    <Label text="🎓 学生管理系统" styleClass="admin-title"/>
+
     <!-- 顶部搜索栏 -->
-    <HBox spacing="10">
-        <TextField fx:id="searchField" promptText="请输入学号或姓名" HBox.hgrow="ALWAYS"/>
-        <Button text="搜索" fx:id="searchButton"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="请输入学号或姓名"
+                   HBox.hgrow="ALWAYS" styleClass="search-field"/>
+        <Button fx:id="searchButton" text="🔍 搜索" styleClass="search-button"/>
     </HBox>
 
     <!-- 学生信息表格 -->
-    <TableView fx:id="studentTable" VBox.vgrow="ALWAYS">
+    <TableView fx:id="studentTable" VBox.vgrow="ALWAYS" styleClass="user-table">
         <columns>
             <TableColumn fx:id="colUserId" text="用户ID" prefWidth="100"/>
             <TableColumn fx:id="colStudentId" text="学号" prefWidth="100"/>
@@ -27,12 +40,9 @@
             <TableColumn fx:id="colCollege" text="学院" prefWidth="120"/>
             <TableColumn fx:id="colMajor" text="专业" prefWidth="120"/>
             <TableColumn fx:id="colGrade" text="年级" prefWidth="80"/>
-            <TableColumn fx:id="colAction" text="操作" prefWidth="100"/>
+            <TableColumn fx:id="colAction" text="操作" prefWidth="210"/>
         </columns>
     </TableView>
+
 </VBox>
-
-
-
-
 
