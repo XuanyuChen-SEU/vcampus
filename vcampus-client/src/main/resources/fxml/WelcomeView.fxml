@@ -1,16 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane styleClass="welcome-background" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <!-- 如果可以显示用户名就更好了 后面我看看要不要改 -->
-        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" layoutY="150.0" text="欢迎使用 V-Campus 虚拟校园系统！" textAlignment="CENTER" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="150.0">
-            <font>
-                <Font size="24.0" />
-            </font>
-        </Label>
+        <!-- 主标题区域 -->
+        <VBox alignment="CENTER" spacing="20.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="80.0">
+            <children>
+                <!-- Logo和标题 -->
+                <HBox alignment="CENTER" spacing="15.0">
+                    <ImageView fx:id="welcomeLogoIcon" fitWidth="60.0" fitHeight="60.0" preserveRatio="true" styleClass="welcome-logo-icon">
+                        <image>
+                            <Image url="@../images/logo-icon.png" />
+                        </image>
+                    </ImageView>
+                    <VBox alignment="CENTER_LEFT" spacing="5.0">
+                        <Label text="V-Campus" styleClass="welcome-main-title" />
+                        <Label text="虚拟校园系统" styleClass="welcome-subtitle" />
+                    </VBox>
+                </HBox>
+                
+                <!-- 欢迎文字 -->
+                <Label text="欢迎使用 V-Campus 虚拟校园系统！" styleClass="welcome-text" />
+                
+                <!-- 系统描述 -->
+                <Label text="一个集成了校园商店、图书馆、学籍管理、教务系统等功能的综合性平台" 
+                       styleClass="welcome-description" 
+                       wrapText="true" 
+                       maxWidth="600.0" />
+            </children>
+        </VBox>
+        
+        <!-- 功能卡片区域 -->
+        <VBox alignment="CENTER" spacing="30.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="300.0" AnchorPane.bottomAnchor="120.0">
+            <children>
+                <!-- 功能卡片标题 -->
+                <Label text="系统功能" styleClass="features-title" />
+                
+                <!-- 功能卡片网格 -->
+                <HBox alignment="CENTER" spacing="40.0">
+                    <children>
+                        <!-- 校园商店卡片 -->
+                        <VBox alignment="CENTER" spacing="10.0" styleClass="feature-card">
+                            <children>
+                                <Label text="🛒" styleClass="feature-icon" />
+                                <Label text="校园商店" styleClass="feature-title" />
+                                <VBox alignment="CENTER" spacing="2.0">
+                                    <children>
+                                        <Label text="在线购物平台" styleClass="feature-description" />
+                                        <Label text="商品浏览与购买" styleClass="feature-description" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                        
+                        <!-- 图书馆卡片 -->
+                        <VBox alignment="CENTER" spacing="10.0" styleClass="feature-card">
+                            <children>
+                                <Label text="📚" styleClass="feature-icon" />
+                                <Label text="图书馆" styleClass="feature-title" />
+                                <VBox alignment="CENTER" spacing="2.0">
+                                    <children>
+                                        <Label text="图书借阅管理" styleClass="feature-description" />
+                                        <Label text="在线阅读服务" styleClass="feature-description" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                        
+                        <!-- 学籍管理卡片 -->
+                        <VBox alignment="CENTER" spacing="10.0" styleClass="feature-card">
+                            <children>
+                                <Label text="📋" styleClass="feature-icon" />
+                                <Label text="学籍管理" styleClass="feature-title" />
+                                <VBox alignment="CENTER" spacing="2.0">
+                                    <children>
+                                        <Label text="个人信息管理" styleClass="feature-description" />
+                                        <Label text="成绩查询服务" styleClass="feature-description" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                        
+                        <!-- 教务系统卡片 -->
+                        <VBox alignment="CENTER" spacing="10.0" styleClass="feature-card">
+                            <children>
+                                <Label text="🎓" styleClass="feature-icon" />
+                                <Label text="教务系统" styleClass="feature-title" />
+                                <VBox alignment="CENTER" spacing="2.0">
+                                    <children>
+                                        <Label text="课程表管理" styleClass="feature-description" />
+                                        <Label text="选课系统" styleClass="feature-description" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+        
+        <!-- 底部信息 -->
+        <VBox alignment="CENTER" spacing="5.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
+            <children>
+                <Label text="© 2024 V-Campus Virtual Campus System" styleClass="copyright" />
+            </children>
+        </VBox>
     </children>
 </AnchorPane>

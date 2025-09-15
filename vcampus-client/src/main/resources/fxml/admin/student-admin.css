@@ -10,7 +10,7 @@
     -fx-font-size: 36px;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0.0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
     -fx-padding: 10px 0 10px 0;
 }
 
@@ -44,14 +44,14 @@
 
 .search-button:hover {
     -fx-background-color: linear-gradient(to right, #5a6fd8, #6a4190);
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0.0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
 }
 
 /* === 表格 === */
 .user-table {
     -fx-background-color: rgba(255, 255, 255, 0.95);
     -fx-background-radius: 10;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0.0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
 }
 
 .user-table .column-header {
@@ -69,6 +69,7 @@
 
 .user-table .table-row-cell:selected {
     -fx-background-color: #e3f2fd;
+    -fx-text-fill: #333333;
 }
 
 /* 操作列按钮样式 */

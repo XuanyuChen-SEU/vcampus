@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox spacing="10.0" style="-fx-background-color: #f4f6f8;"
+<VBox spacing="10.0" styleClass="academic-background"
       prefWidth="1200.0" prefHeight="800.0"
       xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.vcampus.client.controller.AcademicController">
@@ -19,7 +19,7 @@
         <Insets top="20.0" right="25.0" bottom="20.0" left="25.0" />
     </padding>
     <children>
-        <Label text="教务管理模块">
+        <Label text="教务管理模块" styleClass="academic-title">
             <font><Font name="System Bold" size="24.0" /></font>
         </Label>
 
@@ -42,7 +42,7 @@
 
         <Separator prefWidth="200.0" />
 
-        <HBox fx:id="courseListHeader" alignment="CENTER_LEFT" style="-fx-padding: 8 20; -fx-background-color: #E9ECEF; -fx-background-radius: 4;">
+        <HBox fx:id="courseListHeader" alignment="CENTER_LEFT" styleClass="academic-course-header">
             <children>
                 <Label text="课程号" prefWidth="140.0" style="-fx-font-weight: bold; -fx-text-fill: #333;" />
                 <Label text="课程名称" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-weight: bold; -fx-text-fill: #333;" />
@@ -56,9 +56,9 @@
             </VBox.margin>
         </HBox>
 
-        <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="academic-scroll-pane">
             <content>
-                <VBox fx:id="courseListContainer" spacing="0" style="-fx-background-color: white; -fx-background-radius: 6;" />
+                <VBox fx:id="courseListContainer" spacing="0" styleClass="academic-course-container" />
             </content>
         </ScrollPane>
 
