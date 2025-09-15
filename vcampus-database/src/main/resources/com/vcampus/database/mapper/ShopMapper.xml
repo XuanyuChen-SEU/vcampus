@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    ShopMapper.xml - 商店模块数据访问层映射文件
+    
+    功能说明：
+    1. 商品(Product)的查询操作（根据ID查询、关键词搜索）
+    2. 商店交易记录(ShopTransaction)的CRUD操作
+    3. 数据库表的创建和管理
+    4. 批量数据导入功能
+    
+    作者：谌宣羽
+-->
+
+<!-- namespace：名称空间，对应ShopMapper接口 -->
+<mapper namespace="com.vcampus.database.mapper.ShopMapper">
+
+    <!-- ==========================================================
+         ResultMap 定义
+         ========================================================== -->
+
+    <!-- 订单结果映射 -->
+    <resultMap id="OrderResultMap" type="com.vcampus.common.dto.ShopTransaction">
+        <!-- 通用字段 -->
+        <result property="id" column="null" />
+        <result property="userId" column="userId" />
+        
+        <!-- 订单相关字段 -->
+        <result property="orderId" column="orderId" jdbcType="VARCHAR" />
+        <result property="quantity" column="quantity" />
+        <result property="priceAtPurchase" column="priceAtPurchase" />
+        <result property="totalPrice" column="totalPrice" />
+        <result property="orderStatus" column="orderStatus" />
+        <result property="createTime" column="createTime" />
+        <result property="payTime" column="payTime" />
+        
+        <!-- 收藏相关字段 - 订单查询时为空 -->
+        <result property="addTime" column="null" />
+        
+        <!-- 商店用户信息字段 - 订单查询时为空 -->
+        <result property="cardNumber" column="null" />
+        <result property="balance" column="null" />
+        
+        <!-- 商品对象映射 -->
+        <association property="product" javaType="com.vcampus.common.dto.Product">
+            <id property="id" column="id" />
+            <result property="name" column="name" />
+            <result property="price" column="price" />
+            <result property="stock" column="stock" />
+            <result property="description" column="description" />
+            <result property="imageUrl" column="imageUrl" />
+            <result property="status" column="status" />
+        </association>
+    </resultMap>
+
+    <!-- 收藏结果映射 -->
+    <resultMap id="FavoriteResultMap" type="com.vcampus.common.dto.ShopTransaction">
+        <!-- 通用字段 -->
+        <result property="id" column="id" />
+        <result property="userId" column="userId" />
+        
+        <!-- 订单相关字段 - 收藏查询时为空 -->
+        <result property="orderId" column="null" />
+        <result property="quantity" column="null" />
+        <result property="priceAtPurchase" column="null" />
+        <result property="totalPrice" column="null" />
+        <result property="orderStatus" column="null" />
+        <result property="createTime" column="null" />
+        <result property="payTime" column="null" />
+        
+        <!-- 收藏相关字段 -->
+        <result property="addTime" column="addTime" />
+        
+        <!-- 商店用户信息字段 - 收藏查询时为空 -->
+        <result property="cardNumber" column="null" />
+        <result property="balance" column="null" />
+        
+        <!-- 商品对象映射 -->
+        <association property="product" javaType="com.vcampus.common.dto.Product">
+            <id property="id" column="id" />
+            <result property="name" column="name" />
+            <result property="price" column="price" />
+            <result property="stock" column="stock" />
+            <result property="description" column="description" />
+            <result property="imageUrl" column="imageUrl" />
+            <result property="status" column="status" />
+        </association>
+    </resultMap>
+
+    <!-- ==========================================================
+         数据库表管理操作
+         ========================================================== -->
+
+    <!-- 从CSV文件批量导入商品数据 -->
+    <update id="loadProductsFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_product
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (id, name, price, stock, description, imageUrl, @statusVar)
+        SET status = REPLACE(@statusVar, '\r', '');
+    </update>
+
+    <!-- 从CSV文件批量导入订单数据 -->
+    <update id="loadOrdersFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_order
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (orderId, userId, productId, quantity, priceAtPurchase, totalPrice, orderStatus, @createTimeVar, @payTimeVar)
+        SET 
+            createTime = CASE WHEN @createTimeVar = '' OR @createTimeVar = '\\N' THEN NULL ELSE STR_TO_DATE(@createTimeVar, '%Y-%m-%d %H:%i:%s') END,
+            payTime = CASE WHEN @payTimeVar = '' OR @payTimeVar = '\\N' THEN NULL ELSE STR_TO_DATE(@payTimeVar, '%Y-%m-%d %H:%i:%s') END;
+    </update>
+
+    <!-- 从CSV文件批量导入收藏数据 -->
+    <update id="loadFavoritesFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_favorite
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (userId, productId, @addTimeVar)
+        SET addTime = CASE WHEN @addTimeVar = '' THEN CURRENT_TIMESTAMP ELSE STR_TO_DATE(@addTimeVar, '%Y-%m-%d %H:%i:%s') END;
+    </update>
+
+    <!-- ==========================================================
+         商品(Product)相关操作
+         ========================================================== -->
+
+    <!-- 查询所有商品 -->
+    <select id="getAllProducts" resultType="com.vcampus.common.dto.Product">
+        SELECT 
+            id,
+            name,
+            price,
+            stock,
+            description,
+            imageUrl,
+            status
+        FROM vcampus_db.tb_product
+        ORDER BY id ASC
+    </select>
+
+    <!-- 根据商品ID查询商品详情 -->
+    <select id="getProductById" resultType="com.vcampus.common.dto.Product">
+        SELECT 
+            id,
+            name,
+            price,
+            stock,
+            description,
+            imageUrl,
+            status
+        FROM vcampus_db.tb_product
+        WHERE id = #{productId}
+    </select>
+
+    <!-- 根据关键词模糊搜索商品名称 -->
+    <select id="searchProducts" resultType="com.vcampus.common.dto.Product">
+        SELECT 
+            id,
+            name,
+            price,
+            stock,
+            description,
+            imageUrl,
+            status
+        FROM vcampus_db.tb_product
+        WHERE name LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY id ASC
+    </select>
+
+    <!-- 更新商品信息 -->
+    <update id="updateProductById">
+        UPDATE vcampus_db.tb_product
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="imageUrl != null">imageUrl = #{imageUrl},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 添加新商品 -->
+    <insert id="addProduct" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO vcampus_db.tb_product (
+            name, price, stock, description, imageUrl, status
+        )
+        VALUES (
+            #{name}, #{price}, #{stock}, #{description}, #{imageUrl}, #{status}
+        )
+    </insert>
+
+    <!-- 删除商品 -->
+    <delete id="deleteProductById">
+        DELETE FROM vcampus_db.tb_product WHERE id = #{productId}
+    </delete>
+
+    <!-- ==========================================================
+         订单(Order)相关操作
+         ========================================================== -->
+
+    <!-- 获取所有订单 -->
+    <select id="getAllOrders" resultMap="OrderResultMap">
+        SELECT 
+            o.orderId,
+            o.userId,
+            o.productId,
+            o.quantity,
+            o.priceAtPurchase,
+            o.totalPrice,
+            o.orderStatus,
+            o.createTime,
+            o.payTime,
+            p.id,
+            p.name,
+            p.price,
+            p.stock,
+            p.description,
+            p.imageUrl,
+            p.status
+        FROM vcampus_db.tb_order o
+        LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
+        ORDER BY o.createTime DESC
+    </select>
+
+    <!-- 根据订单ID获取订单详情 -->
+    <select id="getOrderById" resultMap="OrderResultMap">
+        SELECT 
+            o.orderId,
+            o.userId,
+            o.productId,
+            o.quantity,
+            o.priceAtPurchase,
+            o.totalPrice,
+            o.orderStatus,
+            o.createTime,
+            o.payTime,
+            p.id,
+            p.name,
+            p.price,
+            p.stock,
+            p.description,
+            p.imageUrl,
+            p.status
+        FROM vcampus_db.tb_order o
+        LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
+        WHERE o.orderId = #{orderId}
+    </select>
+
+    <!-- 根据用户ID获取该用户的所有订单 -->
+    <select id="getOrdersByUserId" resultMap="OrderResultMap">
+        SELECT 
+            o.orderId,
+            o.userId,
+            o.productId,
+            o.quantity,
+            o.priceAtPurchase,
+            o.totalPrice,
+            o.orderStatus,
+            o.createTime,
+            o.payTime,
+            p.id,
+            p.name,
+            p.price,
+            p.stock,
+            p.description,
+            p.imageUrl,
+            p.status
+        FROM vcampus_db.tb_order o
+        LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
+        WHERE o.userId = #{userId}
+        ORDER BY o.createTime DESC
+    </select>
+
+    <!-- 保存一个新的订单 -->
+    <insert id="saveOrder" useGeneratedKeys="false">
+        INSERT INTO vcampus_db.tb_order (
+            orderId, userId, productId, quantity, priceAtPurchase, 
+            totalPrice, orderStatus, createTime, payTime
+        )
+        VALUES (
+            #{orderId}, #{userId}, #{product.id}, #{quantity}, #{priceAtPurchase},
+            #{totalPrice}, #{orderStatus}, #{createTime}, #{payTime}
+        )
+    </insert>
+
+    <!-- ==========================================================
+         收藏(Favorite)相关操作
+         ========================================================== -->
+
+    <!-- 获取所有收藏 -->
+    <select id="getAllFavorites" resultMap="FavoriteResultMap">
+        SELECT 
+            f.id,
+            f.userId,
+            f.productId,
+            f.addTime,
+            p.id,
+            p.name,
+            p.price,
+            p.stock,
+            p.description,
+            p.imageUrl,
+            p.status
+        FROM vcampus_db.tb_favorite f
+        LEFT JOIN vcampus_db.tb_product p ON f.productId = p.id
+        ORDER BY f.addTime DESC
+    </select>
+
+    <!-- 根据用户ID获取该用户的所有收藏 -->
+    <select id="getFavoritesByUserId" resultMap="FavoriteResultMap">
+        SELECT 
+            f.id,
+            f.userId,
+            f.productId,
+            f.addTime,
+            p.id,
+            p.name,
+            p.price,
+            p.stock,
+            p.description,
+            p.imageUrl,
+            p.status
+        FROM vcampus_db.tb_favorite f
+        LEFT JOIN vcampus_db.tb_product p ON f.productId = p.id
+        WHERE f.userId = #{userId}
+        ORDER BY f.addTime DESC
+    </select>
+
+    <!-- 添加一个新的收藏记录 -->
+    <insert id="addFavorite" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO vcampus_db.tb_favorite (
+            userId, productId, addTime
+        )
+        VALUES (
+            #{userId}, #{product.id}, #{addTime}
+        )
+    </insert>
+
+    <!-- 移除一个收藏记录 -->
+    <delete id="removeFavorite">
+        DELETE FROM vcampus_db.tb_favorite WHERE id = #{favoriteId}
+    </delete>
+
+</mapper>

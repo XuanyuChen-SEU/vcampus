@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vcampus.database.mapper.LibraryMapper">
+
+
+    <update id="loadBooksFromCsv">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_book
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (book_id, book_name, author, isbn, publisher, description, borrow_status);
+    </update>
+
+    <update id="loadBorrowLogsFromCsv">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_borrow_log
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (log_id, book_id, book_name, user_id, username, borrow_date, due_date);
+    </update>
+
+    <update id="dropBookTable">
+        DROP TABLE IF EXISTS vcampus_db.`tb_book`
+    </update>
+
+    <update id="dropBorrowLogTable">
+        DROP TABLE IF EXISTS vcampus_db.`tb_borrow_log`
+    </update>
+
+
+
+    <update id="createBookTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.`tb_book` (
+                                                            `book_id`       VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '图书ID',
+            `book_name`     VARCHAR(255) NOT NULL COMMENT '书名',
+            `author`        VARCHAR(100) NOT NULL COMMENT '作者',
+            `isbn`          VARCHAR(20) UNIQUE COMMENT 'ISBN号',
+            `publisher`     VARCHAR(100) COMMENT '出版社',
+            `description`   TEXT COMMENT '描述',
+            `borrow_status` VARCHAR(20) NOT NULL DEFAULT '在馆' COMMENT '借阅状态'
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    </update>
+
+    <update id="createBorrowLogTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.`tb_borrow_log` (
+                                                                  `log_id`      VARCHAR(50) NOT NULL PRIMARY KEY,
+            `book_id`     VARCHAR(50) NOT NULL,
+            `book_name`   VARCHAR(255) NOT NULL,
+            `user_id`     VARCHAR(50) NOT NULL,
+            `username`    VARCHAR(100) NOT NULL,
+            `borrow_date` DATE NOT NULL,
+            `due_date`    DATE NOT NULL,
+            `return_date` DATE DEFAULT NULL,  -- I strongly recommend adding this column
+
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    </update>
+
+    <select id="selectAllBooks" resultType="com.vcampus.common.dto.Book">
+        SELECT
+            book_id as bookId,
+            book_name as bookName,
+            author,
+            isbn as ISBN,
+            publisher,
+            description,
+            borrow_status as borrowStatus
+        FROM vcampus_db.tb_book;
+    </select>
+
+    <select id="selectBookById" resultType="com.vcampus.common.dto.Book">
+        SELECT
+            book_id as bookId,
+            book_name as bookName,
+            author,
+            isbn as ISBN,
+            publisher,
+            description,
+            borrow_status as borrowStatus
+        FROM vcampus_db.tb_book WHERE book_id = #{bookId};
+    </select>
+
+    <select id="searchBooks" resultType="com.vcampus.common.dto.Book">
+        SELECT
+            book_id as bookId,
+            book_name as bookName,
+            author,
+            isbn as ISBN,
+            publisher,
+            description,
+            borrow_status as borrowStatus
+        FROM vcampus_db.tb_book
+        WHERE book_name LIKE CONCAT('%', #{keyword}, '%') OR author LIKE CONCAT('%', #{keyword}, '%');
+    </select>
+
+    <insert id="insertBook" parameterType="com.vcampus.common.dto.Book">
+        INSERT INTO vcampus_db.tb_book (book_id, book_name, author, isbn, publisher, description, borrow_status)
+        VALUES (#{bookId}, #{bookName}, #{author}, #{ISBN}, #{publisher}, #{description}, #{borrowStatus});
+    </insert>
+
+    <update id="updateBook" parameterType="com.vcampus.common.dto.Book">
+        UPDATE vcampus_db.tb_book
+        <set>
+            <if test="bookName != null">book_name = #{bookName},</if>
+            <if test="author != null">author = #{author},</if>
+            <if test="ISBN != null">isbn = #{ISBN},</if>
+            <if test="publisher != null">publisher = #{publisher},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="borrowStatus != null">borrow_status = #{borrowStatus},</if>
+        </set>
+        WHERE book_id = #{bookId};
+    </update>
+
+    <delete id="deleteBookById">
+        DELETE FROM vcampus_db.tb_book WHERE book_id = #{bookId};
+    </delete>
+
+    <select id="selectAllBorrowLogs" resultType="com.vcampus.common.dto.BorrowLog">
+        SELECT
+            log_id as logId,
+            book_id as bookId,
+            book_name as bookName,
+            user_id as userId,
+            username,
+            borrow_date as borrowDate,
+            due_date as dueDate
+        FROM vcampus_db.tb_borrow_log;
+    </select>
+
+    <select id="selectBorrowLogsByUserId" resultType="com.vcampus.common.dto.BorrowLog">
+        SELECT
+            log_id as logId,
+            book_id as bookId,
+            book_name as bookName,
+            user_id as userId,
+            username,
+            borrow_date as borrowDate,
+            due_date as dueDate
+        FROM vcampus_db.tb_borrow_log WHERE user_id = #{userId};
+    </select>
+
+    <select id="searchAllBorrowLogs" resultType="com.vcampus.common.dto.BorrowLog">
+        SELECT
+            log_id as logId,
+            book_id as bookId,
+            book_name as bookName,
+            user_id as userId,
+            username,
+            borrow_date as borrowDate,
+            due_date as dueDate
+        FROM vcampus_db.tb_borrow_log
+        WHERE book_name LIKE CONCAT('%', #{keyword}, '%') OR username LIKE CONCAT('%', #{keyword}, '%');
+    </select>
+
+    <select id="searchMyBorrows" resultType="com.vcampus.common.dto.BorrowLog">
+        SELECT
+            log_id as logId,
+            book_id as bookId,
+            book_name as bookName,
+            user_id as userId,
+            username,
+            borrow_date as borrowDate,
+            due_date as dueDate
+        FROM vcampus_db.tb_borrow_log
+        WHERE user_id = #{userId} AND book_name LIKE CONCAT('%', #{keyword}, '%');
+    </select>
+
+    <insert id="insertBorrowLog">
+        INSERT INTO vcampus_db.tb_borrow_log
+            (log_id, book_id, book_name, user_id, username, borrow_date, due_date)
+        VALUES (#{logId}, #{bookId}, #{bookName}, #{userId}, #{username}, #{borrowDate}, #{dueDate});
+    </insert>
+
+    <update id="updateBorrowLog" parameterType="com.vcampus.common.dto.BorrowLog">
+        UPDATE vcampus_db.tb_borrow_log
+        SET due_date = #{dueDate}
+        WHERE log_id = #{logId};
+    </update>
+
+    <select id="findUsernameByUserId" resultType="java.lang.String">
+
+        SELECT name FROM vcampus_db.tb_student WHERE userId = #{userId};
+
+    </select>
+
+
+    <select id="selectAllUserBorrowStatus" resultType="com.vcampus.common.dto.UserBorrowStatus">
+        WITH RankedBorrows AS (
+            SELECT
+                l.user_id,
+                l.book_name,
+                ROW_NUMBER() OVER (PARTITION BY l.user_id ORDER BY l.borrow_date DESC) as rn
+            FROM
+                vcampus_db.tb_borrow_log l
+            WHERE
+                l.return_date IS NULL
+        )
+        SELECT
+            u.userId,
+            s.name AS name,      -- 【修改点 1】从学生表 (s) 获取姓名
+            s.college AS identity, -- 【修改点 2】用学院 (college) 作为身份，或者用固定值 '学生'
+        MAX(CASE WHEN rb.rn = 1 THEN rb.book_name ELSE NULL END) AS borrowedBook1,
+        MAX(CASE WHEN rb.rn = 2 THEN rb.book_name ELSE NULL END) AS borrowedBook2,
+        MAX(CASE WHEN rb.rn = 3 THEN rb.book_name ELSE NULL END) AS borrowedBook3
+        FROM
+            vcampus_db.tb_user u
+            -- 【修改点 3】在这里将 tb_user 和 tb_student 连接起来
+            INNER JOIN
+            vcampus_db.tb_student s ON u.userId = s.userId
+            LEFT JOIN
+            RankedBorrows rb ON u.userId = rb.user_id AND rb.rn &lt;= 3
+        GROUP BY
+            u.userId, s.name, s.college -- 【修改点 4】GROUP BY 子句也要更新
+        ORDER BY
+            u.userId
+    </select>
+
+    <select id="searchUserBorrowStatus" resultType="com.vcampus.common.dto.UserBorrowStatus">
+        WITH RankedBorrows AS (
+            SELECT
+                l.user_id,
+                l.book_name,
+                ROW_NUMBER() OVER (PARTITION BY l.user_id ORDER BY l.borrow_date DESC) as rn
+            FROM
+                vcampus_db.tb_borrow_log l
+            WHERE
+                l.return_date IS NULL
+        )
+        SELECT
+            u.userId,
+            s.name AS name,
+            s.college AS identity,
+        MAX(CASE WHEN rb.rn = 1 THEN rb.book_name ELSE NULL END) AS borrowedBook1,
+        MAX(CASE WHEN rb.rn = 2 THEN rb.book_name ELSE NULL END) AS borrowedBook2,
+        MAX(CASE WHEN rb.rn = 3 THEN rb.book_name ELSE NULL END) AS borrowedBook3
+        FROM
+            vcampus_db.tb_user u
+            INNER JOIN
+            vcampus_db.tb_student s ON u.userId = s.userId
+            LEFT JOIN
+            RankedBorrows rb ON u.userId = rb.user_id AND rb.rn &lt;= 3
+        WHERE
+        -- 【关键修改】同时搜索用户ID和学生姓名
+            u.userId LIKE CONCAT('%', #{keyword}, '%') OR s.name LIKE CONCAT('%', #{keyword}, '%')
+        GROUP BY
+            u.userId, s.name, s.college
+        ORDER BY
+            u.userId
+    </select>
+</mapper>

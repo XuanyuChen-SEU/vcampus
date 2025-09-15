@@ -79,7 +79,10 @@ public class UserSession {
     public String getCurrentUserId() {
         return currentUserId;
     }
-    
+
+
+
+
     /**
      * 获取当前用户角色
      * @return 用户角色，如果未登录则返回null

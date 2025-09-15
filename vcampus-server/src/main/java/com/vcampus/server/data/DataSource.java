@@ -24,20 +24,28 @@ public class DataSource {
 
     // 使用静态代码块，在类被加载时仅执行一次，初始化所有数据
     static {
-        System.out.println("DATASOURCE: 正在初始化全局静态模拟数据...");
+        System.out.println("DATASOURCE: 正在初始化【信息增强版】模拟数据...");
 
-        // 1. 创建课程数据
+        // ⭐ 1. 为课程添加完整信息
         List<ClassSession> englishSessions = List.of(
-                new ClassSession("ENG_S01", "[01] 张老师", "1-16周 周二 3-4节", 60, 1, false)
+                new ClassSession("ENG_S01", "陈玉玲,任丹丽", "1-11周 星期四 11-13节 教七-203", 20, 1, false)
         );
-        MOCK_COURSE_TABLE.put("B17M0010", new Course("B17M0010", "大学英语II", "必修", "外国语学院", NOT_SELECTED, englishSessions));
+        Course englishCourse = new Course("B00RW025[01]", "大学英语II", "必修", "外国语学院", NOT_SELECTED, englishSessions,2.0,"","九龙湖");
+//        englishCourse.setCredits(2.0);
+//        englishCourse.setCategory("人文社科与智慧（原文艺社科类）");
+//        englishCourse.setCampus("九龙湖");
+        MOCK_COURSE_TABLE.put("B00RW025[01]", englishCourse);
 
         List<ClassSession> seSessions = List.of(
-                new ClassSession("SE_S01", "[01] 刘老师", "1-16周 周一 5-6节", 50, 20, false)
+                new ClassSession("SE_S01", "任国森", "1-8周 星期二 8-9节 教三-204", 20, 1, false)
         );
-        MOCK_COURSE_TABLE.put("B08M4000", new Course("B08M4000", "软件工程", "限选", "计算机学院", NOT_SELECTED, seSessions));
+        Course seCourse = new Course("BJSL0120[04]", "计算机组成原理", "必修", "软件学院", NOT_SELECTED, seSessions,4.0,"","九龙湖");
+//        seCourse.setCredits(1.0);
+//        seCourse.setCategory("通识教育核心课程");
+//        seCourse.setCampus("九龙湖");
+        MOCK_COURSE_TABLE.put("BJSL0120[04]", seCourse);
 
-        // 2. 为学生 '1234567' 创建初始选课记录
+        // ⭐ 2. 为学生 '1234567' 创建初始选课记录
         MOCK_SELECTION_TABLE.put("1234567", new ArrayList<>(List.of("ENG_S01")));
 
         System.out.println("DATASOURCE: 模拟数据初始化完成。");

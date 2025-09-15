@@ -206,6 +206,9 @@ public class MainViewController {
     void handleLibraryNav(ActionEvent event) {
         loadView("/fxml/library/LibraryView.fxml");
     }
+
+
+
     @FXML
     void handleStudentRecordNav(ActionEvent event) {
         loadView("/fxml/studentrecord/StudentRecordView.fxml");

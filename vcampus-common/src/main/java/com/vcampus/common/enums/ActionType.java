@@ -23,14 +23,16 @@ public enum ActionType {
     SEARCH_STUDENT("姓名模糊搜索"),
     INFO_STUDENT_ADMIN("查看学生详细信息"),
     UPDATE_STUDENT_ADMIN("更新学生信息"),
+    INFO_BOOK("获取图书信息"),
+    UPDATE_BOOK("更新图书信息"),
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
     DELETE_USER("删除用户"),                   // 删除用户
     RESET_USER_PASSWORD("重置用户密码"),        // 重置用户密码
     SEARCH_USERS("搜索用户"),                  // 搜索用户
-    GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请  
+    GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请
     APPROVE_FORGET_PASSWORD_APPLICATION("批准忘记密码申请"),        // 批准忘记密码申请
-    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请// 拒绝忘记密码申请
+    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请
 
 
     // --- 商店模块 - 用户端 ---
@@ -54,22 +56,13 @@ public enum ActionType {
     SHOP_ADMIN_ADD_PRODUCT("管理员添加商品"),
     SHOP_ADMIN_UPDATE_PRODUCT("管理员更新商品"),
     SHOP_ADMIN_DELETE_PRODUCT("管理员删除商品"),
-    SHOP_ADMIN_GET_ALL_RETURNS("管理员获取所有退货申请"),
-    SHOP_ADMIN_REVIEW_RETURN("管理员审核退货"),// <-- 确保最后一个是分号
-    //新增课程（学生端）相关枚举值
-//    GET_COURSE_TABLE("获取课表"),    // 获取所有可选课程
-//    GET_COURSE_DETAIL("获取课程详情"),           // 获取单个课程的详细信息
-//    ENROLL_COURSE("选课"),                      // 学生选课
-//    DROP_COURSE("退课"),                        // 学生退课
-//    CHECK_COURSE_CONFLICT("检查课程冲突"),       // 检查所选课程是否与已选课程冲突
-//
-//    // 2. 课表功能
-//    GET_STUDENT_TIMETABLE("获取学生课表"),       // 获取学生的完整课表
-//    GET_STUDENT_ENROLLED_COURSES("获取学生已选课程"), // 获取学生已选课程列表（不包含课表格式）
-//
-//    // 课程详情相关
-//    GET_COURSE_ENROLLMENT_STATUS("获取课程报名状态"), // 获取课程的报名状态（已选人数等）
-//
+    SHOP_ADMIN_GET_ALL_ORDERS("管理员获取所有订单"),
+    SHOP_ADMIN_GET_ALL_FAVORITES("管理员获取所有收藏"),
+    SHOP_ADMIN_GET_ORDERS_BY_USER("管理员根据用户ID获取订单"),
+    SHOP_ADMIN_GET_FAVORITES_BY_USER("管理员根据用户ID获取收藏"),
+
+
+
     // === 选课相关操作 ===
 
     // 客户端 -> 服务端 (请求)
@@ -80,9 +73,37 @@ public enum ActionType {
     // 服务端 -> 客户端 (响应)
     GET_ALL_COURSES_RESPONSE("对获取课程请求的响应"),   // 对获取课程请求的响应
     SELECT_COURSE_RESPONSE("对选课请求的响应"),     // 对选课请求的响应
-    DROP_COURSE_RESPONSE("对退课请求的响应");       // 对退课请求的响应
+    DROP_COURSE_RESPONSE("对退课请求的响应"),     // 对退课请求的响应
 
 
+    // ⭐ 新增：获取我的课表
+    GET_MY_COURSES("获取我的课表"),
+    GET_MY_COURSES_RESPONSE("对获取我的课表请求的响应"),
+
+    // --- 图书馆模块 - 通用端 ---
+
+    LIBRARY_GET_ALL_BOOKS("获取所有图书"),
+    LIBRARY_SEARCH_BOOKS("搜索所有图书"),
+    LIBRARY_GET_MY_BORROWS("获取我的借阅记录"),
+    LIBRARY_GET_ADMIN_BORROW_HISTORY ("获取管理员借阅记录"),
+    LIBRARY_GET_ALL_USERS_STATUS("获取所有用户借阅状态"),
+    // --- 图书馆模块 - 用户端 ---
+    LIBRARY_RENEW_ALL("续借所有图书"),
+    LIBRARY_SEARCH_MY_BORROWS("搜索我的借阅记录"),
+    LIBRARY_BORROW_BOOK("用户借阅图书"),
+    LIBRARY_RETURN_BOOK("用户归还图书"),
+    LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
+
+
+    // --- 图书馆模块 - 管理员端 ---
+    LIBRARY_ADD_BOOK("管理员添加图书"),
+    LIBRARY_DELETE_BOOK("管理员删除图书"),
+    LIBRARY_MODIFY_BOOK("管理员修改图书"),
+    LIBRARY_SEARCH_HISTORY   ("搜索借阅历史"),
+    LIBRARY_SEARCH_USERS("搜索用户借阅历史"),
+
+    // ⭐ 新增
+    SEARCH_COURSES("搜索响应课程");
 
     private final String description;
 

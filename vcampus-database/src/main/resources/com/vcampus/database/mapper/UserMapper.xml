@@ -3,11 +3,6 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
-
-
-
-
 <!--
     namespace：名称空间
 -->
@@ -27,7 +22,6 @@
     </update>
 
     <update id="createUserTable" parameterType="java.lang.String">
-            <!-- 显式指定在 Vcampus_db 数据库下创建 user 表 -->
             CREATE TABLE IF NOT EXISTS vcampus_db.`tb_user` (
             `userId` VARCHAR(50) NOT NULL COMMENT '用户ID（7位数字字符串）',
             `password` VARCHAR(50) NOT NULL COMMENT '密码（7位数字字符串）',
@@ -64,21 +58,6 @@
         (userId, @passwordVar)
         SET password = REPLACE(@passwordVar, '\r', '')
     </update>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <!-- 查询所有用户 -->
     <select id="selectAll" resultType="com.vcampus.common.dto.User">

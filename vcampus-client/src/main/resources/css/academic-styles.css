@@ -1,0 +1,45 @@
+/* =============================================================== */
+/* 教务管理模块 (Academic Module) 样式表              */
+/* =============================================================== */
+
+/* --- 通用 Label 样式 --- */
+/* 为所有普通 Label 设置一个清晰的深灰色，而不是纯黑，视觉上更柔和 */
+.label {
+    -fx-text-fill: #333333;
+}
+
+
+/* --- ⭐ TableView (我的课表) 专属样式 --- */
+
+/* 1. 设置表格中【所有单元格】的默认字体颜色 */
+.table-cell {
+    -fx-text-fill: #333333; /* 设置单元格文字为深灰色 */
+    -fx-font-size: 13px;    /* 统一字体大小 */
+    -fx-padding: 10px;      /* 增加单元格内边距，让内容不拥挤 */
+    -fx-alignment: CENTER_LEFT; /* 内容居左对齐 */
+}
+
+/* 2. 设置表格【表头】的字体样式 */
+.table-view .column-header .label {
+    -fx-text-fill: #111111; /* 表头文字颜色更深一些 */
+    -fx-font-weight: bold;   /* 字体加粗 */
+}
+
+/* 3. 特殊处理表格单元格中的【超链接】颜色 */
+.table-cell .hyperlink {
+    -fx-text-fill: #007bff; /* 蓝色 */
+}
+
+/* 4. 特殊处理表格单元格中的【按钮】文字颜色 */
+.table-cell .button {
+    -fx-text-fill: white; /* 假设按钮背景是深色，文字为白色 */
+}
+
+/* 5. 为退选按钮定义一个特定的样式类 */
+.drop-button {
+    -fx-background-color: #f44336; /* 红色背景 */
+    -fx-text-fill: white;
+}
+.drop-button:hover {
+    -fx-background-color: #d32f2f; /* 鼠标悬浮时颜色变深 */
+}

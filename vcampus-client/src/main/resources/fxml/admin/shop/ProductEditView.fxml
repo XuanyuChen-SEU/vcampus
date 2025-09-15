@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.shopAdmin.ProductEditViewController"
+            styleClass="admin-content-background">
+    
+    <!-- 滚动容器 -->
+    <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" 
+                AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+        <content>
+            <!-- 表单区域 -->
+            <GridPane fx:id="formContainer" alignment="CENTER" hgap="20.0" vgap="20.0" minWidth="600.0">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                    <ColumnConstraints minWidth="300.0" prefWidth="300.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="120.0" />
+                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="40.0" />
+                </rowConstraints>
+                
+                <!-- 商品ID (只读) -->
+                <Label text="商品ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="form-label" />
+                <TextField fx:id="idField" promptText="商品ID" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="form-field" editable="false" />
+                
+                <!-- 商品名称 -->
+                <Label text="商品名称:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="form-label" />
+                <TextField fx:id="nameField" promptText="请输入商品名称" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="form-field" />
+                
+                <!-- 商品价格 -->
+                <Label text="商品价格:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="form-label" />
+                <TextField fx:id="priceField" promptText="请输入商品价格" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="form-field" />
+                
+                <!-- 商品库存 -->
+                <Label text="商品库存:" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="form-label" />
+                <Spinner fx:id="stockSpinner" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="form-field" />
+                
+                <!-- 商品状态 -->
+                <Label text="商品状态:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="form-label" />
+                <ComboBox fx:id="statusCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="form-field" />
+                
+                <!-- 商品图片URL -->
+                <Label text="图片URL:" GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="form-label" />
+                <TextField fx:id="imageUrlField" promptText="请输入商品图片URL" GridPane.columnIndex="1" GridPane.rowIndex="5" styleClass="form-field" />
+                
+                <!-- 商品描述 -->
+                <Label text="商品描述:" GridPane.columnIndex="0" GridPane.rowIndex="6" styleClass="form-label" />
+                <TextArea fx:id="descriptionField" promptText="请输入商品详细描述" GridPane.columnIndex="1" GridPane.rowIndex="6" styleClass="form-textarea" />
+                
+                <!-- 按钮区域 -->
+                <HBox alignment="CENTER" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                    <children>
+                        <Button fx:id="updateButton" text="💾 更新商品" onAction="#handleUpdate" styleClass="add-button" />
+                        <Button fx:id="resetButton" text="🔄 重置表单" onAction="#handleReset" styleClass="reset-button" />
+                        <Button fx:id="cancelButton" text="❌ 取消" onAction="#handleCancel" styleClass="cancel-button" />
+                    </children>
+                </HBox>
+            </GridPane>
+        </content>
+    </ScrollPane>
+</AnchorPane>
