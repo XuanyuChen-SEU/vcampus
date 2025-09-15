@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.LibraryAdminViewController"
+            styleClass="admin-content-background">
+
+    <!-- 标题区域 -->
+    <VBox fx:id="titleContainer" alignment="CENTER" spacing="10.0" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+        <children>
+            <Label text="👥 图书管理系统" styleClass="admin-title" />
+        </children>
+    </VBox>
+
+    <!-- 导航栏区域 -->
+    <HBox fx:id="navigationContainer" alignment="CENTER" spacing="15.0" AnchorPane.topAnchor="120.0"
+          AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+        <children>
+            <Button fx:id="bookListButton" text="📋 图书列表" onAction="#handleBookList" styleClass="nav-button" />
+            <Button fx:id="createBookButton" text="➕ 创建图书" onAction="#handleCreateBook" styleClass="nav-button" />
+            <Button fx:id="borrowLogListButton" text="📋 借阅记录" onAction="#handleBorrowLogList" styleClass="nav-button" />
+            <Button fx:id="createBorrowLogButton" text="➕ 创建借阅记录" onAction="#handleCreateBorrowLog" styleClass="nav-button" />
+        </children>
+    </HBox>
+
+
+    <!-- 子视图容器 -->
+    <AnchorPane fx:id="subViewContainer" AnchorPane.topAnchor="180.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="sub-view-container" />
+
+
+</AnchorPane>

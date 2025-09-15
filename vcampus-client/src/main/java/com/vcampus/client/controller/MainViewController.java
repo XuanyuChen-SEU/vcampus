@@ -69,7 +69,9 @@ public class MainViewController {
     
     @FXML
     private Button academicButton;
-    
+
+    @FXML
+    private Button chatButton;
     // 动画相关字段
     private boolean isSidebarExpanded = false;
     private Timeline expandTimeline;
@@ -247,7 +249,11 @@ public class MainViewController {
             System.err.println("加载视图时发生错误: " + e.getMessage());
         }
     }
-    
+
+    @FXML
+    private void handleShowChatView() {
+        loadView("/fxml/library/ChatView.fxml");
+    }
     /**
      * 初始化侧边栏动画
      */
@@ -310,12 +316,16 @@ public class MainViewController {
             libraryButton.setText("📚 图书馆");
             studentRecordButton.setText("📋 学籍管理");
             academicButton.setText("🎓 教务管理");
+            // 【新增】当侧边栏展开时，为AI助手按钮设置文本
+            chatButton.setText("AI助手");
         } else {
             homeButton.setText("🏠");
             storeButton.setText("🛒");
             libraryButton.setText("📚");
             studentRecordButton.setText("📋");
             academicButton.setText("🎓");
+            // 【新增】当侧边栏折叠时，清空AI助手按钮的文本（只留图标）
+            chatButton.setText("");
         }
     }
 }

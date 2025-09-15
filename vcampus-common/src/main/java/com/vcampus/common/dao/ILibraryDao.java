@@ -30,6 +30,10 @@ public interface ILibraryDao {
     List<BorrowLog> searchAllBorrowLogs(String keyword);
     boolean insertBorrowLog(BorrowLog log);
     boolean updateBorrowLog(BorrowLog log);
+    boolean deleteBorrowLogById(String logId);
+    // 【新增】定义管理员创建借阅记录的接口方法
+    boolean adminCreateBorrowLog(String bookId, String userId);
+
 
 
     List<UserBorrowStatus> getAllUserBorrowStatus();

@@ -126,6 +126,7 @@ public class MessageController {
                 case LIBRARY_SEARCH_USERS:
                 case LIBRARY_RETURN_BOOK:
                 case LIBRARY_GET_BOOK_PDF:
+                case LIBRARY_CREATE_BORROW_LOG:
                     return libraryController.dispatch(request);
 
                 // --- 添加结束 ---

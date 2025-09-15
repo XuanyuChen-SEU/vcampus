@@ -86,7 +86,8 @@ public enum ActionType {
     LIBRARY_BORROW_BOOK("用户借阅图书"),
     LIBRARY_RETURN_BOOK("用户归还图书"),
     LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
-
+    LIBRARY_UPDATE_BORROW_LOG("修改借阅记录"),
+    LIBRARY_CREATE_BORROW_LOG("创建借阅记录"),
 
     // --- 图书馆模块 - 管理员端 ---
     LIBRARY_ADD_BOOK("管理员添加图书"),
