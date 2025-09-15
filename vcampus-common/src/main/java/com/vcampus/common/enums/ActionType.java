@@ -14,11 +14,17 @@ public enum ActionType {
     GLOBAL_NOTIFICATION("全局通知"),
     SYSTEM_BROADCAST("系统广播"),
     EMERGENCY_NOTIFICATION("紧急通知"),
+
+    // --- 学籍模块 - 用户端 ---
     INFO_STUDENT("获取学生信息"),
-    UPDATE_STUDENT("更新学生信息"),
+    UPDATE_STUDENT("修改学生信息"),
+    // --- 学籍模块 -管理员端 ---
+    ALL_STUDENT("获取所有学生信息"),
+    SEARCH_STUDENT("姓名模糊搜索"),
+    INFO_STUDENT_ADMIN("查看学生详细信息"),
+    UPDATE_STUDENT_ADMIN("更新学生信息"),
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
-
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
     DELETE_USER("删除用户"),                   // 删除用户
@@ -54,9 +60,9 @@ public enum ActionType {
     SHOP_ADMIN_GET_ALL_FAVORITES("管理员获取所有收藏"),
     SHOP_ADMIN_GET_ORDERS_BY_USER("管理员根据用户ID获取订单"),
     SHOP_ADMIN_GET_FAVORITES_BY_USER("管理员根据用户ID获取收藏"),
-    
 
-    
+
+
     // === 选课相关操作 ===
 
     // 客户端 -> 服务端 (请求)
@@ -73,6 +79,7 @@ public enum ActionType {
     // ⭐ 新增：获取我的课表
     GET_MY_COURSES("获取我的课表"),
     GET_MY_COURSES_RESPONSE("对获取我的课表请求的响应"),
+
     // --- 图书馆模块 - 通用端 ---
 
     LIBRARY_GET_ALL_BOOKS("获取所有图书"),
@@ -93,8 +100,10 @@ public enum ActionType {
     LIBRARY_DELETE_BOOK("管理员删除图书"),
     LIBRARY_MODIFY_BOOK("管理员修改图书"),
     LIBRARY_SEARCH_HISTORY   ("搜索借阅历史"),
-    LIBRARY_SEARCH_USERS("搜索用户借阅历史");
+    LIBRARY_SEARCH_USERS("搜索用户借阅历史"),
 
+    // ⭐ 新增
+    SEARCH_COURSES("搜索响应课程");
 
     private final String description;
 

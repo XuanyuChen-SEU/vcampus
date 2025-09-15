@@ -22,6 +22,11 @@ public interface IStudentDao {
     List<Student> findByNameLike(String name);
 
     /**
+     * 通过学号模糊搜索学生
+     */
+//    List<Student> findByStudentId(String name);
+
+    /**
      * 插入新学生信息
      */
     boolean insert(Student student);
@@ -40,4 +45,6 @@ public interface IStudentDao {
      * 查询所有学生，返回所有学生的学生信息
      */
     List<Student> findAll();
+
+
 }

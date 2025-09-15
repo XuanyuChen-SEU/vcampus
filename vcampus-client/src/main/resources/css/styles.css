@@ -1038,3 +1038,78 @@
         -fx-font-size: 11px;
     }
 }
+
+/* 学生管理界面样式 */
+
+/* === 背景样式 === */
+.admin-content-background {
+    -fx-background-color: transparent;
+}
+
+/* === 标题样式 === */
+.admin-title {
+    -fx-font-size: 36px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+    -fx-padding: 10px 0 20px 0;
+}
+
+/* === 搜索栏 === */
+.search-field {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 12 8 12;
+    -fx-font-size: 14px;
+}
+
+.search-field:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+.search-button,
+.refresh-button {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-min-width: 80px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.search-button:hover,
+.refresh-button:hover {
+    -fx-background-color: linear-gradient(to right, #5a6fd8, #6a4190);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+/* === 表格 === */
+.user-table {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
+}
+
+.user-table .column-header {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.user-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.user-table .table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+}

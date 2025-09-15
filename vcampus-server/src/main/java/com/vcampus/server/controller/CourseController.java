@@ -46,4 +46,12 @@ public class CourseController {
         String studentId = (String) payload.get("userId");
         return courseService.getMyCourses(studentId);
     }
+
+    // 在服务端的 CourseController.java 中添加新方法:
+    public Message handleSearchCourses(Message request) {
+        Map<String, Object> payload = (Map<String, Object>) request.getData();
+        String userId = (String) payload.get("userId");
+        String keyword = (String) payload.get("keyword");
+        return courseService.searchCourses(userId, keyword);
+    }
 }

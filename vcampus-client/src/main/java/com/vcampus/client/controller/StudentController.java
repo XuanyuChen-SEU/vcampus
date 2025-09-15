@@ -14,9 +14,9 @@ import java.time.LocalDate;
 
 public class StudentController implements IClientController {
 
+    // === 基本信息 ===
     @FXML private Label userIdLabel;
     @FXML private Label studentIdLabel;
-    @FXML private Label cardIdLabel;
     @FXML private Label nameLabel;
     @FXML private Label genderLabel;
     @FXML private Label collegeLabel;
@@ -26,31 +26,41 @@ public class StudentController implements IClientController {
     @FXML private Label nativePlaceLabel;
     @FXML private Label politicsStatusLabel;
     @FXML private Label studentStatusLabel;
+
+    // === 联系方式 ===
     @FXML private Label phoneLabel;
     @FXML private Label emailLabel;
     @FXML private Label dormAddressLabel;
 
+    // === 父亲信息 ===
     @FXML private Label fatherNameLabel;
     @FXML private Label fatherPhoneLabel;
     @FXML private Label fatherPoliticsLabel;
     @FXML private Label fatherWorkLabel;
 
+    // === 母亲信息 ===
     @FXML private Label motherNameLabel;
     @FXML private Label motherPhoneLabel;
     @FXML private Label motherPoliticsLabel;
     @FXML private Label motherWorkLabel;
 
-
+    // === 按钮 ===
     @FXML private Button editOrSaveButton;       // 修改/保存
     @FXML private Button pdfOrCancelButton;      // 导出PDF/取消
 
+    // === 各区块 GridPane ===
     @FXML private GridPane studentGridPane;
+    @FXML private GridPane contactGridPane;
+    @FXML private GridPane fatherGridPane;
+    @FXML private GridPane motherGridPane;
 
     private final StudentService studentService = new StudentService();
 
+    // === 编辑模式下的输入控件 ===
     private DatePicker birthDatePicker;
     private TextField nativePlaceField;
     private ComboBox<String> politicsComboBox;
+
     private TextField phoneField;
     private TextField emailField;
     private TextField dormAddressField;
@@ -65,9 +75,11 @@ public class StudentController implements IClientController {
     private ComboBox<String> motherPoliticsCombo;
     private TextField motherWorkField;
 
+    // === 保存原始值 ===
     private String originalBirthDate;
     private String originalNativePlace;
     private String originalPoliticsStatus;
+
     private String originalPhone;
     private String originalEmail;
     private String originalDormAddress;
@@ -81,8 +93,6 @@ public class StudentController implements IClientController {
     private String originalMotherPhone;
     private String originalMotherPolitics;
     private String originalMotherWork;
-
-
 
     private boolean editing = false;
 
@@ -102,90 +112,110 @@ public class StudentController implements IClientController {
         });
     }
 
+    // =================== 进入编辑模式（修复位置错乱核心） ===================
     private void enterEditMode() {
         editing = true;
 
-        // 按钮样式修改
+        // 按钮切换
         editOrSaveButton.setText("保存");
         editOrSaveButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 6;");
         pdfOrCancelButton.setText("取消");
         pdfOrCancelButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 6;");
 
-        // 保存原值
-        originalBirthDate = birthDateLabel.getText();
-        originalNativePlace = nativePlaceLabel.getText();
-        originalPoliticsStatus = politicsStatusLabel.getText();
+        // 保存原始值
+        originalBirthDate = safeText(birthDateLabel);
+        originalNativePlace = safeText(nativePlaceLabel);
+        originalPoliticsStatus = safeText(politicsStatusLabel);
 
-        originalPhone = phoneLabel.getText();
-        originalEmail = emailLabel.getText();
-        originalDormAddress = dormAddressLabel.getText();
+        originalPhone = safeText(phoneLabel);
+        originalEmail = safeText(emailLabel);
+        originalDormAddress = safeText(dormAddressLabel);
 
-        originalFatherName = fatherNameLabel.getText();
-        originalFatherPhone = fatherPhoneLabel.getText();
-        originalFatherPolitics = fatherPoliticsLabel.getText();
-        originalFatherWork = fatherWorkLabel.getText();
+        originalFatherName = safeText(fatherNameLabel);
+        originalFatherPhone = safeText(fatherPhoneLabel);
+        originalFatherPolitics = safeText(fatherPoliticsLabel);
+        originalFatherWork = safeText(fatherWorkLabel);
 
-        originalMotherName = motherNameLabel.getText();
-        originalMotherPhone = motherPhoneLabel.getText();
-        originalMotherPolitics = motherPoliticsLabel.getText();
-        originalMotherWork = motherWorkLabel.getText();
+        originalMotherName = safeText(motherNameLabel);
+        originalMotherPhone = safeText(motherPhoneLabel);
+        originalMotherPolitics = safeText(motherPoliticsLabel);
+        originalMotherWork = safeText(motherWorkLabel);
 
-        // 创建编辑控件
+        // === 基本信息（修正行列索引） ===
+        // 出生日期 - 第3行第3列
         birthDatePicker = new DatePicker();
-        if (originalBirthDate != null && !originalBirthDate.isEmpty()) {
+        birthDatePicker.setStyle("-fx-pref-height: 26px;"); // 匹配行高
+        if (!originalBirthDate.isEmpty()) {
             birthDatePicker.setValue(LocalDate.parse(originalBirthDate));
         }
+
+        // 籍贯 - 第4行第1列
         nativePlaceField = new TextField(originalNativePlace);
+        nativePlaceField.setStyle("-fx-pref-height: 26px;");
 
+        // 政治面貌 - 第4行第3列
         politicsComboBox = new ComboBox<>();
+        politicsComboBox.setStyle("-fx-pref-height: 26px;");
         politicsComboBox.getItems().addAll("中共党员", "预备党员", "共青团员", "群众");
-        politicsComboBox.setValue(originalPoliticsStatus);
+        politicsComboBox.setValue(originalPoliticsStatus.isEmpty() ? "群众" : originalPoliticsStatus);
 
+        // 移除原有标签并添加编辑控件（精确指定位置）
+        studentGridPane.getChildren().removeAll(birthDateLabel, nativePlaceLabel, politicsStatusLabel);
+        studentGridPane.add(birthDatePicker, 3, 3);    // 出生日期：第3行第3列
+        studentGridPane.add(nativePlaceField, 1, 4);   // 籍贯：第4行第1列
+        studentGridPane.add(politicsComboBox, 3, 4);   // 政治面貌：第4行第3列
+
+        // === 联系方式 ===
         phoneField = new TextField(originalPhone);
+        phoneField.setStyle("-fx-pref-height: 26px;");
         emailField = new TextField(originalEmail);
+        emailField.setStyle("-fx-pref-height: 26px;");
         dormAddressField = new TextField(originalDormAddress);
+        dormAddressField.setStyle("-fx-pref-height: 26px;");
 
+        contactGridPane.getChildren().removeAll(phoneLabel, emailLabel, dormAddressLabel);
+        contactGridPane.add(phoneField, 1, 0);
+        contactGridPane.add(emailField, 3, 0);
+        contactGridPane.add(dormAddressField, 1, 1);
+
+        // === 父亲信息 ===
         fatherNameField = new TextField(originalFatherName);
+        fatherNameField.setStyle("-fx-pref-height: 26px;");
         fatherPhoneField = new TextField(originalFatherPhone);
+        fatherPhoneField.setStyle("-fx-pref-height: 26px;");
         fatherPoliticsCombo = new ComboBox<>();
+        fatherPoliticsCombo.setStyle("-fx-pref-height: 26px;");
         fatherPoliticsCombo.getItems().addAll("中共党员", "预备党员", "共青团员", "群众");
-        fatherPoliticsCombo.setValue(originalFatherPolitics);
+        fatherPoliticsCombo.setValue(originalFatherPolitics.isEmpty() ? "群众" : originalFatherPolitics);
         fatherWorkField = new TextField(originalFatherWork);
+        fatherWorkField.setStyle("-fx-pref-height: 26px;");
 
+        fatherGridPane.getChildren().removeAll(fatherNameLabel, fatherPhoneLabel, fatherPoliticsLabel, fatherWorkLabel);
+        fatherGridPane.add(fatherNameField, 1, 0);
+        fatherGridPane.add(fatherPhoneField, 3, 0);
+        fatherGridPane.add(fatherPoliticsCombo, 1, 1);
+        fatherGridPane.add(fatherWorkField, 3, 1);
+
+        // === 母亲信息 ===
         motherNameField = new TextField(originalMotherName);
+        motherNameField.setStyle("-fx-pref-height: 26px;");
         motherPhoneField = new TextField(originalMotherPhone);
+        motherPhoneField.setStyle("-fx-pref-height: 26px;");
         motherPoliticsCombo = new ComboBox<>();
+        motherPoliticsCombo.setStyle("-fx-pref-height: 26px;");
         motherPoliticsCombo.getItems().addAll("中共党员", "预备党员", "共青团员", "群众");
-        motherPoliticsCombo.setValue(originalMotherPolitics);
+        motherPoliticsCombo.setValue(originalMotherPolitics.isEmpty() ? "群众" : originalMotherPolitics);
         motherWorkField = new TextField(originalMotherWork);
+        motherWorkField.setStyle("-fx-pref-height: 26px;");
 
-        // 替换 Label 为编辑控件
-        studentGridPane.getChildren().removeAll(
-                birthDateLabel, nativePlaceLabel, politicsStatusLabel,
-                phoneLabel, emailLabel, dormAddressLabel,
-                fatherNameLabel, fatherPhoneLabel, fatherPoliticsLabel, fatherWorkLabel,
-                motherNameLabel, motherPhoneLabel, motherPoliticsLabel, motherWorkLabel
-        );
-
-        studentGridPane.add(birthDatePicker, 8, 1);
-        studentGridPane.add(nativePlaceField, 9, 1);
-        studentGridPane.add(politicsComboBox, 10, 1);
-
-        studentGridPane.add(phoneField, 12, 1);
-        studentGridPane.add(emailField, 13, 1);
-        studentGridPane.add(dormAddressField, 14, 1);
-
-        studentGridPane.add(fatherNameField, 0, 2);
-        studentGridPane.add(fatherPhoneField, 1, 2);
-        studentGridPane.add(fatherPoliticsCombo, 2, 2);
-        studentGridPane.add(fatherWorkField, 3, 2);
-
-        studentGridPane.add(motherNameField, 4, 2);
-        studentGridPane.add(motherPhoneField, 5, 2);
-        studentGridPane.add(motherPoliticsCombo, 6, 2);
-        studentGridPane.add(motherWorkField, 7, 2);
+        motherGridPane.getChildren().removeAll(motherNameLabel, motherPhoneLabel, motherPoliticsLabel, motherWorkLabel);
+        motherGridPane.add(motherNameField, 1, 0);
+        motherGridPane.add(motherPhoneField, 3, 0);
+        motherGridPane.add(motherPoliticsCombo, 1, 1);
+        motherGridPane.add(motherWorkField, 3, 1);
     }
 
+    // =================== 保存修改 ===================
     private void saveChanges() {
         String newBirthDate = birthDatePicker.getValue() != null ? birthDatePicker.getValue().toString() : "";
         String newNativePlace = nativePlaceField.getText();
@@ -205,6 +235,7 @@ public class StudentController implements IClientController {
         String newMotherPolitics = motherPoliticsCombo.getValue();
         String newMotherWork = motherWorkField.getText();
 
+        // 更新标签文本
         birthDateLabel.setText(newBirthDate);
         nativePlaceLabel.setText(newNativePlace);
         politicsStatusLabel.setText(newPoliticsStatus);
@@ -223,10 +254,10 @@ public class StudentController implements IClientController {
         motherPoliticsLabel.setText(newMotherPolitics);
         motherWorkLabel.setText(newMotherWork);
 
+        // 准备更新对象
         Student updatedStudent = new Student();
         updatedStudent.setUserId(userIdLabel.getText());
         updatedStudent.setStudentId(studentIdLabel.getText());
-        updatedStudent.setCardId(cardIdLabel.getText());
         updatedStudent.setName(nameLabel.getText());
         updatedStudent.setGender(genderLabel.getText());
         updatedStudent.setCollege(collegeLabel.getText());
@@ -251,6 +282,7 @@ public class StudentController implements IClientController {
         studentService.updateStudentInfo(updatedStudent);
     }
 
+    // =================== 取消编辑 ===================
     private void cancelEdit() {
         // 恢复原值
         birthDateLabel.setText(originalBirthDate);
@@ -274,53 +306,54 @@ public class StudentController implements IClientController {
         exitEditMode();
     }
 
+    // =================== 退出编辑模式（修复位置错乱核心） ===================
     private void exitEditMode() {
         editing = false;
 
+        // 按钮还原
         editOrSaveButton.setText("修改");
         editOrSaveButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6;");
-
         pdfOrCancelButton.setText("导出PDF");
         pdfOrCancelButton.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 6;");
 
-        studentGridPane.getChildren().removeAll(
-                birthDatePicker, nativePlaceField, politicsComboBox,
-                phoneField, emailField, dormAddressField,
-                fatherNameField, fatherPhoneField, fatherPoliticsCombo, fatherWorkField,
-                motherNameField, motherPhoneField, motherPoliticsCombo, motherWorkField
-        );
+        // === 基本信息（精确还原位置） ===
+        studentGridPane.getChildren().removeAll(birthDatePicker, nativePlaceField, politicsComboBox);
+        studentGridPane.add(birthDateLabel, 3, 3);    // 出生日期：第3行第3列
+        studentGridPane.add(nativePlaceLabel, 1, 4);   // 籍贯：第4行第1列
+        studentGridPane.add(politicsStatusLabel, 3, 4); // 政治面貌：第4行第3列
 
-        studentGridPane.add(birthDateLabel, 8, 1);
-        studentGridPane.add(nativePlaceLabel, 9, 1);
-        studentGridPane.add(politicsStatusLabel, 10, 1);
+        // === 联系方式 ===
+        contactGridPane.getChildren().removeAll(phoneField, emailField, dormAddressField);
+        contactGridPane.add(phoneLabel, 1, 0);
+        contactGridPane.add(emailLabel, 3, 0);
+        contactGridPane.add(dormAddressLabel, 1, 1);
 
-        studentGridPane.add(phoneLabel, 12, 1);
-        studentGridPane.add(emailLabel, 13, 1);
-        studentGridPane.add(dormAddressLabel, 14, 1);
+        // === 父亲信息 ===
+        fatherGridPane.getChildren().removeAll(fatherNameField, fatherPhoneField, fatherPoliticsCombo, fatherWorkField);
+        fatherGridPane.add(fatherNameLabel, 1, 0);
+        fatherGridPane.add(fatherPhoneLabel, 3, 0);
+        fatherGridPane.add(fatherPoliticsLabel, 1, 1);
+        fatherGridPane.add(fatherWorkLabel, 3, 1);
 
-        studentGridPane.add(fatherNameLabel, 0, 2);
-        studentGridPane.add(fatherPhoneLabel, 1, 2);
-        studentGridPane.add(fatherPoliticsLabel, 2, 2);
-        studentGridPane.add(fatherWorkLabel, 3, 2);
-
-        studentGridPane.add(motherNameLabel, 4, 2);
-        studentGridPane.add(motherPhoneLabel, 5, 2);
-        studentGridPane.add(motherPoliticsLabel, 6, 2);
-        studentGridPane.add(motherWorkLabel, 7, 2);
+        // === 母亲信息 ===
+        motherGridPane.getChildren().removeAll(motherNameField, motherPhoneField, motherPoliticsCombo, motherWorkField);
+        motherGridPane.add(motherNameLabel, 1, 0);
+        motherGridPane.add(motherPhoneLabel, 3, 0);
+        motherGridPane.add(motherPoliticsLabel, 1, 1);
+        motherGridPane.add(motherWorkLabel, 3, 1);
     }
 
     private void exportPdf() {
-        // TODO: 实现 PDF 导出逻辑
         showInfo("导出 PDF 功能待实现");
     }
 
+    // =================== 网络消息回调 ===================
     public void handleStudentInfoResponse(Message message) {
         Platform.runLater(() -> {
             if (message.isSuccess() && message.getData() != null) {
                 Student student = (Student) message.getData();
                 userIdLabel.setText(student.getUserId());
                 studentIdLabel.setText(student.getStudentId());
-                cardIdLabel.setText(student.getCardId());
                 nameLabel.setText(student.getName());
                 genderLabel.setText(student.getGender());
                 collegeLabel.setText(student.getCollege());
@@ -417,6 +450,11 @@ public class StudentController implements IClientController {
         } else {
             showError("当前没有登录用户，请先登录！");
         }
+    }
+
+    // null 安全处理
+    private String safeText(Label label) {
+        return (label != null && label.getText() != null) ? label.getText() : "";
     }
 }
 

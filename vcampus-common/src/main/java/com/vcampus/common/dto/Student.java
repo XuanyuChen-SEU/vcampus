@@ -12,7 +12,6 @@ public class Student implements Serializable {
     // 基本信息
     private String userId;
     private String studentId;
-    private String cardId;
     private String name;
     private String gender;
     private String college;
@@ -43,17 +42,34 @@ public class Student implements Serializable {
     // 默认构造
     public Student() {}
 
-    public Student(String userId, String studentId, String cardId,
-                   String name, String gender, String college,
-                   String major, int grade) {
-        setUserId(userId);
-        setStudentId(studentId);
-        setCardId(cardId);
+    public Student(String userId, String studentId, String cardId, String name, String gender,
+                   String college, String major, int grade, String birth_date,
+                   String native_place, String politics_status, String student_status,
+                   String phone, String email, String dormAddress,
+                   String fatherName, String fatherPhone, String fatherPoliticsStatus, String fatherWorkUnit,
+                   String motherName, String motherPhone, String motherPoliticsStatus, String motherWorkUnit) {
+        this.userId = userId;
+        this.studentId = studentId;
         this.name = name;
         this.gender = gender;
         this.college = college;
         this.major = major;
         this.grade = grade;
+        this.birth_date = birth_date;
+        this.native_place = native_place;
+        this.politics_status = politics_status;
+        this.student_status = student_status;
+        this.phone = phone;
+        this.email = email;
+        this.dormAddress = dormAddress;
+        this.fatherName = fatherName;
+        this.fatherPhone = fatherPhone;
+        this.fatherPoliticsStatus = fatherPoliticsStatus;
+        this.fatherWorkUnit = fatherWorkUnit;
+        this.motherName = motherName;
+        this.motherPhone = motherPhone;
+        this.motherPoliticsStatus = motherPoliticsStatus;
+        this.motherWorkUnit = motherWorkUnit;
     }
 
     // Getter & Setter
@@ -67,12 +83,6 @@ public class Student implements Serializable {
     public void setStudentId(String studentId) {
         if (studentId != null && studentId.matches("\\d{8}")) this.studentId = studentId;
         else throw new IllegalArgumentException("学号必须为8位纯数字字符串");
-    }
-
-    public String getCardId() { return cardId; }
-    public void setCardId(String cardId) {
-        if (cardId != null && cardId.matches("\\d{9}")) this.cardId = cardId;
-        else throw new IllegalArgumentException("一卡通号必须为9位纯数字字符串");
     }
 
     public String getName() { return name; }

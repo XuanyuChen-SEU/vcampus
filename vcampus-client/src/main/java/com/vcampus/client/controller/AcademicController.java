@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import javafx.scene.control.TextField; // ⭐ 1. 确保导入 TextField
 
 public class AcademicController implements IClientController {
 
@@ -33,6 +34,12 @@ public class AcademicController implements IClientController {
     // ⭐ 修正2：遵循 Java 命名规范，变量名以小写字母开头
     private final CourseService courseService = new CourseService();
     private Button currentActiveButton;
+
+    // --- ⭐ 2. 新增 FXML 注入 ---
+    // 注入 FXML 中定义的搜索栏相关控件
+    @FXML private HBox searchBarContainer;
+    @FXML private TextField searchTextField;
+    @FXML private Button searchButton;
 
     @FXML
     public void initialize() {
@@ -58,6 +65,8 @@ public class AcademicController implements IClientController {
         // ⭐ 3. 隐藏页眉
         courseListHeader.setVisible(false);
         courseListHeader.setManaged(false); // 让页眉不占据布局空间
+        searchBarContainer.setVisible(false);
+        searchBarContainer.setManaged(false);
         updateButtonStyles(timetableButton);
         try {
             courseListContainer.getChildren().clear();
@@ -88,7 +97,8 @@ public class AcademicController implements IClientController {
         // ⭐ 4. 显示页眉
         courseListHeader.setVisible(true);
         courseListHeader.setManaged(true);
-
+        searchBarContainer.setVisible(true);
+        searchBarContainer.setManaged(true);
         requestCourseDataFromServer();
     }
 
@@ -120,6 +130,25 @@ public class AcademicController implements IClientController {
             // 无论成功失败，都刷新列表以同步最新状态
             requestCourseDataFromServer();
         });
+    }
+
+    /**
+     * ⭐ 5. 新增：处理搜索按钮的点击事件
+     */
+    @FXML
+    private void handleSearchCourse(ActionEvent event) {
+        String keyword = searchTextField.getText();
+        System.out.println("UI: 正在发起课程搜索，关键词: '" + keyword + "'");
+
+        showLoadingIndicator();
+
+        // 如果搜索框为空，则请求所有课程（相当于重置）
+        if (keyword == null || keyword.trim().isEmpty()) {
+            courseService.getAllSelectableCourses();
+        } else {
+            // 否则，调用 Service 的新搜索方法
+            courseService.searchCourses(keyword);
+        }
     }
 
     private void requestCourseDataFromServer() {

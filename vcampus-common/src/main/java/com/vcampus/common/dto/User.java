@@ -28,7 +28,6 @@ public class User implements Serializable {//数据传输对象
     private String password;
 
     // --- 为商店功能新增的字段 ---
-    private String cardNumber;  // 一卡通号
     private Double balance;     // 一卡通余额
 
     // 默认构造方法（反序列化必需）
@@ -41,7 +40,6 @@ public class User implements Serializable {//数据传输对象
 
     public User(String userId, String cardNumber, Double balance) {
         this.setUserId(userId); // 使用setter
-        this.cardNumber = cardNumber;
         this.balance = balance;
     }
 
@@ -66,14 +64,6 @@ public class User implements Serializable {//数据传输对象
     // 注意，这里密码是明文
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getCardNumber() {
-        return cardNumber;
-    }
-
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
     }
 
     public Double getBalance() {
