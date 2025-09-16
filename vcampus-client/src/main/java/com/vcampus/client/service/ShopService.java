@@ -79,13 +79,5 @@ public class ShopService {
         socketClient.sendMessage(new Message(ActionType.SHOP_GET_BALANCE, userId));
     }
 
-    /**
-     * 【新增】异步发送“充值”的请求
-     */
-    public void rechargeBalance(String userId, double amount) {
-        // 将 userId 和 amount 打包到一个对象或Map中发送
-        // 这里用 Balance DTO 来打包非常合适
-        Balance rechargeRequest = new Balance(userId, amount);
-        socketClient.sendMessage(new Message(ActionType.SHOP_RECHARGE_BALANCE, rechargeRequest));
-    }
+
 }
