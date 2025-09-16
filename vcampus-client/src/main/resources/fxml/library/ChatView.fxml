@@ -17,13 +17,13 @@
     <children>
         <ImageView fx:id="watermarkLogo" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@/images/LibraryIcons/logo-text.png"/>
+                <Image url="@../../images/LibraryIcons/logo-text.png"/>
             </image>
         </ImageView>
 
         <BorderPane fx:id="mainPane" styleClass="chat-background">
             <stylesheets>
-                <URL value="@/css/ChatView.css"/>
+                <URL value="@../../css/ChatView.css"/>
             </stylesheets>
             <center>
                 <ScrollPane fx:id="chatScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="chat-scroll-pane">
