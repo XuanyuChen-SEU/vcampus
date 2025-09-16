@@ -2,6 +2,9 @@ package com.vcampus.server.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,19 +57,46 @@ public class ShopService {
         } else {
             products = shopDao.searchProducts(keyword.trim());
         }
+        
+        System.out.println("=== ShopService.searchProducts 返回 " + products.size() + " 个商品 ===");
+        for (int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            System.out.println("  位置 " + i + ": " + product.getName() + " (ID: " + product.getId() + ")");
+        }
+        
         // 为每个商品加载图片数据
         for (Product product : products) {
             loadProductImage(product);
         }
+        
+        System.out.println("=== 商品搜索处理完成 ===");
         return products;
     }
 
     public List<ShopTransaction> getMyOrders(String userId) {
-        return shopDao.getOrdersByUserId(userId);
+        List<ShopTransaction> orders = shopDao.getOrdersByUserId(userId);
+        // 为每个订单中的商品加载图片数据
+        if (orders != null) {
+            for (ShopTransaction order : orders) {
+                if (order.getProduct() != null) {
+                    loadProductImage(order.getProduct());
+                }
+            }
+        }
+        return orders;
     }
 
     public List<ShopTransaction> getMyFavorites(String userId) {
-        return shopDao.getFavoritesByUserId(userId);
+        List<ShopTransaction> favorites = shopDao.getFavoritesByUserId(userId);
+        // 为每个收藏中的商品加载图片数据
+        if (favorites != null) {
+            for (ShopTransaction favorite : favorites) {
+                if (favorite.getProduct() != null) {
+                    loadProductImage(favorite.getProduct());
+                }
+            }
+        }
+        return favorites;
     }
     public Product getProductDetail(String productId) {
         // 1. 在 Service 层进行业务逻辑校验
@@ -114,8 +144,26 @@ public class ShopService {
                 throw new IllegalArgumentException("库存不能为负数");
             }
             
+            // 如果有图片数据，先保存图片并设置路径
+            if (product.getImageData() != null && product.getImageData().length > 0) {
+                String imagePath = saveProductImage(product.getImageData(), null); // null表示新商品，ID将在数据库插入后生成
+                product.setImagePath(imagePath);
+                System.out.println("商品图片已保存到: " + imagePath);
+            }
+            
             // 使用真实数据库DAO
-            return shopDao.addProduct(product);
+            boolean result = shopDao.addProduct(product);
+            
+            // 如果添加成功且有图片数据，重新保存图片（使用生成的ID）
+            if (result && product.getImageData() != null && product.getImageData().length > 0) {
+                String finalImagePath = saveProductImage(product.getImageData(), product.getId());
+                product.setImagePath(finalImagePath);
+                // 更新数据库中的图片路径
+                shopDao.updateProductById(product);
+                System.out.println("商品图片最终保存到: " + finalImagePath);
+            }
+            
+            return result;
         } catch (Exception e) {
             System.err.println("添加商品失败: " + e.getMessage());
             return false;
@@ -132,6 +180,13 @@ public class ShopService {
             // 业务逻辑验证
             if (product == null || product.getId() == null) {
                 throw new IllegalArgumentException("商品信息或ID不能为空");
+            }
+            
+            // 如果有图片数据，保存图片并设置路径
+            if (product.getImageData() != null && product.getImageData().length > 0) {
+                String imagePath = saveProductImage(product.getImageData(), product.getId());
+                product.setImagePath(imagePath);
+                System.out.println("商品图片已更新到: " + imagePath);
             }
             
             // 使用真实数据库DAO
@@ -169,7 +224,16 @@ public class ShopService {
     public List<ShopTransaction> getAllOrders() {
         try {
             // 使用真实数据库DAO
-            return shopDao.getAllOrders();
+            List<ShopTransaction> orders = shopDao.getAllOrders();
+            // 为每个订单中的商品加载图片数据
+            if (orders != null) {
+                for (ShopTransaction order : orders) {
+                    if (order.getProduct() != null) {
+                        loadProductImage(order.getProduct());
+                    }
+                }
+            }
+            return orders;
         } catch (Exception e) {
             System.err.println("获取所有订单失败: " + e.getMessage());
             return new ArrayList<>();
@@ -183,7 +247,16 @@ public class ShopService {
     public List<ShopTransaction> getAllFavorites() {
         try {
             // 使用真实数据库DAO
-            return shopDao.getAllFavorites();
+            List<ShopTransaction> favorites = shopDao.getAllFavorites();
+            // 为每个收藏中的商品加载图片数据
+            if (favorites != null) {
+                for (ShopTransaction favorite : favorites) {
+                    if (favorite.getProduct() != null) {
+                        loadProductImage(favorite.getProduct());
+                    }
+                }
+            }
+            return favorites;
         } catch (Exception e) {
             System.err.println("获取所有收藏失败: " + e.getMessage());
             return new ArrayList<>();
@@ -357,5 +430,55 @@ public class ShopService {
         }
         
         return outputStream.toByteArray();
+    }
+    
+    /**
+     * 保存商品图片到服务器
+     * @param imageData 图片数据
+     * @param productId 商品ID（如果为null，表示新商品）
+     * @return 图片路径
+     */
+    private String saveProductImage(byte[] imageData, Long productId) {
+        try {
+            // 获取项目根目录的绝对路径
+            String projectRoot = System.getProperty("user.dir");
+            System.out.println("当前工作目录: " + projectRoot);
+            
+            // 如果当前在vcampus-server目录，需要回到上级目录
+            if (projectRoot.endsWith("vcampus-server")) {
+                projectRoot = projectRoot.substring(0, projectRoot.lastIndexOf("vcampus-server"));
+                System.out.println("调整后的项目根目录: " + projectRoot);
+            }
+            
+            // 创建图片目录 - 使用绝对路径
+            Path imageDir = Paths.get(projectRoot, "vcampus-database", "src", "main", "resources", "db_img", "products");
+            if (!Files.exists(imageDir)) {
+                Files.createDirectories(imageDir);
+                System.out.println("创建图片目录: " + imageDir.toAbsolutePath());
+            }
+            
+            // 生成文件名
+            String fileName;
+            if (productId != null) {
+                fileName = productId + ".png";
+            } else {
+                // 对于新商品，使用时间戳作为临时文件名
+                fileName = "temp_" + System.currentTimeMillis() + ".png";
+            }
+            
+            // 保存图片文件
+            Path imagePath = imageDir.resolve(fileName);
+            Files.write(imagePath, imageData);
+            
+            // 返回相对路径
+            String relativePath = "/db_img/products/" + fileName;
+            System.out.println("图片已保存: " + imagePath.toAbsolutePath());
+            System.out.println("相对路径: " + relativePath);
+            
+            return relativePath;
+        } catch (IOException e) {
+            System.err.println("保存图片失败: " + e.getMessage());
+            throw new RuntimeException("保存图片失败", e);
+        }
     }
 }

@@ -4,15 +4,15 @@ import com.vcampus.client.controller.libraryAdmin.BookCreateViewController;
 import com.vcampus.client.controller.libraryAdmin.BookListViewController;
 import com.vcampus.client.controller.libraryAdmin.BorrowLogCreateController;
 import com.vcampus.client.controller.libraryAdmin.BorrowLogListViewController;
+import com.vcampus.client.controller.shopAdmin.FavoriteManagementViewController;
+import com.vcampus.client.controller.shopAdmin.OrderManagementViewController;
+import com.vcampus.client.controller.shopAdmin.ProductAddViewController;
+import com.vcampus.client.controller.shopAdmin.ProductEditViewController;
+import com.vcampus.client.controller.shopAdmin.ProductManagementViewController;
 import com.vcampus.client.controller.userAdmin.ForgetPasswordTableViewController;
 import com.vcampus.client.controller.userAdmin.UserCreateViewController;
 import com.vcampus.client.controller.userAdmin.UserListViewController;
 import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
-import com.vcampus.client.controller.shopAdmin.ProductManagementViewController;
-import com.vcampus.client.controller.shopAdmin.ProductAddViewController;
-import com.vcampus.client.controller.shopAdmin.ProductEditViewController;
-import com.vcampus.client.controller.shopAdmin.OrderManagementViewController;
-import com.vcampus.client.controller.shopAdmin.FavoriteManagementViewController;
 import com.vcampus.common.dto.Message;
 
 /**
@@ -93,6 +93,10 @@ public class MessageController {
     }
     public void setProductManagementViewController(ProductManagementViewController controller) {
         this.productManagementViewController = controller;
+    }
+    
+    public ProductManagementViewController getProductManagementViewController() {
+        return this.productManagementViewController;
     }
     public void setProductAddViewController(ProductAddViewController controller) {
         this.productAddViewController = controller;
@@ -265,13 +269,34 @@ public class MessageController {
                 // --- 商店模块 ---
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
-                    // 优先分发给商店管理员控制器，如果没有则分发给普通商店控制器
-                    if (productManagementViewController != null) {
-                        productManagementViewController.handleSearchProductsResponse(message);
-                    } else if (shopController != null) {
-                        shopController.handleProductListResponse(message);
+                    // 根据当前用户角色决定路由
+                    com.vcampus.client.session.UserSession userSession = com.vcampus.client.session.UserSession.getInstance();
+                    if (userSession.isLoggedIn() && userSession.getCurrentUserRole() != null) {
+                        String roleDesc = userSession.getCurrentUserRole().getDesc();
+                        if ("商店管理员".equals(roleDesc)) {
+                            // 管理员角色，路由到管理员控制器
+                            if (productManagementViewController != null) {
+                                productManagementViewController.handleSearchProductsResponse(message);
+                            } else {
+                                System.err.println("路由警告：收到管理员商品列表响应，但ProductManagementViewController未注册。");
+                            }
+                        } else {
+                            // 学生/教师角色，路由到学生控制器
+                            if (shopController != null) {
+                                shopController.handleProductListResponse(message);
+                            } else {
+                                System.err.println("路由警告：收到学生商品列表响应，但ShopController未注册。");
+                            }
+                        }
                     } else {
-                        System.err.println("路由警告：收到商品列表响应，但相关控制器未注册。");
+                        // 未登录或角色未知，优先分发给商店管理员控制器，如果没有则分发给普通商店控制器
+                        if (productManagementViewController != null) {
+                            productManagementViewController.handleSearchProductsResponse(message);
+                        } else if (shopController != null) {
+                            shopController.handleProductListResponse(message);
+                        } else {
+                            System.err.println("路由警告：收到商品列表响应，但相关控制器未注册。");
+                        }
                     }
                     break;
                 case SHOP_GET_MY_ORDERS:

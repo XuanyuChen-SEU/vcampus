@@ -56,9 +56,14 @@
                 <Label text="商品状态:" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="form-label" />
                 <ComboBox fx:id="statusCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="form-field" />
                 
-                <!-- 商品图片URL -->
-                <Label text="图片URL:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="form-label" />
-                <TextField fx:id="imageUrlField" promptText="请输入商品图片URL" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="form-field" />
+                <!-- 商品图片上传 -->
+                <Label text="商品图片:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="form-label" />
+                <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <children>
+                        <TextField fx:id="imagePathField" promptText="选择图片文件..." styleClass="form-field" HBox.hgrow="ALWAYS" editable="false" />
+                        <Button fx:id="selectImageButton" text="📁 选择图片" onAction="#handleSelectImage" styleClass="select-button" />
+                    </children>
+                </HBox>
                 
                 <!-- 商品描述 -->
                 <Label text="商品描述:" GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="form-label" />

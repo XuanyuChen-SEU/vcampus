@@ -472,33 +472,36 @@ public class ProductManagementViewController implements IClientController{
     }
 
     public void handleSearchProductsResponse(Message message) {
-        if (message.isSuccess()) {
-            System.out.println("搜索商品成功: " + message.getMessage());
-            productData.clear();
-            originalProducts.clear(); // 清空原始商品映射
-            
-            List<Product> products = (List<Product>) message.getData();
-            if (products != null) {
-                for (Product product : products) {
-                    String status = getStatusFromProduct(product.getStatus());
-                    productData.add(new ProductTableItem(
-                        product.getId().toString(),
-                        product.getName(),
-                        String.format("%.2f", product.getPrice()),
-                        product.getStock().toString(),
-                        status
-                    ));
-                    
-                    // 存储原始商品数据
-                    originalProducts.put(product.getId().toString(), product);
+        // 确保在JavaFX Application Thread中执行UI更新
+        javafx.application.Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                System.out.println("搜索商品成功: " + message.getMessage());
+                productData.clear();
+                originalProducts.clear(); // 清空原始商品映射
+                
+                List<Product> products = (List<Product>) message.getData();
+                if (products != null) {
+                    for (Product product : products) {
+                        String status = getStatusFromProduct(product.getStatus());
+                        productData.add(new ProductTableItem(
+                            product.getId().toString(),
+                            product.getName(),
+                            String.format("%.2f", product.getPrice()),
+                            product.getStock().toString(),
+                            status
+                        ));
+                        
+                        // 存储原始商品数据
+                        originalProducts.put(product.getId().toString(), product);
+                    }
                 }
+                productTable.setItems(productData);
+                updateStatistics();
+            } else {
+                System.err.println("搜索商品失败: " + message.getMessage());
+                showError("搜索商品失败: " + message.getMessage());
             }
-            productTable.setItems(productData);
-            updateStatistics();
-        } else {
-            System.err.println("搜索商品失败: " + message.getMessage());
-            showError("搜索商品失败: " + message.getMessage());
-        }
+        });
     }
 
     public void handleDeleteProductResponse(Message message) {
@@ -533,7 +536,7 @@ public class ProductManagementViewController implements IClientController{
     /**
      * 刷新商品列表
      */
-    private void refreshProductList() {
+    public void refreshProductList() {
         String searchText = searchField.getText();
         String selectedStatus = statusFilterCombo.getValue();
         if (selectedStatus == null) {
