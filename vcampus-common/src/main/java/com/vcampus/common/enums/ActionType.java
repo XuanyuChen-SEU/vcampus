@@ -44,6 +44,9 @@ public enum ActionType {
     SHOP_CREATE_ORDER("创建订单"),
     SHOP_GET_MY_ORDERS("获取我的订单"),
     SHOP_CANCEL_ORDER("取消订单"),
+    // --- 【新增】余额相关操作 ---
+    SHOP_GET_BALANCE("获取用户余额"),
+    SHOP_RECHARGE_BALANCE("用户充值"),
     // 收藏夹管理
     SHOP_ADD_FAVORITE("添加收藏"),
     SHOP_GET_MY_FAVORITES("获取我的收藏"),
