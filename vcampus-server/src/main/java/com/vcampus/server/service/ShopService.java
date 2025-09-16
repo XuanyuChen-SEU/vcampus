@@ -1,15 +1,12 @@
 package com.vcampus.server.service;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vcampus.common.dao.IShopDao;
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
-import com.vcampus.common.enums.OrderStatus;
-import com.vcampus.common.enums.ProductStatus;
-
 import com.vcampus.server.dao.impl.ShopDao;
 
 /**
@@ -36,15 +33,32 @@ public class ShopService {
     // --- 下面的所有业务逻辑方法保持不变 ---
 
     public List<Product> getAllProducts() {
-        return shopDao.getAllProducts();
+        List<Product> products = shopDao.getAllProducts();
+        System.out.println("=== ShopService.getAllProducts 返回 " + products.size() + " 个商品 ===");
+        for (int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            System.out.println("  位置 " + i + ": " + product.getName() + " (ID: " + product.getId() + ")");
+        }
+        // 为每个商品加载图片数据
+        for (Product product : products) {
+            loadProductImage(product);
+        }
+        System.out.println("=== 商品列表处理完成 ===");
+        return products;
     }
 
     public List<Product> searchProducts(String keyword) {
-        // 商店管理员功能使用真实数据库DAO
+        List<Product> products;
         if (keyword == null || keyword.trim().isEmpty()) {
-            return shopDao.getAllProducts();
+            products = shopDao.getAllProducts();
+        } else {
+            products = shopDao.searchProducts(keyword.trim());
         }
-        return shopDao.searchProducts(keyword.trim());
+        // 为每个商品加载图片数据
+        for (Product product : products) {
+            loadProductImage(product);
+        }
+        return products;
     }
 
     public List<ShopTransaction> getMyOrders(String userId) {
@@ -61,8 +75,18 @@ public class ShopService {
             throw new IllegalArgumentException("无效的请求数据：商品ID不能为空。");
         }
 
+        System.out.println("ShopService.getProductDetail 被调用，商品ID: " + productId);
+        
         // 2. 调用 DAO 层获取数据
-        return shopDao.getProductById(productId);
+        Product product = shopDao.getProductById(productId);
+        if (product != null) {
+            System.out.println("找到商品: " + product.getName() + " (ID: " + product.getId() + ")");
+            // 加载图片数据
+            loadProductImage(product);
+        } else {
+            System.out.println("未找到商品，ID: " + productId);
+        }
+        return product;
     }
 
     // ==========================================================
@@ -292,5 +316,46 @@ public class ShopService {
         // 3. 调用 DAO 从数据库中删除对应的收藏记录
         System.out.println("业务逻辑：请求从数据库删除收藏记录，ID为 " + favoriteId);
         return shopDao.removeFavorite(favoriteId);
+    }
+
+    /**
+     * 为商品加载图片数据
+     * @param product 商品对象
+     */
+    private void loadProductImage(Product product) {
+        if (product == null || product.getImagePath() == null) {
+            return;
+        }
+        
+        try {
+            String resourcePath = product.getImagePath();
+            InputStream inputStream = getClass().getResourceAsStream(resourcePath);
+            
+            if (inputStream != null) {
+                byte[] imageBytes = readAllBytes(inputStream);
+                // 将图片数据存储到商品对象中
+                product.setImageData(imageBytes);
+                System.out.println("成功加载商品图片: " + product.getName() + " (" + imageBytes.length + " bytes)");
+            } else {
+                System.out.println("未找到商品图片: " + product.getName() + " - " + resourcePath);
+            }
+        } catch (IOException e) {
+            System.err.println("加载商品图片失败: " + product.getName() + " - " + e.getMessage());
+        }
+    }
+
+    /**
+     * 工具方法：将 InputStream 转换为 byte[]
+     */
+    private byte[] readAllBytes(InputStream inputStream) throws IOException {
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+        
+        return outputStream.toByteArray();
     }
 }

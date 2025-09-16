@@ -38,7 +38,8 @@ public class ShopDao implements IShopDao {
     public Product getProductById(String productId) {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
-            return shopMapper.getProductById(productId);
+            Long id = Long.parseLong(productId);
+            return shopMapper.getProductById(id);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

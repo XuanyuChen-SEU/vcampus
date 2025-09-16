@@ -26,6 +26,12 @@ public class ShopController {
     public Message handleGetAllProducts(Message message) {
         try {
             List<Product> products = shopService.getAllProducts();
+            System.out.println("=== 服务端返回商品列表，共 " + products.size() + " 个商品 ===");
+            for (int i = 0; i < products.size(); i++) {
+                Product product = products.get(i);
+                System.out.println("  位置 " + i + ": " + product.getName() + " (ID: " + product.getId() + ")");
+            }
+            System.out.println("=== 服务端商品列表处理完成 ===");
             return Message.success(ActionType.SHOP_GET_ALL_PRODUCTS, products, "获取商品列表成功");
         } catch (Exception e) {
             e.printStackTrace();
@@ -151,6 +157,7 @@ public class ShopController {
                 return Message.failure(ActionType.SHOP_GET_PRODUCT_DETAIL, "无效的请求数据：商品ID必须为字符串。");
             }
             String productId = (String) message.getData();
+            System.out.println("服务端收到商品详情请求，商品ID: " + productId);
 
             // 2. 调用 Service 层处理业务逻辑
             Product product = shopService.getProductDetail(productId);

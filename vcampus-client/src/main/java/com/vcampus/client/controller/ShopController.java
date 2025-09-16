@@ -1,8 +1,7 @@
 package com.vcampus.client.controller;
-import java.util.Optional;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.vcampus.client.MainApp;
@@ -20,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -38,7 +38,6 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.control.ButtonBar;
 
 public class ShopController implements IClientController{
 
@@ -229,7 +228,14 @@ public class ShopController implements IClientController{
                 if (empty || product == null) {
                     setGraphic(null);
                 } else {
-                    Image image = new Image(product.getImagePath(), 50, 50, true, true, true);
+                    Image image;
+                    if (product.getImageData() != null && product.getImageData().length > 0) {
+                        // 使用图片数据创建Image
+                        image = new Image(new java.io.ByteArrayInputStream(product.getImageData()), 50, 50, true, true);
+                    } else {
+                        // 回退到使用图片路径
+                        image = new Image(product.getImagePath(), 50, 50, true, true, true);
+                    }
                     imageView.setImage(image);
                     nameLabel.setText(product.getName());
                     setGraphic(contentBox);
@@ -246,9 +252,13 @@ public class ShopController implements IClientController{
                 productPane.getChildren().add(new Label("没有找到任何商品。"));
                 return;
             }
-            for (Product product : products) {
+            System.out.println("=== 客户端显示商品列表，共 " + products.size() + " 个商品 ===");
+            for (int i = 0; i < products.size(); i++) {
+                Product product = products.get(i);
+                System.out.println("  位置 " + i + ": " + product.getName() + " (ID: " + product.getId() + ")");
                 productPane.getChildren().add(createProductCard(product));
             }
+            System.out.println("=== 商品列表显示完成 ===");
         });
     }
 
@@ -256,6 +266,7 @@ public class ShopController implements IClientController{
      * 升级版：创建一个更接近淘宝风格的商品卡片
      */
     private VBox createProductCard(Product product) {
+        System.out.println("创建商品卡片: " + product.getName() + " (ID: " + product.getId() + ")");
         VBox card = new VBox(5);
         card.setPadding(new Insets(10));
         card.setStyle("-fx-border-color: #DDDDDD; -fx-border-radius: 5; -fx-background-color: #FFFFFF;");
@@ -263,13 +274,20 @@ public class ShopController implements IClientController{
 
         ImageView imageView = new ImageView();
         try {
-            Image image = new Image(product.getImagePath(), 160, 160, true, true, true);
+            Image image;
+            if (product.getImageData() != null && product.getImageData().length > 0) {
+                // 使用图片数据创建Image
+                image = new Image(new java.io.ByteArrayInputStream(product.getImageData()), 160, 160, true, true);
+            } else {
+                // 回退到使用图片路径
+                image = new Image(product.getImagePath(), 160, 160, true, true, true);
+            }
             imageView.setImage(image);
         } catch (Exception e) {
             imageView.setImage(new Image("https://via.placeholder.com/160", true));
         }
 
-        Label nameLabel = new Label(product.getName());
+        Label nameLabel = new Label(product.getName() + " (ID:" + product.getId() + ")");
         nameLabel.setWrapText(true);
         nameLabel.setPrefHeight(40); // 给名称两行的高度
 
@@ -281,8 +299,13 @@ public class ShopController implements IClientController{
         priceLabel.setFont(new Font("System Bold", 16));
         priceBox.getChildren().addAll(currencyLabel, priceLabel);
 
-        Button actionButton = new Button("查看详情");
-        actionButton.setOnAction(event -> handleViewDetails(product)); // 修改这里
+        Button actionButton = new Button("查看详情 - " + product.getName());
+        // 修复闭包问题：创建final变量
+        final Product finalProduct = product;
+        actionButton.setOnAction(event -> {
+            System.out.println("按钮点击事件触发，商品: " + finalProduct.getName() + " (ID: " + finalProduct.getId() + ")");
+            handleViewDetails(finalProduct);
+        });
 
         card.getChildren().addAll(imageView, nameLabel, priceBox, actionButton);
         return card;
@@ -292,7 +315,7 @@ public class ShopController implements IClientController{
 
     // --- 这是修改后的 handleViewDetails ---
     private void handleViewDetails(Product product) {
-        System.out.println("用户请求查看商品详情: " + product.getName());
+        System.out.println("用户请求查看商品详情: " + product.getName() + " (ID: " + product.getId() + ")");
         // 【核心修正】只调用 service 发送请求，不接收返回值
         shopService.getProductDetail(String.valueOf(product.getId()));
     }
@@ -314,6 +337,7 @@ public class ShopController implements IClientController{
             }
 
             Product product = (Product) message.getData();
+            System.out.println("显示商品详情: " + product.getName() + " (ID: " + product.getId() + ")");
 
             // --- 创建和显示对话框的逻辑 ---
             Dialog<ButtonType> dialog = new Dialog<>();
@@ -325,7 +349,14 @@ public class ShopController implements IClientController{
             grid.setHgap(10);
             grid.setVgap(10);
             grid.setPadding(new Insets(20, 150, 10, 10));
-            ImageView imageView = new ImageView(new Image(product.getImagePath(), 200, 200, true, true, true));
+            ImageView imageView;
+            if (product.getImageData() != null && product.getImageData().length > 0) {
+                // 使用图片数据创建Image
+                imageView = new ImageView(new Image(new java.io.ByteArrayInputStream(product.getImageData()), 200, 200, true, true));
+            } else {
+                // 回退到使用图片路径
+                imageView = new ImageView(new Image(product.getImagePath(), 200, 200, true, true, true));
+            }
             grid.add(imageView, 0, 0, 1, 3);
             grid.add(new Label(String.format("价格: ¥ %.2f", product.getPrice())), 1, 0);
             grid.add(new Label("库存: " + product.getStock() + " 件"), 1, 1);

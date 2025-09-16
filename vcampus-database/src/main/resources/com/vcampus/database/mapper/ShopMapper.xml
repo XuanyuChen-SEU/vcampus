@@ -80,7 +80,7 @@
         
         <!-- 商品对象映射 -->
         <association property="product" javaType="com.vcampus.common.dto.Product">
-            <id property="id" column="id" />
+            <id property="id" column="product_id" />
             <result property="name" column="name" />
             <result property="price" column="price" />
             <result property="stock" column="stock" />
@@ -320,7 +320,7 @@
             f.userId,
             f.productId,
             f.addTime,
-            p.id,
+            p.id as product_id,
             p.name,
             p.price,
             p.stock,
@@ -339,7 +339,7 @@
             f.userId,
             f.productId,
             f.addTime,
-            p.id,
+            p.id as product_id,
             p.name,
             p.price,
             p.stock,

@@ -55,7 +55,7 @@ public interface ShopMapper {
      * @param productId 商品ID
      * @return 对应的商品对象，如果不存在则返回null
      */
-    Product getProductById(String productId);
+    Product getProductById(Long productId);
     
     /*
      * 根据关键词模糊搜索商品名称
