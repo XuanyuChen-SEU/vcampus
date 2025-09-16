@@ -72,4 +72,12 @@ public class ShopService {
         System.out.println("客户端 ShopService：异步发送取消收藏请求 (ID: " + favoriteId + ")...");
         socketClient.sendMessage(new Message(ActionType.SHOP_REMOVE_FAVORITE, favoriteId));
     }
+    /**
+     * 【新增】异步发送“获取余额”的请求
+     */
+    public void getBalance(String userId) {
+        socketClient.sendMessage(new Message(ActionType.SHOP_GET_BALANCE, userId));
+    }
+
+
 }

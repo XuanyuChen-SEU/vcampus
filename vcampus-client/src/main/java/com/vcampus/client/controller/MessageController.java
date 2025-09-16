@@ -323,9 +323,10 @@ public class MessageController {
                     break;
                 case SHOP_CREATE_ORDER:
                     if (shopController != null) {
-                        // 假设您在ShopController中有一个处理下单响应的方法
+                        // 当收到创建订单的响应时，调用 ShopController 中对应的处理方法
                         shopController.handleCreateOrderResponse(message);
                     } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
                         System.err.println("路由警告：收到创建订单响应，但ShopController未注册。");
                     }
                     break;
