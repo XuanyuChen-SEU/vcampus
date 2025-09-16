@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.image.ImageView?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.vcampus.client.controller.shopAdmin.ProductEditViewController"
@@ -65,7 +66,7 @@
                 <Label text="商品图片:" GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="form-label" />
                 <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                     <children>
-                        <TextField fx:id="imagePathField" promptText="选择图片文件..." styleClass="form-field" HBox.hgrow="ALWAYS" editable="false" />
+                        <ImageView fx:id="imagePreview" fitWidth="80.0" fitHeight="80.0" preserveRatio="true" pickOnBounds="true" />
                         <Button fx:id="selectImageButton" text="📁 选择图片" onAction="#handleSelectImage" styleClass="select-button" />
                     </children>
                 </HBox>

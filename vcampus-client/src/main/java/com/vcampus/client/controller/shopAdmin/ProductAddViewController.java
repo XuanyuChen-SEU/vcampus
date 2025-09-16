@@ -45,7 +45,7 @@ public class ProductAddViewController implements IClientController{
     private ComboBox<String> statusCombo;
     
     @FXML
-    private TextField imagePathField;
+    private javafx.scene.image.ImageView imagePreview;
     
     @FXML
     private TextArea descriptionField;
@@ -118,12 +118,7 @@ public class ProductAddViewController implements IClientController{
             }
         });
         
-        // 图片路径输入验证（简单验证）
-        imagePathField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.length() > 500) { // 限制路径长度
-                imagePathField.setText(oldValue);
-            }
-        });
+        // 图片路径输入验证已移除，因为现在使用图片预览
         
         // 商品名称长度限制
         nameField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -155,7 +150,6 @@ public class ProductAddViewController implements IClientController{
         double price = Double.parseDouble(priceField.getText().trim());
         int stock = stockSpinner.getValue();
         ProductStatus status = getStatusFromString(statusCombo.getValue());
-        String imagePath = imagePathField.getText().trim();
         String description = descriptionField.getText().trim();
         
         try {
@@ -259,8 +253,16 @@ public class ProductAddViewController implements IClientController{
             // 验证文件是否为PNG格式
             if (selectedFile.getName().toLowerCase().endsWith(".png")) {
                 selectedImageFile = selectedFile;
-                imagePathField.setText(selectedFile.getName());
-                System.out.println("选择的图片文件: " + selectedFile.getAbsolutePath());
+                
+                // 显示图片预览
+                try {
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(selectedFile.toURI().toString());
+                    imagePreview.setImage(image);
+                    System.out.println("选择的图片文件: " + selectedFile.getAbsolutePath());
+                } catch (Exception e) {
+                    System.err.println("加载图片预览失败: " + e.getMessage());
+                    showError("加载图片预览失败: " + e.getMessage());
+                }
             } else {
                 showError("请选择PNG格式的图片文件");
             }
@@ -338,7 +340,7 @@ public class ProductAddViewController implements IClientController{
         priceField.clear();
         stockSpinner.getValueFactory().setValue(0);
         statusCombo.setValue("在售");
-        imagePathField.clear();
+        imagePreview.setImage(null); // 清除图片预览
         descriptionField.clear();
         selectedImageFile = null; // 重置选择的图片文件
         nameField.requestFocus();

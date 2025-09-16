@@ -137,13 +137,80 @@ public class ProductManagementViewController implements IClientController{
         stockColumn.setCellValueFactory(cellData -> cellData.getValue().stockProperty());
         statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
         
+        // 设置商品名称列显示图片和文字
+        nameColumn.setCellFactory(new Callback<TableColumn<ProductTableItem, String>, TableCell<ProductTableItem, String>>() {
+            @Override
+            public TableCell<ProductTableItem, String> call(TableColumn<ProductTableItem, String> param) {
+                return new TableCell<ProductTableItem, String>() {
+                    private final javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView();
+                    private final javafx.scene.control.Label nameLabel = new javafx.scene.control.Label();
+                    private final javafx.scene.layout.HBox hbox = new javafx.scene.layout.HBox(8);
+                    
+                    {
+                        // 设置图片大小（比文字稍大）
+                        imageView.setFitWidth(32);
+                        imageView.setFitHeight(32);
+                        imageView.setPreserveRatio(true);
+                        imageView.setSmooth(true);
+                        
+                        // 设置文字样式
+                        nameLabel.setStyle("-fx-font-size: 14px;");
+                        
+                        // 设置HBox布局
+                        hbox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                        hbox.getChildren().addAll(imageView, nameLabel);
+                    }
+                    
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setGraphic(null);
+                        } else {
+                            ProductTableItem productItem = getTableView().getItems().get(getIndex());
+                            if (productItem != null) {
+                                nameLabel.setText(productItem.getName());
+                                
+                                // 获取原始商品数据以获取图片
+                                Product originalProduct = originalProducts.get(productItem.getId());
+                                if (originalProduct != null) {
+                                    try {
+                                        // 优先使用imageData，其次使用imagePath
+                                        if (originalProduct.getImageData() != null && originalProduct.getImageData().length > 0) {
+                                            javafx.scene.image.Image image = new javafx.scene.image.Image(
+                                                new java.io.ByteArrayInputStream(originalProduct.getImageData()), 32, 32, true, true);
+                                            imageView.setImage(image);
+                                        } else if (originalProduct.getImagePath() != null && !originalProduct.getImagePath().isEmpty()) {
+                                            javafx.scene.image.Image image = new javafx.scene.image.Image(originalProduct.getImagePath(), 32, 32, true, true, true);
+                                            imageView.setImage(image);
+                                        } else {
+                                            // 设置默认图片
+                                            imageView.setImage(new javafx.scene.image.Image("https://via.placeholder.com/32", true));
+                                        }
+                                    } catch (Exception e) {
+                                        // 设置默认图片
+                                        imageView.setImage(new javafx.scene.image.Image("https://via.placeholder.com/32", true));
+                                    }
+                                } else {
+                                    // 设置默认图片
+                                    imageView.setImage(new javafx.scene.image.Image("https://via.placeholder.com/32", true));
+                                }
+                                
+                                setGraphic(hbox);
+                            }
+                        }
+                    }
+                };
+            }
+        });
+        
         // 设置列宽比例，让表格占满整个区域
         idColumn.prefWidthProperty().bind(productTable.widthProperty().multiply(0.12));      // 12%
-        nameColumn.prefWidthProperty().bind(productTable.widthProperty().multiply(0.25));    // 25%
+        nameColumn.prefWidthProperty().bind(productTable.widthProperty().multiply(0.30));    // 30% (增加宽度以容纳图片)
         priceColumn.prefWidthProperty().bind(productTable.widthProperty().multiply(0.15));   // 15%
         stockColumn.prefWidthProperty().bind(productTable.widthProperty().multiply(0.12));   // 12%
         statusColumn.prefWidthProperty().bind(productTable.widthProperty().multiply(0.16));  // 16%
-        actionsColumn.prefWidthProperty().bind(productTable.widthProperty().multiply(0.20)); // 20%
+        actionsColumn.prefWidthProperty().bind(productTable.widthProperty().multiply(0.15)); // 15% (减少操作列宽度)
         
         // 设置操作列
         actionsColumn.setCellFactory(new Callback<TableColumn<ProductTableItem, Void>, TableCell<ProductTableItem, Void>>() {
