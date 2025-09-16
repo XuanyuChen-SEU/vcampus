@@ -42,7 +42,7 @@ public class ProductAddViewController implements IClientController{
     private ComboBox<String> statusCombo;
     
     @FXML
-    private TextField imageUrlField;
+    private TextField imagePathField;
     
     @FXML
     private TextArea descriptionField;
@@ -112,10 +112,10 @@ public class ProductAddViewController implements IClientController{
             }
         });
         
-        // 图片URL输入验证（简单验证）
-        imageUrlField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.length() > 500) { // 限制URL长度
-                imageUrlField.setText(oldValue);
+        // 图片路径输入验证（简单验证）
+        imagePathField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 500) { // 限制路径长度
+                imagePathField.setText(oldValue);
             }
         });
         
@@ -149,7 +149,7 @@ public class ProductAddViewController implements IClientController{
         double price = Double.parseDouble(priceField.getText().trim());
         int stock = stockSpinner.getValue();
         ProductStatus status = getStatusFromString(statusCombo.getValue());
-        String imageUrl = imageUrlField.getText().trim();
+        String imagePath = imagePathField.getText().trim();
         String description = descriptionField.getText().trim();
         
         try {
@@ -159,7 +159,7 @@ public class ProductAddViewController implements IClientController{
             newProduct.setPrice(price);
             newProduct.setStock(stock);
             newProduct.setStatus(status);
-            newProduct.setImageUrl(imageUrl.isEmpty() ? null : imageUrl);
+            newProduct.setImagePath(imagePath.isEmpty() ? null : imagePath);
             newProduct.setDescription(description.isEmpty() ? null : description);
             
             // 使用Service层发送添加商品请求
@@ -285,7 +285,7 @@ public class ProductAddViewController implements IClientController{
         priceField.clear();
         stockSpinner.getValueFactory().setValue(0);
         statusCombo.setValue("在售");
-        imageUrlField.clear();
+        imagePathField.clear();
         descriptionField.clear();
         nameField.requestFocus();
     }

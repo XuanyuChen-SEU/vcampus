@@ -25,7 +25,7 @@ public class ProductEditViewController {
     @FXML private TextField priceField;
     @FXML private Spinner<Integer> stockSpinner;
     @FXML private ComboBox<String> statusCombo;
-    @FXML private TextField imageUrlField;
+    @FXML private TextField imagePathField;
     @FXML private TextArea descriptionField;
     @FXML private Button updateButton;
     @FXML private Button resetButton;
@@ -118,7 +118,7 @@ public class ProductEditViewController {
                 priceField.setText(String.valueOf(product.getPrice()));
                 stockSpinner.getValueFactory().setValue(product.getStock());
                 statusCombo.setValue(product.getStatus().toString());
-                imageUrlField.setText(product.getImageUrl());
+                imagePathField.setText(product.getImagePath());
                 descriptionField.setText(product.getDescription());
             } catch (Exception e) {
                 System.err.println("填充表单数据时发生错误: " + e.getMessage());
@@ -237,7 +237,7 @@ public class ProductEditViewController {
             product.setStatus(ProductStatus.ON_SALE); // 默认值
         }
         
-        product.setImageUrl(imageUrlField.getText().trim());
+        product.setImagePath(imagePathField.getText().trim());
         product.setDescription(descriptionField.getText().trim());
         return product;
     }
@@ -253,7 +253,7 @@ public class ProductEditViewController {
             priceField.clear();
             stockSpinner.getValueFactory().setValue(0);
             statusCombo.setValue("在售");
-            imageUrlField.clear();
+            imagePathField.clear();
             descriptionField.clear();
         });
     }

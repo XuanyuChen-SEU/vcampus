@@ -16,7 +16,8 @@ public class Product implements Serializable {
     private Double price;       // 商品单价
     private Integer stock;      // 商品库存数量
     private String description; // 商品详细描述
-    private String imageUrl;    // 商品图片链接
+    private String imagePath;   // 商品图片路径
+    private byte[] imageData;   // 商品图片数据（二进制）
     private ProductStatus status; // 商品状态 (ON_SALE / OFF_SHELF)
 
     // 构造函数
@@ -35,16 +36,18 @@ public class Product implements Serializable {
      * @param price 商品价格
      * @param stock 商品库存
      * @param description 商品描述
-     * @param imageUrl 商品图片URL
+     * @param imagePath 商品图片路径
+     * @param imageData 商品图片数据
      * @param status 商品状态
      */
-    public Product(Long id, String name, Double price, Integer stock, String description, String imageUrl, ProductStatus status) {
+    public Product(Long id, String name, Double price, Integer stock, String description, String imagePath, byte[] imageData, ProductStatus status) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stock = stock;
         this.description = description;
-        this.imageUrl = imageUrl;
+        this.imagePath = imagePath;
+        this.imageData = imageData;
         this.status = status;
     }
 
@@ -90,14 +93,21 @@ public class Product implements Serializable {
         this.description = description;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
 
     public ProductStatus getStatus() {
         return status;
@@ -116,7 +126,7 @@ public class Product implements Serializable {
                 ", price=" + price +
                 ", stock=" + stock +
                 ", description='" + description + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
+                ", imagePath='" + imagePath + '\'' +
                 ", status=" + status +
                 '}';
     }

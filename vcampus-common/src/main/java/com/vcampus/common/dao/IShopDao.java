@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
+import com.vcampus.common.entity.Balance;
 
 /**
  * 商店数据访问对象接口 (IShopDao)
@@ -98,4 +99,18 @@ public interface IShopDao {
      * @return 如果移除成功，返回 true；否则返回 false。
      */
     boolean removeFavorite(String favoriteId);
+
+    // ==========================================================
+    // 余额 (Balance) 相关操作
+    // ==========================================================
+
+    /*
+     * 根据用户id获取余额
+     */
+    Balance getBalanceByUserId(String userId);
+
+    /*
+     * 更新余额
+     */
+    boolean updateBalance(Balance balance);
 }

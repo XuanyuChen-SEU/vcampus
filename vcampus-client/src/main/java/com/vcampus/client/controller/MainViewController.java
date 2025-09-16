@@ -316,7 +316,6 @@ public class MainViewController {
             libraryButton.setText("📚 图书馆");
             studentRecordButton.setText("📋 学籍管理");
             academicButton.setText("🎓 教务管理");
-            // 【新增】当侧边栏展开时，为AI助手按钮设置文本
             chatButton.setText("AI助手");
         } else {
             homeButton.setText("🏠");

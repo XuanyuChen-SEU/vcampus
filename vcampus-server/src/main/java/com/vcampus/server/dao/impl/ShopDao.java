@@ -1,14 +1,14 @@
 package com.vcampus.server.dao.impl;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 
 import com.vcampus.common.dao.IShopDao;
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
+import com.vcampus.common.entity.Balance;
 import com.vcampus.database.mapper.ShopMapper;
 import com.vcampus.database.utils.MyBatisUtil;
 
@@ -38,7 +38,8 @@ public class ShopDao implements IShopDao {
     public Product getProductById(String productId) {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
-            return shopMapper.getProductById(productId);
+            Long id = Long.parseLong(productId);
+            return shopMapper.getProductById(id);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -197,6 +198,34 @@ public class ShopDao implements IShopDao {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
             boolean result = shopMapper.removeFavorite(favoriteId);
+            sqlSession.commit();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ==========================================================
+    // 余额 (Balance) 相关操作
+    // ==========================================================
+
+    @Override
+    public Balance getBalanceByUserId(String userId) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
+            return shopMapper.getBalanceByUserId(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public boolean updateBalance(Balance balance) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
+            boolean result = shopMapper.updateBalance(balance);
             sqlSession.commit();
             return result;
         } catch (Exception e) {

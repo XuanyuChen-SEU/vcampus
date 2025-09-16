@@ -325,7 +325,7 @@ public class ProductManagementViewController implements IClientController{
         }
         
         // 设置其他字段的默认值（因为表格中没有显示）
-        product.setImageUrl(""); // 默认空字符串
+        product.setImagePath(""); // 默认空字符串
         product.setDescription(""); // 默认空字符串
         
         return product;

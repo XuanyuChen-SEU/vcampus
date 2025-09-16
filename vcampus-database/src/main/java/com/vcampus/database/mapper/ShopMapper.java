@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
+import com.vcampus.common.entity.Balance;
 
 /**
  * 
@@ -32,6 +33,12 @@ public interface ShopMapper {
      * @param filePath CSV文件的完整路径
      */
     void loadFavoritesFromCsv(String filePath);
+
+    /*  
+     * 从CSV文件批量导入余额数据
+     * @param filePath CSV文件的完整路径
+     */
+    void loadBalancesFromCsv(String filePath);
     
     // ==========================================================
     // 商品(Product)相关操作
@@ -48,7 +55,7 @@ public interface ShopMapper {
      * @param productId 商品ID
      * @return 对应的商品对象，如果不存在则返回null
      */
-    Product getProductById(String productId);
+    Product getProductById(Long productId);
     
     /*
      * 根据关键词模糊搜索商品名称
@@ -139,4 +146,22 @@ public interface ShopMapper {
      * @return 如果移除成功，返回 true；否则返回 false
      */
     boolean removeFavorite(String favoriteId);
+
+    // ===========
+    // 余额(Balance)相关操作
+    // ==========================================================
+
+    /*
+     * 根据用户id获取余额
+     * @param userId 用户id
+     * @return 对应的余额对象，如果不存在则返回null
+     */
+    Balance getBalanceByUserId(String userId);
+
+    /*
+     * 更新余额
+     * @param balance 包含更新信息的余额对象
+     * @return 如果更新成功，返回 true；否则返回 false
+     */
+    boolean updateBalance(Balance balance);
 }
