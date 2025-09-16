@@ -51,7 +51,7 @@
             <result property="price" column="price" />
             <result property="stock" column="stock" />
             <result property="description" column="description" />
-            <result property="imageUrl" column="imageUrl" />
+            <result property="imagePath" column="imagePath" />
             <result property="status" column="status" />
         </association>
     </resultMap>
@@ -85,7 +85,7 @@
             <result property="price" column="price" />
             <result property="stock" column="stock" />
             <result property="description" column="description" />
-            <result property="imageUrl" column="imageUrl" />
+            <result property="imagePath" column="imagePath" />
             <result property="status" column="status" />
         </association>
     </resultMap>
@@ -102,7 +102,7 @@
         FIELDS TERMINATED BY ','
         LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
-        (id, name, price, stock, description, imageUrl, @statusVar)
+        (id, name, price, stock, description, imagePath, @statusVar)
         SET status = REPLACE(@statusVar, '\r', '');
     </update>
 
@@ -140,8 +140,8 @@
         FIELDS TERMINATED BY ','
         LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
-        (userId, balance);
-        SET balance = REPLACE(balance, '\r', '');
+        (userId, @balance)
+        SET balance = REPLACE(@balance, '\r', '');
     </update>
 
     <!-- ==========================================================
@@ -156,7 +156,7 @@
             price,
             stock,
             description,
-            imageUrl,
+            imagePath,
             status
         FROM vcampus_db.tb_product
         ORDER BY id ASC
@@ -170,7 +170,7 @@
             price,
             stock,
             description,
-            imageUrl,
+            imagePath,
             status
         FROM vcampus_db.tb_product
         WHERE id = #{productId}
@@ -184,7 +184,7 @@
             price,
             stock,
             description,
-            imageUrl,
+            imagePath,
             status
         FROM vcampus_db.tb_product
         WHERE name LIKE CONCAT('%', #{keyword}, '%')
@@ -199,7 +199,7 @@
             <if test="price != null">price = #{price},</if>
             <if test="stock != null">stock = #{stock},</if>
             <if test="description != null">description = #{description},</if>
-            <if test="imageUrl != null">imageUrl = #{imageUrl},</if>
+            <if test="imagePath != null">imagePath = #{imagePath},</if>
             <if test="status != null">status = #{status},</if>
         </set>
         WHERE id = #{id}
@@ -208,10 +208,10 @@
     <!-- 添加新商品 -->
     <insert id="addProduct" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO vcampus_db.tb_product (
-            name, price, stock, description, imageUrl, status
+            name, price, stock, description, imagePath, status
         )
         VALUES (
-            #{name}, #{price}, #{stock}, #{description}, #{imageUrl}, #{status}
+            #{name}, #{price}, #{stock}, #{description}, #{imagePath}, #{status}
         )
     </insert>
 
@@ -241,7 +241,7 @@
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_order o
         LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
@@ -265,7 +265,7 @@
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_order o
         LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
@@ -289,7 +289,7 @@
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_order o
         LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
@@ -325,7 +325,7 @@
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_favorite f
         LEFT JOIN vcampus_db.tb_product p ON f.productId = p.id
@@ -344,7 +344,7 @@
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_favorite f
         LEFT JOIN vcampus_db.tb_product p ON f.productId = p.id

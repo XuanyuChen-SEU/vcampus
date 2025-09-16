@@ -137,7 +137,7 @@
             `price` DECIMAL(10,2) NOT NULL COMMENT '商品价格',
             `stock` INT NOT NULL DEFAULT 0 COMMENT '商品库存',
             `description` TEXT COMMENT '商品描述',
-            `imageUrl` VARCHAR(500) COMMENT '商品图片URL',
+            `imagePath` VARCHAR(500) COMMENT '商品图片路径',
             `status` ENUM('ON_SALE', 'OFF_SHELF') NOT NULL DEFAULT 'ON_SALE' COMMENT '商品状态',
             `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
             `updateTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

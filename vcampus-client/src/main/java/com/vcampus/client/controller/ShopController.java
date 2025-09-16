@@ -229,7 +229,7 @@ public class ShopController implements IClientController{
                 if (empty || product == null) {
                     setGraphic(null);
                 } else {
-                    Image image = new Image(product.getImageUrl(), 50, 50, true, true, true);
+                    Image image = new Image(product.getImagePath(), 50, 50, true, true, true);
                     imageView.setImage(image);
                     nameLabel.setText(product.getName());
                     setGraphic(contentBox);
@@ -263,7 +263,7 @@ public class ShopController implements IClientController{
 
         ImageView imageView = new ImageView();
         try {
-            Image image = new Image(product.getImageUrl(), 160, 160, true, true, true);
+            Image image = new Image(product.getImagePath(), 160, 160, true, true, true);
             imageView.setImage(image);
         } catch (Exception e) {
             imageView.setImage(new Image("https://via.placeholder.com/160", true));
@@ -325,7 +325,7 @@ public class ShopController implements IClientController{
             grid.setHgap(10);
             grid.setVgap(10);
             grid.setPadding(new Insets(20, 150, 10, 10));
-            ImageView imageView = new ImageView(new Image(product.getImageUrl(), 200, 200, true, true, true));
+            ImageView imageView = new ImageView(new Image(product.getImagePath(), 200, 200, true, true, true));
             grid.add(imageView, 0, 0, 1, 3);
             grid.add(new Label(String.format("价格: ¥ %.2f", product.getPrice())), 1, 0);
             grid.add(new Label("库存: " + product.getStock() + " 件"), 1, 1);
