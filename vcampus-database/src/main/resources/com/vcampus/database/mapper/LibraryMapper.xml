@@ -96,7 +96,12 @@
             description,
             borrow_status as borrowStatus
         FROM vcampus_db.tb_book
-        WHERE book_name LIKE CONCAT('%', #{keyword}, '%') OR author LIKE CONCAT('%', #{keyword}, '%');
+        WHERE book_name LIKE CONCAT('%', #{keyword}, '%') OR
+              author LIKE CONCAT('%', #{keyword}, '%') OR
+              isbn LIKE CONCAT('%', #{keyword}, '%') OR
+              publisher LIKE CONCAT('%', #{keyword}, '%') OR
+              description LIKE CONCAT('%', #{keyword}, '%');
+              borrow_status LIKE CONCAT('%', #{keyword}, '%');
     </select>
 
     <insert id="insertBook" parameterType="com.vcampus.common.dto.Book">
@@ -176,6 +181,10 @@
             (log_id, book_id, book_name, user_id, username, borrow_date, due_date)
         VALUES (#{logId}, #{bookId}, #{bookName}, #{userId}, #{username}, #{borrowDate}, #{dueDate});
     </insert>
+
+    <delete id="deleteBorrowLogById">
+        DELETE FROM vcampus_db.tb_borrow_log WHERE log_id = #{logId};
+    </delete>
 
     <update id="updateBorrowLog" parameterType="com.vcampus.common.dto.BorrowLog">
         UPDATE vcampus_db.tb_borrow_log

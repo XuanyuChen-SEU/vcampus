@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.libraryAdmin.BorrowLogCreateController"
+            styleClass="admin-content-background">
+
+    <VBox fx:id="formContainer" alignment="CENTER" spacing="20.0" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0">
+        <children>
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="书籍ID:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="bookIdField" promptText="请输入要借阅的书籍ID" styleClass="form-field" prefWidth="250.0" />
+                </children>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="用户ID:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="userIdField" promptText="请输入借阅用户的ID" styleClass="form-field" prefWidth="250.0" />
+                </children>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="20.0">
+                <padding>
+                    <Insets top="20.0" />
+                </padding>
+                <children>
+                    <Button fx:id="createButton" text="✅ 创建记录" onAction="#handleCreate" styleClass="create-button" />
+                    <Button fx:id="resetButton" text="🔄 重置表单" onAction="#handleReset" styleClass="reset-button" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+</AnchorPane>

@@ -22,7 +22,7 @@
     </update>
 
     <update id="createUserTable" parameterType="java.lang.String">
-            CREATE TABLE IF NOT EXISTS vcampus_db.`tb_user` (
+            CREATE TABLE IF NOT EXISTS vcampus_db.tb_user (
             `userId` VARCHAR(50) NOT NULL COMMENT '用户ID（7位数字字符串）',
             `password` VARCHAR(50) NOT NULL COMMENT '密码（7位数字字符串）',
             PRIMARY KEY (`userId`) -- 建议加主键，避免重复插入
