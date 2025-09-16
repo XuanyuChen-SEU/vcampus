@@ -17,10 +17,34 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <configuration>
           <mainClass>com.vcampus.client.MainApp</mainClass>
+          <commandlineArgs />
+          <jlinkImageName>vcampus-client</jlinkImageName>
+          <jlinkZipName>vcampus-client-distribution</jlinkZipName>
+          <launcher>vcampus-client</launcher>
+          <noManPages>true</noManPages>
+          <noHeaderFiles>true</noHeaderFiles>
         </configuration>
       </plugin>
       <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <includeScope>runtime</includeScope>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -33,17 +57,7 @@
                   <mainClass>com.vcampus.client.MainApp</mainClass>
                 </transformer>
               </transformers>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-              <finalName>vcampus-client-executable</finalName>
+              <finalName>vcampus-client-${project.version}</finalName>
             </configuration>
           </execution>
         </executions>
