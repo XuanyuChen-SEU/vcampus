@@ -18,7 +18,7 @@
                 <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
                 <property name="url" value="jdbc:mysql://localhost:3306/?serverTimezone=UTC&amp;allowLoadLocalInfile=true"/>
                 <property name="username" value="root"/>
-                <property name="password" value="Abcd0410"/>
+                <property name="password" value="1ssyzjkl"/>
 
             </dataSource>
 
