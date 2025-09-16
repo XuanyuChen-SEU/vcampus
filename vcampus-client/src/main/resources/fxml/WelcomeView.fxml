@@ -9,10 +9,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane styleClass="welcome-background" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane styleClass="welcome-background" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.WelcomeViewController">
     <children>
         <!-- 主标题区域 -->
-        <VBox alignment="CENTER" spacing="20.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="80.0">
+        <VBox fx:id="topContentBox" translateY="-500.0"  alignment="CENTER" spacing="20.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="80.0">
             <children>
                 <!-- Logo和标题 -->
                 <HBox alignment="CENTER" spacing="15.0">
@@ -26,24 +26,24 @@
                         <Label text="虚拟校园系统" styleClass="welcome-subtitle" />
                     </VBox>
                 </HBox>
-                
+
                 <!-- 欢迎文字 -->
                 <Label text="欢迎使用 V-Campus 虚拟校园系统！" styleClass="welcome-text" />
-                
+
                 <!-- 系统描述 -->
-                <Label text="一个集成了校园商店、图书馆、学籍管理、教务系统等功能的综合性平台" 
-                       styleClass="welcome-description" 
-                       wrapText="true" 
+                <Label text="一个集成了校园商店、图书馆、学籍管理、教务系统等功能的综合性平台"
+                       styleClass="welcome-description"
+                       wrapText="true"
                        maxWidth="600.0" />
             </children>
         </VBox>
-        
+
         <!-- 功能卡片区域 -->
-        <VBox alignment="CENTER" spacing="30.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="300.0" AnchorPane.bottomAnchor="120.0">
+        <VBox fx:id="bottomContentBox" translateY="500.0" alignment="CENTER" spacing="30.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="300.0" AnchorPane.bottomAnchor="120.0">
             <children>
                 <!-- 功能卡片标题 -->
                 <Label text="系统功能" styleClass="features-title" />
-                
+
                 <!-- 功能卡片网格 -->
                 <HBox alignment="CENTER" spacing="40.0">
                     <children>
@@ -60,7 +60,7 @@
                                 </VBox>
                             </children>
                         </VBox>
-                        
+
                         <!-- 图书馆卡片 -->
                         <VBox alignment="CENTER" spacing="10.0" styleClass="feature-card">
                             <children>
@@ -74,7 +74,7 @@
                                 </VBox>
                             </children>
                         </VBox>
-                        
+
                         <!-- 学籍管理卡片 -->
                         <VBox alignment="CENTER" spacing="10.0" styleClass="feature-card">
                             <children>
@@ -88,7 +88,7 @@
                                 </VBox>
                             </children>
                         </VBox>
-                        
+
                         <!-- 教务系统卡片 -->
                         <VBox alignment="CENTER" spacing="10.0" styleClass="feature-card">
                             <children>
@@ -106,7 +106,7 @@
                 </HBox>
             </children>
         </VBox>
-        
+
         <!-- 底部信息 -->
         <VBox alignment="CENTER" spacing="5.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
             <children>

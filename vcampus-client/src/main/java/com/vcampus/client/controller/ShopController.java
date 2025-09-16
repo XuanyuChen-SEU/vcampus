@@ -12,7 +12,7 @@ import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.OrderStatus;
-
+import javafx.stage.Window;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -39,6 +39,21 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+
+// 确保您的类中有这些 import
+import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import java.io.IOException;
+import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 
 public class ShopController implements IClientController{
 
@@ -65,6 +80,18 @@ public class ShopController implements IClientController{
 
     @FXML
     void initialize() {
+        // --- 全新配置代码 ---
+        final int numColumns = 4;
+        final double hgap = 15.0; // 水平间距
+        final double vgap = 15.0; // 垂直间距
+        final Insets padding = new Insets(15.0); // 内边距
+
+        productPane.setHgap(hgap);
+        productPane.setVgap(vgap);
+        productPane.setPadding(padding);
+
+        // 关键：让 TilePane 的宽度能跟随 ScrollPane 变化
+        productScrollPane.setFitToWidth(true);
         System.out.println("商店控制器初始化完成！");
         currentUser = new User(MainApp.getGlobalUserSession().getCurrentUserId(),"");        // 1. 配置UI相关的组件
         setupOrderTable();
@@ -72,7 +99,9 @@ public class ShopController implements IClientController{
         // 2. 将自己注册到消息中心，以便接收异步消息
         registerToMessageController();
         loadInitialProducts();
+
     }
+
 
     @Override
     public void registerToMessageController() {
@@ -253,27 +282,62 @@ public class ShopController implements IClientController{
     }
 
     /**
-     * 升级版：创建一个更接近淘宝风格的商品卡片
+     * 【最终决战版 - 独立解决问题】
+     * 卡片宽度直接绑定到 ScrollPane，强制实现4列布局和3:4比例。
      */
     private VBox createProductCard(Product product) {
-        VBox card = new VBox(5);
-        card.setPadding(new Insets(10));
-        card.setStyle("-fx-border-color: #DDDDDD; -fx-border-radius: 5; -fx-background-color: #FFFFFF;");
-        card.setPrefWidth(180);
+        // 1. 外部容器：作为边框和背景
+        VBox cardFrame = new VBox();
+        cardFrame.setStyle("-fx-border-color: #DDDDDD; -fx-border-radius: 5; -fx-background-color: #FFFFFF; -fx-background-radius: 5;");
 
+        // --- 【核心中的核心】---
+        // 我们直接将卡片的宽度属性绑定到 ScrollPane 的宽度上
+        final int numColumns = 4;
+        final double hgap = productPane.getHgap();
+        final Insets padding = productPane.getPadding();
+
+        cardFrame.prefWidthProperty().bind(
+                productScrollPane.widthProperty() // 从 ScrollPane 获取总宽度
+                        .subtract(padding.getLeft() + padding.getRight()) // 减去 TilePane 的左右内边距
+                        .subtract((numColumns - 1) * hgap) // 减去列之间的所有水平间距
+                        .subtract(30) // 【关键】减去滚动条的大致宽度和一个安全边距
+                        .divide(numColumns) // 最后除以4
+        );
+        // --- 绑定结束 ---
+
+        // 2. 内部核心容器：StackPane，用于堆叠内容和“支柱”
+        StackPane stackPane = new StackPane();
+
+        // 3. 创建不可见的“支柱” Region，以强制实现 3:4 比例
+        Region sizingStrut = new Region();
+        sizingStrut.prefHeightProperty().bind(stackPane.widthProperty().multiply(4.0 / 3.0));
+        sizingStrut.setVisible(false);
+
+        // 4. 创建可见内容的容器 VBox
+        VBox contentContainer = new VBox();
+
+        // --- 图片部分 ---
         ImageView imageView = new ImageView();
         try {
-            Image image = new Image(product.getImageUrl(), 160, 160, true, true, true);
+            Image image = new Image(product.getImageUrl(), true);
             imageView.setImage(image);
         } catch (Exception e) {
-            imageView.setImage(new Image("https://via.placeholder.com/160", true));
+            imageView.setImage(new Image("https://via.placeholder.com/200", true));
         }
+        imageView.fitWidthProperty().bind(contentContainer.widthProperty());
+        imageView.fitHeightProperty().bind(contentContainer.heightProperty().multiply(0.55));
+        imageView.setPreserveRatio(false);
+
+        // --- 文字和按钮部分 ---
+        VBox textBox = new VBox(5);
+        textBox.setPadding(new Insets(10));
+        VBox.setVgrow(textBox, Priority.ALWAYS);
 
         Label nameLabel = new Label(product.getName());
         nameLabel.setWrapText(true);
-        nameLabel.setPrefHeight(40); // 给名称两行的高度
 
         HBox priceBox = new HBox(5);
+        // ... (price box 的内容)
         Label currencyLabel = new Label("¥");
         currencyLabel.setTextFill(Color.RED);
         Label priceLabel = new Label(String.valueOf(product.getPrice()));
@@ -281,12 +345,23 @@ public class ShopController implements IClientController{
         priceLabel.setFont(new Font("System Bold", 16));
         priceBox.getChildren().addAll(currencyLabel, priceLabel);
 
-        Button actionButton = new Button("查看详情");
-        actionButton.setOnAction(event -> handleViewDetails(product)); // 修改这里
 
-        card.getChildren().addAll(imageView, nameLabel, priceBox, actionButton);
-        return card;
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
+        Button actionButton = new Button("查看详情");
+        actionButton.setMaxWidth(Double.MAX_VALUE);
+        actionButton.setOnAction(event -> handleViewDetails(product));
+
+        // 5. 组装
+        textBox.getChildren().addAll(nameLabel, priceBox, spacer, actionButton);
+        contentContainer.getChildren().addAll(imageView, textBox);
+        stackPane.getChildren().addAll(sizingStrut, contentContainer);
+        cardFrame.getChildren().add(stackPane);
+
+        return cardFrame;
     }
+
 
     // --- 请将这个完整的方法添加到你的 ShopController.java 中 ---
 
@@ -418,20 +493,7 @@ public class ShopController implements IClientController{
         }
     }
 
-    /**
-     * 【新增，作为异步入口】处理“创建订单”的异步响应。
-     * @param message 服务器返回的响应消息
-     */
-    public void handleCreateOrderResponse(Message message) {
-        Platform.runLater(() -> {
-            if (message.isSuccess()) {
-                ShopTransaction createdOrder = (ShopTransaction) message.getData();
-                showPaymentDialog(createdOrder); // 成功后弹出支付对话框
-            } else {
-                showError("下单失败: " + message.getMessage());
-            }
-        });
-    }
+
 
     /**
      * 【新增，作为异步入口】处理“添加收藏”的异步响应。
@@ -491,68 +553,65 @@ public class ShopController implements IClientController{
         Platform.runLater(() -> new Alert(Alert.AlertType.INFORMATION, message).showAndWait());
     }
     /**
-     * 【已升级】显示功能更丰富的支付确认对话框
-     * @param order 服务器成功创建并返回的订单对象
+     * 【最终版】处理“创建订单”的异步响应。
+     * 当服务器成功创建一个待支付订单后，此方法被 MessageController 调用。
+     * @param message 服务器返回的响应消息
      */
-    private void showPaymentDialog(ShopTransaction order) {
-        // 1. 创建一个自定义对话框
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("订单确认");
-        dialog.setHeaderText("订单已创建成功！请确认您的订单信息");
+    public void handleCreateOrderResponse(Message message) {
+        Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                // 1. 从消息中解析出服务器已创建的订单对象
+                ShopTransaction createdOrder = (ShopTransaction) message.getData();
 
-        // 2. 创建用于布局的 GridPane
-        GridPane grid = new GridPane();
-        grid.setHgap(10); // 水平间距
-        grid.setVgap(10); // 垂直间距
-        grid.setPadding(new Insets(20, 150, 10, 10));
+                // 2. 【核心】调用我们新的方法，弹出独立的 FXML 窗口
+                showCreateOrderWindow(createdOrder);
 
-        // 3. 从 order 对象中提取信息并创建标签
-        //    【注意】我们假设订单中只有一个商品，所以直接从 order.getProduct() 获取
-        Product product = order.getProduct();
-
-        // 订单号
-        grid.add(new Label("订单号:"), 0, 0);
-        grid.add(new Label(order.getId() != null ? order.getId().toString() : "N/A"), 1, 0);
-
-        // 商品名称
-        grid.add(new Label("商品:"), 0, 1);
-        grid.add(new Label(product.getName()), 1, 1);
-
-        // 购买数量 (假设每次买一个)
-        grid.add(new Label("数量:"), 0, 2);
-        grid.add(new Label("1"), 1, 2);
-
-        // 商品单价
-        grid.add(new Label("单价:"), 0, 3);
-        grid.add(new Label(String.format("¥ %.2f", product.getPrice())), 1, 3);
-
-        // 订单总价
-        grid.add(new Label("总计:"), 0, 4);
-        Label totalPriceLabel = new Label(String.format("¥ %.2f", order.getTotalPrice()));
-        totalPriceLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: red;");
-        grid.add(totalPriceLabel, 1, 4);
-
-        // 4. 将 GridPane 设置为对话框的内容
-        dialog.getDialogPane().setContent(grid);
-
-        // 5. 创建自定义按钮
-        ButtonType confirmButton = new ButtonType("确认支付", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelButton = new ButtonType("稍后支付", ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(confirmButton, cancelButton);
-
-        // 6. 显示对话框并处理用户的点击结果
-        Optional<ButtonType> result = dialog.showAndWait();
-        if (result.isPresent() && result.get() == confirmButton) {
-            System.out.println("用户确认支付订单：" + order.getId());
-            // TODO: 在这里调用一个新的 service 方法，向服务器发送支付请求
-            // 例如: Message response = shopService.payForOrder(order.getId());
-            showSuccess("支付成功！(模拟)"); // 暂时先模拟成功
-        } else {
-            showError("支付已取消，您可以在“我的订单”中找到该笔订单。");
-        }
+            } else {
+                // 3. 如果下单失败，显示错误信息
+                showError("下单失败: " + message.getMessage());
+            }
+        });
     }
 
+    private void showCreateOrderWindow(ShopTransaction order) {
+        try {
+            // 1. 创建一个新的 FXMLLoader
+            FXMLLoader loader = new FXMLLoader();
 
+            // 【已修正】直接传入路径字符串
+            loader.setLocation(MainApp.class.getResource("/fxml/CreateOrderView.fxml"));
 
+            // 2. 加载 FXML 并创建一个新的 Stage (窗口)
+            AnchorPane page = (AnchorPane) loader.load();
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("创建订单");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
 
+            // --- 【核心修正 - 无需修改 MainApp】 ---
+            // 从当前界面上的任意一个已知控件（例如 productScrollPane）获取其所在的窗口
+            // 这个窗口就是我们的主舞台 (primaryStage)
+            Window ownerWindow = productScrollPane.getScene().getWindow();
+            dialogStage.initOwner(ownerWindow);
+            // --- 修正结束 ---
+
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // 3. 获取新窗口的控制器
+            CreateOrderController controller = loader.getController();
+
+            // 4. 【关键】调用控制器的数据初始化方法
+            // TODO: 您需要一个方法来获取当前用户的余额
+            double mockBalance = 500.0;
+            controller.initData(order, mockBalance);
+
+            // 5. 显示窗口并等待用户操作
+            dialogStage.showAndWait();
+
+        } catch (IOException | NullPointerException e) {
+            // 增加了 NullPointerException 的捕获，以防 getScene() 或 getWindow() 为空
+            e.printStackTrace();
+            showError("无法加载订单页面: " + e.getMessage());
+        }
+    }
 }

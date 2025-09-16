@@ -9,32 +9,50 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.text.Font?>
 
-<!-- fx:controller 路径已指向我们新的、功能更强大的 ShopController -->
+<!-- fx:controller 路径保持不变 -->
 <BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.ShopController">
 
-    <!-- ===== 顶部区域：搜索与导航 (保持不变) ===== -->
+    <!-- ===== 顶部区域：【已升级】加入了余额显示和充值功能 ===== -->
     <top>
         <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="15.0" style="-fx-background-color: #F0F0F0; -fx-border-color: #CCCCCC; -fx-border-width: 0 0 1 0;">
             <padding> <Insets left="20.0" right="20.0" /> </padding>
             <children>
+                <!-- 商店标题 -->
                 <Label text="校园商店"> <font> <Font name="System Bold" size="18.0" /> </font> </Label>
+
+                <!-- 搜索框 -->
                 <TextField fx:id="searchField" onAction="#handleSearch" promptText="搜索商品..." HBox.hgrow="ALWAYS" />
                 <Button fx:id="searchButton" onAction="#handleSearch" text="搜索" />
+
+                <!-- 使用一个可伸缩的 Region 来推开右侧的按钮，实现左右分离布局 -->
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- 【新增】余额显示标签 -->
+                <!-- fx:id 必须和 Controller 中的变量名完全对应 -->
+                <Label fx:id="balanceLabel" text="余额: 加载中..." style="-fx-font-weight: bold;">
+                    <font> <Font size="14.0" /> </font>
+                </Label>
+
+                <!-- 【新增】充值按钮 -->
+                <Button fx:id="rechargeButton" onAction="#handleRecharge" text="充值" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+
+                <!-- 导航按钮 -->
                 <Button fx:id="myOrdersButton" onAction="#handleShowMyOrders" text="我的订单" />
                 <Button fx:id="myFavoritesButton" onAction="#handleShowMyFavorites" text="我的收藏" />
             </children>
         </HBox>
     </top>
 
-    <!-- ===== 中部区域：【重大升级】使用 StackPane 实现视图切换 ===== -->
+    <!-- ===== 中部区域：视图切换区 (保持不变) ===== -->
     <center>
         <StackPane fx:id="centerStackPane" BorderPane.alignment="CENTER">
             <children>
-                <!-- 视图一：商品/收藏 展示区 (默认可见) -->
+                <!-- 视图一：商品/收藏 展示区 -->
                 <ScrollPane fx:id="productScrollPane" fitToWidth="true" hbarPolicy="NEVER">
                     <content>
                         <TilePane fx:id="productPane" hgap="20.0" prefColumns="4" vgap="20.0">
@@ -43,10 +61,9 @@
                     </content>
                 </ScrollPane>
 
-                <!-- 视图二：订单 展示区 (默认不可见) -->
-                <TableView fx:id="orderTable" prefHeight="200.0" prefWidth="200.0" visible="false">
+                <!-- 视图二：订单 展示区 -->
+                <TableView fx:id="orderTable" visible="false">
                     <columns>
-                        <!-- 这些 fx:id 必须和 Controller 中的 TableColumn 变量名完全对应 -->
                         <TableColumn fx:id="orderIdColumn" prefWidth="75.0" text="订单号" />
                         <TableColumn fx:id="orderDateColumn" prefWidth="150.0" text="购买日期" />
                         <TableColumn fx:id="orderProductColumn" prefWidth="300.0" text="商品" />

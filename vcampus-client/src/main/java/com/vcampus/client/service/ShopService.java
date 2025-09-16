@@ -72,4 +72,20 @@ public class ShopService {
         System.out.println("客户端 ShopService：异步发送取消收藏请求 (ID: " + favoriteId + ")...");
         socketClient.sendMessage(new Message(ActionType.SHOP_REMOVE_FAVORITE, favoriteId));
     }
+    /**
+     * 【新增】异步发送“获取余额”的请求
+     */
+    public void getBalance(String userId) {
+        socketClient.sendMessage(new Message(ActionType.SHOP_GET_BALANCE, userId));
+    }
+
+    /**
+     * 【新增】异步发送“充值”的请求
+     */
+    public void rechargeBalance(String userId, double amount) {
+        // 将 userId 和 amount 打包到一个对象或Map中发送
+        // 这里用 Balance DTO 来打包非常合适
+        Balance rechargeRequest = new Balance(userId, amount);
+        socketClient.sendMessage(new Message(ActionType.SHOP_RECHARGE_BALANCE, rechargeRequest));
+    }
 }
