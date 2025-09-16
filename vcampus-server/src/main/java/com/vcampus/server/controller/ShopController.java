@@ -19,6 +19,7 @@ public class ShopController {
 
     /**
      * 处理“获取所有商品”的请求
+     *
      * @param message 客户端请求 (data 部分应为 null)
      * @return 包含商品列表的响应 Message
      */
@@ -34,6 +35,7 @@ public class ShopController {
 
     /**
      * 处理“搜索商品”的请求
+     *
      * @param message 客户端请求 (data 部分为 String 类型的关键词)
      * @return 包含搜索结果的响应 Message
      */
@@ -44,7 +46,7 @@ public class ShopController {
                 return Message.failure(ActionType.SHOP_SEARCH_PRODUCTS, "无效的请求数据：搜索关键词必须为字符串。");
             }
             String searchData = (String) message.getData();
-            
+
             // 2. 解析搜索数据：格式为 "关键词|状态"
             String keyword = "";
             final String status;
@@ -61,18 +63,18 @@ public class ShopController {
             } else {
                 status = "全部";
             }
-            
+
             System.out.println("搜索商品 - 关键词: '" + keyword + "', 状态: '" + status + "'");
 
             List<Product> products = shopService.searchProducts(keyword);
-            
+
             // 3. 如果指定了状态筛选，进行额外过滤
             if (!"全部".equals(status) && products != null) {
                 products = products.stream()
-                    .filter(p -> p.getStatus().toString().equals(status))
-                    .collect(java.util.stream.Collectors.toList());
+                        .filter(p -> p.getStatus().toString().equals(status))
+                        .collect(java.util.stream.Collectors.toList());
             }
-            
+
             System.out.println("搜索结果数量: " + (products != null ? products.size() : 0));
             return Message.success(ActionType.SHOP_SEARCH_PRODUCTS, products, "搜索成功");
         } catch (Exception e) {
@@ -83,6 +85,7 @@ public class ShopController {
 
     /**
      * 处理“获取我的订单”的请求
+     *
      * @param message 客户端请求 (data 部分为 String 类型的 userId)
      * @return 包含订单列表的响应 Message
      */
@@ -109,6 +112,7 @@ public class ShopController {
 
     /**
      * 处理“获取我的收藏”的请求
+     *
      * @param message 客户端请求 (data 部分为 String 类型的 userId)
      * @return 包含收藏列表的响应 Message
      */
@@ -167,13 +171,13 @@ public class ShopController {
         }
     }
 
-
     // ==========================================================
     // 商店管理员相关方法
     // ==========================================================
 
     /**
      * 处理"添加商品"的请求
+     *
      * @param message 客户端请求 (data 部分为 Product 对象)
      * @return 包含操作结果的响应 Message
      */
@@ -187,7 +191,7 @@ public class ShopController {
 
             // 2. 调用 Service 层处理业务逻辑
             boolean success = shopService.addProduct(product);
-            
+
             if (success) {
                 return Message.success(ActionType.SHOP_ADMIN_ADD_PRODUCT, "商品添加成功");
             } else {
@@ -201,6 +205,7 @@ public class ShopController {
 
     /**
      * 处理"更新商品"的请求
+     *
      * @param message 客户端请求 (data 部分为 Product 对象)
      * @return 包含操作结果的响应 Message
      */
@@ -214,7 +219,7 @@ public class ShopController {
 
             // 2. 调用 Service 层处理业务逻辑
             boolean success = shopService.updateProduct(product);
-            
+
             if (success) {
                 return Message.success(ActionType.SHOP_ADMIN_UPDATE_PRODUCT, "商品更新成功");
             } else {
@@ -228,6 +233,7 @@ public class ShopController {
 
     /**
      * 处理"删除商品"的请求
+     *
      * @param message 客户端请求 (data 部分为 String 类型的商品ID)
      * @return 包含操作结果的响应 Message
      */
@@ -241,7 +247,7 @@ public class ShopController {
 
             // 2. 调用 Service 层处理业务逻辑
             boolean success = shopService.deleteProduct(productId);
-            
+
             if (success) {
                 return Message.success(ActionType.SHOP_ADMIN_DELETE_PRODUCT, "商品删除成功");
             } else {
@@ -255,6 +261,7 @@ public class ShopController {
 
     /**
      * 处理"获取所有订单"的请求
+     *
      * @param message 客户端请求 (data 部分应为 null)
      * @return 包含订单列表的响应 Message
      */
@@ -270,6 +277,7 @@ public class ShopController {
 
     /**
      * 处理"获取所有收藏"的请求
+     *
      * @param message 客户端请求 (data 部分应为 null)
      * @return 包含收藏列表的响应 Message
      */
@@ -285,6 +293,7 @@ public class ShopController {
 
     /**
      * 处理"管理员根据用户ID获取订单"的请求
+     *
      * @param message 客户端请求 (data 部分为 String 类型的用户ID)
      * @return 包含订单列表的响应 Message
      */
@@ -311,6 +320,7 @@ public class ShopController {
 
     /**
      * 处理"管理员根据用户ID获取收藏"的请求
+     *
      * @param message 客户端请求 (data 部分为 String 类型的用户ID)
      * @return 包含收藏列表的响应 Message
      */
@@ -332,6 +342,73 @@ public class ShopController {
         } catch (Exception e) {
             e.printStackTrace();
             return Message.failure(ActionType.SHOP_ADMIN_GET_FAVORITES_BY_USER, "根据用户ID获取收藏失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 【已增强】处理“创建订单”的请求，能捕获并返回更精确的错误信息。
+     * @param message 客户端请求
+     * @return 响应 Message
+     */
+    public Message handleCreateOrder(Message message) {
+        try {
+            ShopTransaction orderRequest = (ShopTransaction) message.getData();
+            // 现在这个调用可能会抛出我们自定义的异常
+            ShopTransaction createdOrder = shopService.createOrder(orderRequest);
+
+            // 如果代码能执行到这里，说明一切成功
+            return Message.success(ActionType.SHOP_CREATE_ORDER, createdOrder, "订单创建成功");
+
+        } catch (RuntimeException e) {
+            // 【核心】捕获来自 Service 层的业务逻辑异常
+            e.printStackTrace(); // 在服务器控制台打印，方便调试
+            // 将 Service 层抛出的精确错误信息，返回给客户端
+            return Message.failure(ActionType.SHOP_CREATE_ORDER, e.getMessage());
+        } catch (Exception e) {
+            // 捕获其他所有意料之外的异常
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_CREATE_ORDER, "服务器内部未知错误");
+        }
+    }
+    /**
+     * 处理“添加收藏”的请求
+     * @param message 客户端请求
+     * @return 包含操作结果的响应 Message
+     */
+    public Message handleAddFavorite(Message message) {
+        try {
+            ShopTransaction favoriteRequest = (ShopTransaction) message.getData();
+            boolean success = shopService.addFavorite(favoriteRequest);
+
+            if (success) {
+                return Message.success(ActionType.SHOP_ADD_FAVORITE, null, "收藏成功");
+            } else {
+                return Message.failure(ActionType.SHOP_ADD_FAVORITE, "已收藏或添加失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_ADD_FAVORITE, "服务器内部异常: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理“取消收藏”的请求
+     * @param message 客户端请求
+     * @return 包含操作结果的响应 Message
+     */
+    public Message handleRemoveFavorite(Message message) {
+        try {
+            String favoriteId = (String) message.getData();
+            boolean success = shopService.removeFavorite(favoriteId);
+
+            if (success) {
+                return Message.success(ActionType.SHOP_REMOVE_FAVORITE, null, "取消收藏成功");
+            } else {
+                return Message.failure(ActionType.SHOP_REMOVE_FAVORITE, "取消收藏失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_REMOVE_FAVORITE, "服务器内部异常: " + e.getMessage());
         }
     }
 }

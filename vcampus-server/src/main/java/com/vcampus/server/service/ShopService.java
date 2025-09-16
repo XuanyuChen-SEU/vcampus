@@ -9,7 +9,7 @@ import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.enums.OrderStatus;
 import com.vcampus.common.enums.ProductStatus;
-import com.vcampus.server.dao.impl.FakeShopDao;
+
 import com.vcampus.server.dao.impl.ShopDao;
 
 /**
@@ -18,8 +18,7 @@ import com.vcampus.server.dao.impl.ShopDao;
  */
 public class ShopService {
 
-    private final IShopDao shopDao;
-    private final ShopDao realShopDao; // 新增：用于商店管理员功能的真实数据库DAO
+    private final ShopDao shopDao;
 
     /**
      * 构造函数。
@@ -28,53 +27,24 @@ public class ShopService {
      * 3. 将假数据注入到 DAO 实例中。
      */
     public ShopService() {
-        // 1. 先创建一个"空"的 FakeShopDao
-        FakeShopDao fakeDao = new FakeShopDao();
-        this.shopDao = fakeDao;
-        this.realShopDao = new ShopDao(); // 初始化真实数据库DAO
 
-        // 2. 创建所有假数据 (这段逻辑是从 FakeShopDao 的构造函数里搬过来的)
-        List<Product> productTable = new ArrayList<>();
-        List<ShopTransaction> orderTable = new ArrayList<>();
-        List<ShopTransaction> favoriteTable = new ArrayList<>();
+        // 1. 先创建一个“空”的 FakeShopDao
+        this.shopDao = new ShopDao();
 
-        // 初始化商品
-        productTable.add(new Product(1L, "高品质笔记本", 15.50, 100, "非常适合记笔记的本子", "https://via.placeholder.com/160", ProductStatus.ON_SALE));
-        productTable.add(new Product(2L, "多功能中性笔", 5.00, 200, "书写流畅，不断墨", "https://via.placeholder.com/160", ProductStatus.ON_SALE));
-        productTable.add(new Product(3L, "二手教科书《Java核心技术》", 50.00, 10, "九成新，几乎无笔记", "https://via.placeholder.com/160", ProductStatus.ON_SALE));
-        productTable.add(new Product(4L, "校园纪念T恤", 99.00, 50, "纯棉材质，舒适透气", "https://via.placeholder.com/160", ProductStatus.ON_SALE));
-
-        // 初始化订单
-        ShopTransaction order1 = new ShopTransaction(1001L, "1234567", 15.50, OrderStatus.PAID, LocalDateTime.now().minusDays(1), null);
-        order1.setProduct(productTable.get(0));
-        orderTable.add(order1);
-
-        ShopTransaction order2 = new ShopTransaction(1002L, "1234567", 50.00, OrderStatus.RETURNED, LocalDateTime.now().minusDays(5), null);
-        order2.setProduct(productTable.get(2));
-        orderTable.add(order2);
-
-        // 初始化收藏
-        favoriteTable.add(new ShopTransaction(2001L, "1234567", productTable.get(3), LocalDateTime.now()));
-
-        // 3. 将创建好的假数据列表，“喂”给 FakeShopDao
-        System.out.println("ShopService: 正在将测试数据注入到 FakeShopDao...");
-        fakeDao.setProductTable(productTable);
-        fakeDao.setOrderTable(orderTable);
-        fakeDao.setFavoriteTable(favoriteTable);
     }
 
     // --- 下面的所有业务逻辑方法保持不变 ---
 
     public List<Product> getAllProducts() {
-        return realShopDao.getAllProducts();
+        return shopDao.getAllProducts();
     }
 
     public List<Product> searchProducts(String keyword) {
         // 商店管理员功能使用真实数据库DAO
         if (keyword == null || keyword.trim().isEmpty()) {
-            return realShopDao.getAllProducts();
+            return shopDao.getAllProducts();
         }
-        return realShopDao.searchProducts(keyword.trim());
+        return shopDao.searchProducts(keyword.trim());
     }
 
     public List<ShopTransaction> getMyOrders(String userId) {
@@ -121,7 +91,7 @@ public class ShopService {
             }
             
             // 使用真实数据库DAO
-            return realShopDao.addProduct(product);
+            return shopDao.addProduct(product);
         } catch (Exception e) {
             System.err.println("添加商品失败: " + e.getMessage());
             return false;
@@ -141,7 +111,7 @@ public class ShopService {
             }
             
             // 使用真实数据库DAO
-            return realShopDao.updateProductById(product);
+            return shopDao.updateProductById(product);
         } catch (Exception e) {
             System.err.println("更新商品失败: " + e.getMessage());
             return false;
@@ -161,7 +131,7 @@ public class ShopService {
             }
             
             // 使用真实数据库DAO
-            return realShopDao.deleteProductById(productId);
+            return shopDao.deleteProductById(productId);
         } catch (Exception e) {
             System.err.println("删除商品失败: " + e.getMessage());
             return false;
@@ -175,7 +145,7 @@ public class ShopService {
     public List<ShopTransaction> getAllOrders() {
         try {
             // 使用真实数据库DAO
-            return realShopDao.getAllOrders();
+            return shopDao.getAllOrders();
         } catch (Exception e) {
             System.err.println("获取所有订单失败: " + e.getMessage());
             return new ArrayList<>();
@@ -189,7 +159,7 @@ public class ShopService {
     public List<ShopTransaction> getAllFavorites() {
         try {
             // 使用真实数据库DAO
-            return realShopDao.getAllFavorites();
+            return shopDao.getAllFavorites();
         } catch (Exception e) {
             System.err.println("获取所有收藏失败: " + e.getMessage());
             return new ArrayList<>();
@@ -209,7 +179,7 @@ public class ShopService {
             }
             
             // 使用真实数据库DAO
-            return realShopDao.getOrdersByUserId(userId);
+            return shopDao.getOrdersByUserId(userId);
         } catch (Exception e) {
             System.err.println("管理员获取用户订单失败: " + e.getMessage());
             return new ArrayList<>();
@@ -229,10 +199,98 @@ public class ShopService {
             }
             
             // 使用真实数据库DAO
-            return realShopDao.getFavoritesByUserId(userId);
+            return shopDao.getFavoritesByUserId(userId);
         } catch (Exception e) {
             System.err.println("管理员获取用户收藏失败: " + e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * 【已增强】创建订单的业务逻辑，使用异常处理来明确失败原因。
+     * @param orderRequest 包含用户和商品信息的请求
+     * @return 创建成功则返回包含了数据库ID的完整订单对象
+     * @throws RuntimeException 如果库存不足或数据库保存失败
+     */
+    public ShopTransaction createOrder(ShopTransaction orderRequest) {
+        Product product = shopDao.getProductById(orderRequest.getProduct().getId().toString());
+
+        if (product == null) {
+            // 明确抛出异常，而不是返回null
+            throw new RuntimeException("商品不存在或已下架");
+        }
+        if (product.getStock() <= 0) {
+            // 明确抛出异常
+            throw new RuntimeException("商品库存不足");
+        }
+
+        product.setStock(product.getStock() - 1);
+        shopDao.updateProductById(product);
+
+        ShopTransaction newOrder = new ShopTransaction(orderRequest.getUserId(), product.getPrice());
+        newOrder.setProduct(product);
+
+        boolean success = shopDao.saveOrder(newOrder);
+
+        if (!success) {
+            // 明确抛出异常
+            throw new RuntimeException("数据库保存订单失败");
+        }
+
+        return newOrder;
+    }
+
+    /**
+     * 【已补全】添加收藏的业务逻辑，增加了重复收藏检查。
+     * @param favoriteRequest 包含用户ID和商品信息的请求
+     * @return 如果成功返回 true, 否则返回 false
+     */
+    public boolean addFavorite(ShopTransaction favoriteRequest) {
+        // 1. 从请求中获取关键信息
+        String userId = favoriteRequest.getUserId();
+        Long productId = favoriteRequest.getProduct().getId();
+
+        // 【核心逻辑】在添加之前，先检查用户是否已经收藏过此商品
+        // a. 获取该用户的所有收藏记录
+        List<ShopTransaction> userFavorites = shopDao.getFavoritesByUserId(userId);
+
+        // b. 检查这些记录中是否已包含当前要收藏的商品ID
+        boolean alreadyFavorited = userFavorites.stream()
+                .anyMatch(fav -> fav.getProduct() != null && fav.getProduct().getId().equals(productId));
+
+        // 2. 如果已经收藏过，直接返回 false，表示操作“失败”（因为无需再次添加）
+        if (alreadyFavorited) {
+            System.out.println("业务逻辑：用户 " + userId + " 尝试重复收藏商品 " + productId + "，操作被阻止。");
+            return false;
+        }
+
+        // 3. 如果未收藏，才调用 DAO 将新收藏记录写入数据库
+        System.out.println("业务逻辑：用户 " + userId + " 收藏商品 " + productId + "，写入数据库...");
+        return shopDao.addFavorite(favoriteRequest);
+    }
+
+    /**
+     * 【已补全】取消收藏的业务逻辑，增加了参数校验。
+     * @param favoriteId 收藏记录在数据库中的ID (String类型)
+     * @return 如果成功返回 true, 否则返回 false
+     */
+    public boolean removeFavorite(String favoriteId) {
+        // 1. 【核心逻辑】增加健壮性检查，确保传入的ID不是空的或无效的
+        if (favoriteId == null || favoriteId.trim().isEmpty()) {
+            System.err.println("业务逻辑错误：尝试取消收藏时，传入的 favoriteId 为空。");
+            return false;
+        }
+
+        // 2. 将 favoriteId 转换为 Long 类型，以防后续数据库操作因类型不匹配而出错
+        try {
+            Long.parseLong(favoriteId);
+        } catch (NumberFormatException e) {
+            System.err.println("业务逻辑错误：传入的 favoriteId '" + favoriteId + "' 不是一个有效的数字。");
+            return false;
+        }
+
+        // 3. 调用 DAO 从数据库中删除对应的收藏记录
+        System.out.println("业务逻辑：请求从数据库删除收藏记录，ID为 " + favoriteId);
+        return shopDao.removeFavorite(favoriteId);
     }
 }
