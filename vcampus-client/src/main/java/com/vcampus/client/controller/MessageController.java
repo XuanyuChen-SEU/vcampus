@@ -296,6 +296,31 @@ public class MessageController {
                         System.err.println("路由警告：收到商品详情响应，但ShopController未注册。");
                     }
                     break;
+                case SHOP_CREATE_ORDER:
+                    if (shopController != null) {
+                        // 假设您在ShopController中有一个处理下单响应的方法
+                        shopController.handleCreateOrderResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到创建订单响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_ADD_FAVORITE:
+                    if (shopController != null) {
+                        shopController.handleAddFavoriteResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到添加收藏响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_REMOVE_FAVORITE:
+                    if (shopController != null) {
+                        shopController.handleRemoveFavoriteResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到取消收藏响应，但ShopController未注册。");
+                    }
+                    break;
+
 
                 // 商店管理员相关响应处理
                 case SHOP_ADMIN_ADD_PRODUCT:
