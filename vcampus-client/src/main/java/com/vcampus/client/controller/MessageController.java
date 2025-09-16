@@ -10,6 +10,7 @@ import com.vcampus.client.controller.shopAdmin.ProductEditViewController;
 import com.vcampus.client.controller.shopAdmin.OrderManagementViewController;
 import com.vcampus.client.controller.shopAdmin.FavoriteManagementViewController;
 import com.vcampus.common.dto.Message;
+import com.vcampus.client.controller.courseAdmin.CourseAdminController; // 确保导入
 
 /**
  * 客户端消息控制器
@@ -35,6 +36,7 @@ public class MessageController {
     private OrderManagementViewController orderManagementViewController;
     private FavoriteManagementViewController favoriteManagementViewController;
     private MyTimetableController myTimetableController; // ⭐ 新增
+    private CourseAdminController courseAdminController;
 
     /**
      * 设置LoginController实例（由UI层调用）
@@ -87,6 +89,11 @@ public class MessageController {
     }
     public void setFavoriteManagementViewController(FavoriteManagementViewController controller) {
         this.favoriteManagementViewController = controller;
+    }
+
+    // ... (保留所有已有的 setter)
+    public void setCourseAdminController(CourseAdminController controller) {
+        this.courseAdminController = controller;
     }
     /**
      * 处理服务端消息
@@ -377,6 +384,63 @@ public class MessageController {
                         System.err.println("路由警告：收到打开PDF文件响应，但LibraryController未注册。");
                     }
                     break;
+
+                // --- ⭐ 新增：处理教务管理员相关的响应 ---
+                case ADMIN_GET_ALL_COURSES_RESPONSE:
+                    if (courseAdminController != null) {
+                        courseAdminController.handleGetAllCoursesResponse(message);
+                    }
+                    break;
+
+                case ADMIN_ADD_COURSE_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到添加课程响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理添加课程响应");
+                    }
+                    break;
+                case ADMIN_MODIFY_COURSE_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到修改课程响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理修改课程响应");
+                    }
+                    break;
+                case ADMIN_DELETE_COURSE_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到删除课程响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理删除课程响应");
+                    }
+                    break;
+                case ADMIN_ADD_SESSION_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到添加班级响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理添加班级响应");
+                    }
+                    break;
+                case ADMIN_MODIFY_SESSION_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到修改班级响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理修改班级响应");
+                    }
+                    break;
+                case ADMIN_DELETE_SESSION_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到删除班级响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理删除班级响应");
+                    }
+                    break;
+
 
 
 

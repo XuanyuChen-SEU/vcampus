@@ -1,6 +1,7 @@
 package com.vcampus.common.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,9 @@ public class Course implements Serializable {
     private String campus;//校区
 
     // 默认构造方法（反序列化必需）
-    public Course() {}
+    public Course() {
+        this.sessions = new ArrayList<>();
+    }
 
     // 带参构造方法 - 兼容旧的枚举参数
     public Course(String courseId, String courseName, String courseType, String department, Object status, List<ClassSession> sessions,double credits,String category,String campus) {
@@ -46,7 +49,10 @@ public class Course implements Serializable {
         this.courseType = courseType;
         this.department = department;
         this.status = (status instanceof String) ? (String)status : status.toString();
-        this.sessions = sessions;
+        // 如果传入的 sessions 列表是 null，则初始化一个空的 ArrayList
+        this.sessions = (sessions != null) ? sessions : new ArrayList<>();
+
+        this.sessionnum = this.sessions.size();
         this.sessionnum = sessions.size();
         // 新增字段
         this.credits = credits;
@@ -70,6 +76,8 @@ public class Course implements Serializable {
         // 对 sessions 列表也进行深拷贝
         if (other.sessions != null) {
             this.sessions = other.sessions.stream().map(ClassSession::new).collect(Collectors.toList());
+        } else {
+            this.sessions = new ArrayList<>(); // 同样确保不为 null
         }
     }
 

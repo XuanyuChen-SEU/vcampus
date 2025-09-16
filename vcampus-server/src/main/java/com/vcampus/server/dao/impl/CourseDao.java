@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
  * CourseDao 接口的真实数据库实现。
  * 使用 MyBatis 与数据库进行交互。
  */
-public class CourseDao implements ICourseDao {
-
+public class CourseDao /*implements ICourseDao */{
+/*
     @Override
     public List<Course> getAllCourses() {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
@@ -151,4 +151,10 @@ public class CourseDao implements ICourseDao {
             return mapper.selectByStudentAndSession(studentId, sessionId) != null;
         }
     }
+
+    @Override
+    boolean deleteSession(String sessionId){
+        return false;
+    }
+   */
 }

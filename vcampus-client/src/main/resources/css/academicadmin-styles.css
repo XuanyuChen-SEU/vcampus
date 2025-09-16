@@ -1,0 +1,133 @@
+/* =============================================================== */
+/* TreeTableView (教务管理员界面) 专属样式            */
+/* =============================================================== */
+
+/* 1. 设置整个表头区域的背景颜色 */
+/* 我们使用一个专业且柔和的淡蓝灰色，类似您截图中的效果 */
+.tree-table-view .column-header-background {
+    -fx-background-color: #f1f3f5; /* A light, professional grey-blue */
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0; /* 只显示底部边框 */
+}
+
+/* 2. 设置表头中【文字】的样式 */
+.tree-table-view .column-header .label {
+    -fx-text-fill: #343a40;      /* 深灰色文字，保证对比度和可读性 */
+    -fx-font-weight: bold;        /* 字体加粗 */
+    -fx-font-size: 13px;
+    -fx-padding: 8px;           /* 增加内边距，让表头不拥挤 */
+}
+
+/* 3. (可选) 统一设置数据单元格的样式 */
+.tree-table-view .tree-table-cell {
+    -fx-padding: 8px;
+    -fx-border-color: transparent transparent #f1f3f5 transparent; /* 单元格之间的细分隔线 */
+}
+
+/* 4. (可选) 为树状箭头设置颜色 */
+.tree-table-view .tree-table-row-cell .arrow {
+    -fx-background-color: #555555;
+}
+
+/* academic-styles.css */
+
+.add-session-button {
+    -fx-border-color: #adb5bd;
+    -fx-border-style: dashed;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 4;
+    -fx-background-color: transparent;
+    -fx-font-size: 14px;
+    -fx-text-fill: #6c757d;
+    -fx-cursor: hand;
+}
+.add-session-button:hover {
+    -fx-background-color: #f8f9fa;
+}
+
+.delete-button {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+}
+
+/* =============================================================== */
+/* 教务管理后台 (Admin Panel) 专属样式表             */
+/* =============================================================== */
+
+/* --- 1. 根容器背景 --- */
+/* 为主 VBox 设置一个从左上到右下的蓝紫色渐变背景 */
+.admin-background {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #667eea, #764ba2);
+}
+
+/* --- 2. 标题和通用标签样式 --- */
+/* 为主标题（如“教务管理后台”）设置白色字体 */
+.admin-title {
+    -fx-text-fill: white;
+}
+
+/* --- 3. 顶部操作栏按钮样式 --- */
+.admin-toolbar-button {
+    -fx-background-color: rgba(255, 255, 255, 0.2); /* 半透明白色背景 */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+}
+.admin-toolbar-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 删除按钮的特殊样式 */
+.delete-button {
+    -fx-background-color: #f44336; /* 红色 */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+}
+.delete-button:hover {
+    -fx-background-color: #d32f2f;
+}
+
+
+/* --- 4. 课程卡片 (CourseAdminCard) 样式 --- */
+/* 课程卡片的根 VBox 样式，半透明白色背景，带阴影 */
+.course-card {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0.2, 0, 2);
+}
+
+/* 课程卡片【标题行】的文字样式，淡紫色，符合您的截图 */
+.course-card .header-label {
+    -fx-text-fill: #555577; /* 深蓝紫色文字 */
+    -fx-font-weight: bold;
+}
+
+/* --- 5. 教学班卡片 (ClassSessionAdminCard) 样式 --- */
+/* 教学班卡片的根 VBox 样式 */
+.session-card {
+    -fx-background-color: white;
+    -fx-background-radius: 4;
+    -fx-border-color: #e9ecef;
+    -fx-border-radius: 4;
+}
+
+/* 教学班卡片内的普通文字样式 */
+.session-card .info-label {
+    -fx-text-fill: #495057; /* 深灰色文字 */
+}
+
+/* “添加教学班”按钮的虚线框样式 */
+.add-session-button {
+    -fx-border-color: #adb5bd;
+    -fx-border-style: dashed;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 4;
+    -fx-background-color: transparent;
+    -fx-font-size: 14px;
+    -fx-text-fill: #6c757d;
+    -fx-cursor: hand;
+}
+.add-session-button:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+}

@@ -94,16 +94,43 @@ public enum ActionType {
     LIBRARY_RETURN_BOOK("用户归还图书"),
     LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
 
+    // ⭐ 新增
+    SEARCH_COURSES("搜索响应课程"),
+    // ⭐ 新增：教务管理员相关操作
+    ADMIN_GET_ALL_COURSES("管理员获取所有课程"),          // 管理员获取所有课程
+    ADMIN_GET_ALL_COURSES_RESPONSE("管理员获取所有课程响应"),
 
+    ADMIN_ADD_COURSE("管理员增加课程"),               // 管理员增加课程
+    ADMIN_ADD_COURSE_RESPONSE("管理员增加课程响应"),
+
+    ADMIN_MODIFY_COURSE("管理员修改课程"),            // 管理员修改课程
+    ADMIN_MODIFY_COURSE_RESPONSE("管理员修改课程响应"),
+
+    ADMIN_DELETE_COURSE("管理员删除课程"),            // 管理员删除课程
+    ADMIN_DELETE_COURSE_RESPONSE("管理员删除课程响应"),
+
+    ADMIN_ADD_SESSION("管理员增加教学班"),              // 管理员增加教学班
+    ADMIN_ADD_SESSION_RESPONSE("管理员增加教学班响应"),
+
+    ADMIN_MODIFY_SESSION("管理员修改教学班"),           // 管理员修改教学班
+    ADMIN_MODIFY_SESSION_RESPONSE("管理员修改教学班响应"),
+    ADMIN_DELETE_SESSION("管理员删除教学班"),           // 管理员删除教学班
+    ADMIN_DELETE_SESSION_RESPONSE("管理员删除教学班响应"),
+
+
+    // ⭐ 新增：管理员搜索课程
+    ADMIN_SEARCH_COURSES("管理员搜索课程"),
+    // 注意：我们不需要 ADMIN_SEARCH_COURSES_RESPONSE。
+    // 搜索成功后，服务器返回的也是一个课程列表，
+    // 我们可以复用 ADMIN_GET_ALL_COURSES_RESPONSE 这个响应类型。
     // --- 图书馆模块 - 管理员端 ---
     LIBRARY_ADD_BOOK("管理员添加图书"),
     LIBRARY_DELETE_BOOK("管理员删除图书"),
     LIBRARY_MODIFY_BOOK("管理员修改图书"),
     LIBRARY_SEARCH_HISTORY   ("搜索借阅历史"),
-    LIBRARY_SEARCH_USERS("搜索用户借阅历史"),
+    LIBRARY_SEARCH_USERS("搜索用户借阅历史");
 
-    // ⭐ 新增
-    SEARCH_COURSES("搜索响应课程");
+
 
     private final String description;
 

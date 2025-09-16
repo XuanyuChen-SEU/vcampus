@@ -105,6 +105,7 @@ import com.vcampus.server.data.DataSource; // ⭐ 1. 引入全局数据源
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -235,9 +236,162 @@ public class FakeCourseDao implements ICourseDao {
      * @return 一个包含 ClassSession 的 Optional 对象
      */
     private Optional<ClassSession> findSessionById(String sessionId) {
+        if (sessionId == null) return Optional.empty();
+
         return DataSource.MOCK_COURSE_TABLE.values().stream()
-                .flatMap(c -> c.getSessions().stream())
-                .filter(s -> s.getSessionId().equals(sessionId))
+                .filter(Objects::nonNull) // 过滤掉 null 的 Course 对象
+                .filter(course -> course.getSessions() != null) // 过滤掉 sessions 列表为 null 的 Course
+                .flatMap(course -> course.getSessions().stream())
+                .filter(Objects::nonNull) // 过滤掉 null 的 ClassSession 对象
+                .filter(session -> sessionId.equals(session.getSessionId()))
                 .findFirst();
     }
+
+    // --- ⭐ 新增：管理员功能实现 ---
+
+    /**
+     * ⭐ 新增：在内存中添加一个新的课程
+     * @param course 要添加的课程 DTO
+     * @return 如果成功添加，返回 true
+     */
+    @Override
+    public boolean addCourse(Course course) {
+        if (course == null || course.getCourseId() == null) {
+            return false;
+        }
+        // computeIfAbsent: 如果Key不存在，则添加；如果已存在，则不操作并返回现有值
+        // 这样可以保证课程ID的唯一性
+        Course existing = DataSource.MOCK_COURSE_TABLE.putIfAbsent(course.getCourseId(), course);
+
+        if(existing == null) {
+            System.out.println("DAO: [State Changed] 新课程 " + course.getCourseId() + " 已被添加。");
+            return true; // 如果之前没有值(返回null)，说明添加成功
+        } else {
+            System.err.println("DAO 错误：尝试添加已存在的课程ID " + course.getCourseId());
+            return false; // 如果之前有值，说明ID冲突，添加失败
+        }
+    }
+
+    /**
+     * ⭐ 新增：在内存中更新一个课程的信息
+     * @param course 包含了最新信息的课程 DTO
+     * @return 如果成功更新，返回 true
+     */
+    @Override
+    public boolean updateCourse(Course course) {
+        if (course == null || course.getCourseId() == null) {
+            return false;
+        }
+
+        // 检查课程ID是否存在
+        if (DataSource.MOCK_COURSE_TABLE.containsKey(course.getCourseId())) {
+            // 如果存在，用新的课程对象替换旧的
+            DataSource.MOCK_COURSE_TABLE.put(course.getCourseId(), course);
+            System.out.println("DAO: [State Changed] 课程 " + course.getCourseId() + " 已被更新。");
+            return true;
+        } else {
+            System.err.println("DAO 错误：尝试更新不存在的课程ID " + course.getCourseId());
+            return false; // 课程不存在，更新失败
+        }
+    }
+
+    @Override
+    public boolean deleteCourse(String courseId) {
+        // 同时需要删除与该课程相关的所有教学班和选课记录
+        Course removedCourse = DataSource.MOCK_COURSE_TABLE.remove(courseId);
+        if (removedCourse != null) {
+            List<String> sessionsToDelete = removedCourse.getSessions().stream()
+                    .map(ClassSession::getSessionId).collect(Collectors.toList());
+            DataSource.MOCK_SELECTION_TABLE.values()
+                    .forEach(selectionList -> selectionList.removeAll(sessionsToDelete));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean addSession(ClassSession session) {
+        // 1. 检查 session 和它的关键ID是否为空
+        if (session == null || session.getCourseId() == null || session.getSessionId() == null) {
+            return false;
+        }
+
+        // 2. 根据 courseId 找到它应该属于的父课程
+        Course parentCourse = DataSource.MOCK_COURSE_TABLE.get(session.getCourseId());
+        if (parentCourse == null) {
+            System.err.println("DAO错误：尝试为不存在的课程 " + session.getCourseId() + " 添加教学班");
+            return false; // 找不到父课程，添加失败
+        }
+
+        // 3. 检查新的教学班ID是否在整个系统中已存在
+        if (findSessionById(session.getSessionId()).isPresent()) {
+            System.err.println("DAO错误：教学班ID " + session.getSessionId() + " 已存在，无法添加");
+            return false;
+        }
+
+        // 4. 将新的教学班添加到父课程的 sessions 列表中
+        parentCourse.getSessions().add(session);
+        System.out.println("DAO: [State Changed] 新教学班 " + session.getSessionId() + " 已添加到课程 " + parentCourse.getCourseId());
+        return true;
+    }
+
+    @Override
+    public boolean updateSession(ClassSession updatedSession) {
+        if(updatedSession == null || updatedSession.getSessionId() == null) return false;
+
+        // 调用我们下面更健壮的 findSessionById 方法
+        Optional<ClassSession> sessionOpt = findSessionById(updatedSession.getSessionId());
+
+        if (sessionOpt.isPresent()) {
+            ClassSession originalSession = sessionOpt.get();
+            originalSession.setTeacherName(updatedSession.getTeacherName());
+            originalSession.setScheduleInfo(updatedSession.getScheduleInfo());
+            originalSession.setCapacity(updatedSession.getCapacity());
+            System.out.println("FakeDAO: [State Changed] 教学班 " + originalSession.getSessionId() + " 的信息已更新。");
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * ⭐ 新增：在内存中删除一个教学班，并级联删除所有相关的学生选课记录
+     * @param sessionId 要删除的教学班 ID
+     * @return 如果成功删除，返回 true
+     */
+    @Override
+    public boolean deleteSession(String sessionId) {
+        boolean wasRemoved = false;
+        // 1. 遍历所有课程，找到并移除对应的教学班
+        for (Course course : DataSource.MOCK_COURSE_TABLE.values()) {
+            // 使用 removeIf 方法，如果成功删除则返回 true
+            wasRemoved = course.getSessions().removeIf(s -> s.getSessionId().equals(sessionId));
+            if (wasRemoved) {
+                System.out.println("DAO: [State Changed] 教学班 " + sessionId + " 已从课程 " + course.getCourseId() + " 中移除。");
+                break; // 教学班ID是唯一的，找到后即可退出循环
+            }
+        }
+
+        // 2. 如果成功从课程中移除了教学班，则执行级联删除
+        if (wasRemoved) {
+            // 遍历所有学生的选课记录
+            System.out.println("DAO: [State Changed] 正在级联删除教学班 " + sessionId + " 的所有选课记录...");
+            DataSource.MOCK_SELECTION_TABLE.values().forEach(
+                    // 从每个学生的选课列表 (List<String>) 中，移除这个 sessionId
+                    selectionList -> selectionList.remove(sessionId)
+            );
+        }
+
+        return wasRemoved;
+    }
+
+    @Override
+    public boolean updateSessionCapacity(String sessionId, int newCapacity) {
+        Optional<ClassSession> sessionOpt = findSessionById(sessionId);
+        if (sessionOpt.isPresent()) {
+            sessionOpt.get().setCapacity(newCapacity);
+            return true;
+        }
+        return false;
+    }
+
 }

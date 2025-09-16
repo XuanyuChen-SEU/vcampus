@@ -98,6 +98,26 @@ public class MessageController {
                 case SEARCH_COURSES:
                     return courseController.handleSearchCourses(request);
 
+                // --- ⭐ 新增：路由所有教务管理员相关的请求 ---
+                case ADMIN_GET_ALL_COURSES:
+                    return courseController.handleGetAllCoursesAdmin(request);
+                case ADMIN_ADD_COURSE:
+                    return courseController.handleAddCourse(request);
+                case ADMIN_MODIFY_COURSE:
+                    return courseController.handleModifyCourse(request);
+                case ADMIN_DELETE_COURSE:
+                    return courseController.handleDeleteCourse(request);
+                case ADMIN_ADD_SESSION:
+                    return courseController.handleAddSession(request);
+                case ADMIN_MODIFY_SESSION:
+                    return courseController.handleModifySession(request);
+                case ADMIN_DELETE_SESSION:
+                    return courseController.handleDeleteSession(request);
+
+                // ⭐ 新增路由
+                case ADMIN_SEARCH_COURSES:
+                    return courseController.handleAdminSearchCourses(request);
+
                 // --- 商店相关 ---
                 case SHOP_GET_ALL_PRODUCTS:
                     return shopController.handleGetAllProducts(request);
