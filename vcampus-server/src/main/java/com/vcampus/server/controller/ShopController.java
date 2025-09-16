@@ -1,12 +1,12 @@
 package com.vcampus.server.controller;
 
+import java.util.List;
+
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.ShopService;
-
-import java.util.List;
 
 /**
  * 商店模块的控制器 (ShopController) - 服务端 (已优化异常处理)

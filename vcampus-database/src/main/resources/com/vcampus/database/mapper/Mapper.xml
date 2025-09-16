@@ -219,4 +219,12 @@
             );
     </update>
 
+    <!-- 创建余额表 -->
+    <update id="createBalanceTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_balance (
+            userId VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '用户ID（主键）',
+            balance DECIMAL(10,2) NOT NULL COMMENT '余额'
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='余额表';
+    </update>
+
 </mapper>

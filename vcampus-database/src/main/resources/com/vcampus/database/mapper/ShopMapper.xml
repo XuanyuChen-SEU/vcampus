@@ -132,6 +132,18 @@
         SET addTime = CASE WHEN @addTimeVar = '' THEN CURRENT_TIMESTAMP ELSE STR_TO_DATE(@addTimeVar, '%Y-%m-%d %H:%i:%s') END;
     </update>
 
+    <!-- 从CSV文件批量导入余额数据 -->
+    <update id="loadBalancesFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_balance
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (userId, balance);
+        SET balance = REPLACE(balance, '\r', '');
+    </update>
+
     <!-- ==========================================================
          商品(Product)相关操作
          ========================================================== -->
@@ -354,5 +366,19 @@
     <delete id="removeFavorite">
         DELETE FROM vcampus_db.tb_favorite WHERE id = #{favoriteId}
     </delete>
+
+    <!-- ==========================================================
+        余额(Balance)相关操作
+         ========================================================== -->
+
+    <!-- 根据用户id获取余额 -->
+    <select id="getBalanceByUserId" resultType="com.vcampus.common.entity.Balance">
+        SELECT userId, balance FROM vcampus_db.tb_balance WHERE userId = #{userId}
+    </select>
+
+    <!-- 更新余额 -->
+    <update id="updateBalance">
+        UPDATE vcampus_db.tb_balance SET balance = #{balance} WHERE userId = #{userId}
+    </update>
 
 </mapper>
