@@ -317,9 +317,7 @@ public class ShopController implements IClientController{
         } catch (Exception e) {
             imageView.setImage(new Image("https://via.placeholder.com/200", true));
         }
-        imageView.fitWidthProperty().bind(contentContainer.widthProperty());
-        imageView.fitHeightProperty().bind(contentContainer.heightProperty().multiply(0.55));
-        imageView.setPreserveRatio(false);
+        imageView.setPreserveRatio(true);
 
         // --- 文字和按钮部分 ---
         VBox textBox = new VBox(5);
@@ -347,11 +345,9 @@ public class ShopController implements IClientController{
 
         // 5. 组装
         textBox.getChildren().addAll(nameLabel, priceBox, spacer, actionButton);
-        contentContainer.getChildren().addAll(imageView, textBox);
-        stackPane.getChildren().addAll(sizingStrut, contentContainer);
-        cardFrame.getChildren().add(stackPane);
-
-        return cardFrame;
+        card.getChildren().addAll(imageView, textBox);
+        
+        return card;
     }
 
 

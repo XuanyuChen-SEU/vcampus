@@ -39,8 +39,12 @@ public class CreateOrderController {
 
         // 尝试加载图片，如果失败则不显示
         try {
-            if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-                productImageView.setImage(new Image(product.getImageUrl(), true));
+            if (product.getImageData() != null && product.getImageData().length > 0) {
+                // 使用图片数据创建Image
+                productImageView.setImage(new Image(new java.io.ByteArrayInputStream(product.getImageData())));
+            } else if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
+                // 回退到使用图片路径
+                productImageView.setImage(new Image(product.getImagePath()));
             }
         } catch (Exception e) {
             System.err.println("订单页面加载图片失败: " + e.getMessage());
