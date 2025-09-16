@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.libraryAdmin.BookCreateViewController"
+            styleClass="admin-content-background">
+
+    <VBox fx:id="formContainer" alignment="CENTER" spacing="15.0" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0">
+        <children>
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="书籍ID:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="bookIdField" promptText="请输入书籍ID (例如 B001)" styleClass="form-field" prefWidth="300.0" />
+                </children>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="书名:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="titleField" promptText="请输入书名" styleClass="form-field" prefWidth="300.0" />
+                </children>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="作者:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="authorField" promptText="请输入作者" styleClass="form-field" prefWidth="300.0" />
+                </children>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="ISBN:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="isbnField" promptText="请输入ISBN号" styleClass="form-field" prefWidth="300.0" />
+                </children>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="出版社:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="publisherField" promptText="请输入出版社" styleClass="form-field" prefWidth="300.0" />
+                </children>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="15.0">
+                <children>
+                    <Label text="描述:" styleClass="form-label" prefWidth="100.0" />
+                    <TextField fx:id="descriptionField" promptText="请输入简短的描述" styleClass="form-field" prefWidth="300.0" />
+                </children>
+            </HBox>
+
+
+            <HBox alignment="CENTER" spacing="20.0">
+                <padding>
+                    <Insets top="20.0" />
+                </padding>
+                <children>
+                    <Button fx:id="createButton" text="✅ 创建图书" onAction="#handleCreate" styleClass="create-button" />
+                    <Button fx:id="resetButton" text="🔄 重置表单" onAction="#handleReset" styleClass="reset-button" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+</AnchorPane>

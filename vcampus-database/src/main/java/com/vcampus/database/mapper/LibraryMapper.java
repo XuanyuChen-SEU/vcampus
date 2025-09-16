@@ -31,6 +31,7 @@ public interface LibraryMapper {
     List<BorrowLog> searchAllBorrowLogs(String keyword);
     List<BorrowLog> searchMyBorrows(@Param("userId") String userId, @Param("keyword") String keyword);
 
+    int deleteBorrowLogById(String logId);
 
 
 

@@ -17,6 +17,9 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import java.io.File;
 
 /**
  * 商品添加控制器
@@ -42,7 +45,7 @@ public class ProductAddViewController implements IClientController{
     private ComboBox<String> statusCombo;
     
     @FXML
-    private TextField imageUrlField;
+    private javafx.scene.image.ImageView imagePreview;
     
     @FXML
     private TextArea descriptionField;
@@ -55,7 +58,10 @@ public class ProductAddViewController implements IClientController{
     private Button resetButton;
     
     @FXML
-    private Button cancelButton;
+    private Button selectImageButton;
+    
+    // 存储选择的图片文件
+    private File selectedImageFile;
     
     /**
      * 构造函数
@@ -112,12 +118,7 @@ public class ProductAddViewController implements IClientController{
             }
         });
         
-        // 图片URL输入验证（简单验证）
-        imageUrlField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.length() > 500) { // 限制URL长度
-                imageUrlField.setText(oldValue);
-            }
-        });
+        // 图片路径输入验证已移除，因为现在使用图片预览
         
         // 商品名称长度限制
         nameField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -149,7 +150,6 @@ public class ProductAddViewController implements IClientController{
         double price = Double.parseDouble(priceField.getText().trim());
         int stock = stockSpinner.getValue();
         ProductStatus status = getStatusFromString(statusCombo.getValue());
-        String imageUrl = imageUrlField.getText().trim();
         String description = descriptionField.getText().trim();
         
         try {
@@ -159,8 +159,21 @@ public class ProductAddViewController implements IClientController{
             newProduct.setPrice(price);
             newProduct.setStock(stock);
             newProduct.setStatus(status);
-            newProduct.setImageUrl(imageUrl.isEmpty() ? null : imageUrl);
             newProduct.setDescription(description.isEmpty() ? null : description);
+            
+            // 如果有选择的图片文件，设置图片数据
+            if (selectedImageFile != null) {
+                try {
+                    // 读取图片文件为字节数组
+                    byte[] imageData = java.nio.file.Files.readAllBytes(selectedImageFile.toPath());
+                    newProduct.setImageData(imageData);
+                    System.out.println("图片文件大小: " + imageData.length + " bytes");
+                } catch (Exception e) {
+                    System.err.println("读取图片文件失败: " + e.getMessage());
+                    showError("读取图片文件失败: " + e.getMessage());
+                    return;
+                }
+            }
             
             // 使用Service层发送添加商品请求
             Message result = productAddService.addProduct(newProduct);
@@ -198,6 +211,15 @@ public class ProductAddViewController implements IClientController{
     }
     
     /**
+     * 处理取消
+     */
+    @FXML
+    private void handleCancel(ActionEvent event) {
+        // 返回到商品管理视图
+        goBackToProductManagement();
+    }
+    
+    /*
      * 处理重置表单
      */
     @FXML
@@ -205,13 +227,46 @@ public class ProductAddViewController implements IClientController{
         resetForm();
     }
     
+
     /**
-     * 处理取消
+     * 处理选择图片
      */
     @FXML
-    private void handleCancel(ActionEvent event) {
-        // 返回到商品管理视图
-        goBackToProductManagement();
+    private void handleSelectImage(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("选择商品图片");
+        
+        // 设置文件过滤器，只允许PNG文件
+        FileChooser.ExtensionFilter pngFilter = new FileChooser.ExtensionFilter("PNG图片文件", "*.png");
+        fileChooser.getExtensionFilters().add(pngFilter);
+        
+        // 设置初始目录
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        
+        // 获取当前窗口
+        Stage stage = (Stage) selectImageButton.getScene().getWindow();
+        
+        // 显示文件选择对话框
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        
+        if (selectedFile != null) {
+            // 验证文件是否为PNG格式
+            if (selectedFile.getName().toLowerCase().endsWith(".png")) {
+                selectedImageFile = selectedFile;
+                
+                // 显示图片预览
+                try {
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(selectedFile.toURI().toString());
+                    imagePreview.setImage(image);
+                    System.out.println("选择的图片文件: " + selectedFile.getAbsolutePath());
+                } catch (Exception e) {
+                    System.err.println("加载图片预览失败: " + e.getMessage());
+                    showError("加载图片预览失败: " + e.getMessage());
+                }
+            } else {
+                showError("请选择PNG格式的图片文件");
+            }
+        }
     }
     
     /**
@@ -285,8 +340,9 @@ public class ProductAddViewController implements IClientController{
         priceField.clear();
         stockSpinner.getValueFactory().setValue(0);
         statusCombo.setValue("在售");
-        imageUrlField.clear();
+        imagePreview.setImage(null); // 清除图片预览
         descriptionField.clear();
+        selectedImageFile = null; // 重置选择的图片文件
         nameField.requestFocus();
     }
     
@@ -368,6 +424,9 @@ public class ProductAddViewController implements IClientController{
             alert.setContentText(message.getMessage());
             alert.showAndWait();
             
+            // 通知商品管理控制器刷新列表
+            notifyProductManagementRefresh();
+            
             // 自动返回商品管理视图
             goBackToProductManagement();
         } else {
@@ -377,6 +436,25 @@ public class ProductAddViewController implements IClientController{
             alert.setHeaderText("商品添加失败");
             alert.setContentText(message.getMessage());
             alert.showAndWait();
+        }
+    }
+    
+    /**
+     * 通知商品管理控制器刷新列表
+     */
+    private void notifyProductManagementRefresh() {
+        try {
+            // 通过MessageController获取ProductManagementViewController
+            com.vcampus.client.controller.MessageController messageController = 
+                com.vcampus.client.MainApp.getGlobalSocketClient().getMessageController();
+            
+            if (messageController != null && messageController.getProductManagementViewController() != null) {
+                // 触发刷新操作
+                messageController.getProductManagementViewController().refreshProductList();
+                System.out.println("已通知商品管理控制器刷新列表");
+            }
+        } catch (Exception e) {
+            System.err.println("通知刷新失败: " + e.getMessage());
         }
     }
 }

@@ -30,7 +30,7 @@
     <TableView fx:id="productTable" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" styleClass="data-table">
         <columns>
             <TableColumn fx:id="idColumn" text="商品ID" minWidth="80.0" />
-            <TableColumn fx:id="nameColumn" text="商品名称" minWidth="150.0" />
+            <TableColumn fx:id="nameColumn" text="商品名称" minWidth="200.0" />
             <TableColumn fx:id="priceColumn" text="价格" minWidth="100.0" />
             <TableColumn fx:id="stockColumn" text="库存" minWidth="80.0" />
             <TableColumn fx:id="statusColumn" text="状态" minWidth="100.0" />

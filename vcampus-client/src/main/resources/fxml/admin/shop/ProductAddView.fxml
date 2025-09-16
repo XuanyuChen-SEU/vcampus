@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.image.ImageView?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.vcampus.client.controller.shopAdmin.ProductAddViewController"
@@ -56,9 +57,14 @@
                 <Label text="商品状态:" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="form-label" />
                 <ComboBox fx:id="statusCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="form-field" />
                 
-                <!-- 商品图片URL -->
-                <Label text="图片URL:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="form-label" />
-                <TextField fx:id="imageUrlField" promptText="请输入商品图片URL" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="form-field" />
+                <!-- 商品图片上传 -->
+                <Label text="商品图片:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="form-label" />
+                <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <children>
+                        <ImageView fx:id="imagePreview" fitWidth="80.0" fitHeight="80.0" preserveRatio="true" pickOnBounds="true" />
+                        <Button fx:id="selectImageButton" text="📁 选择图片" onAction="#handleSelectImage" styleClass="select-button" />
+                    </children>
+                </HBox>
                 
                 <!-- 商品描述 -->
                 <Label text="商品描述:" GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="form-label" />

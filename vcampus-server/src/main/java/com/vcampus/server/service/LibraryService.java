@@ -47,7 +47,15 @@ public class LibraryService {
     public List<BorrowLog> getAdminBorrowHistory() {
         return libraryDao.getAllBorrowLogs();
     }
-
+    /**
+     * 【新增】处理管理员创建借阅记录的业务逻辑
+     * @param bookId 书籍ID
+     * @param userId 用户ID
+     * @return 操作是否成功
+     */
+    public boolean createBorrowLog(String bookId, String userId) {
+        return libraryDao.adminCreateBorrowLog(bookId, userId);
+    }
     // --- 借阅搜索业务 ---
     // 【核心修改】将搜索逻辑完全委托给 DAO，以利用数据库的查询性能
     public List<Book> searchBooks(String keyword) {
@@ -152,5 +160,15 @@ public class LibraryService {
         buffer.flush();
         return buffer.toByteArray();
     }
+    /**
+     * 【新增】处理更新借阅记录的业务逻辑
+     * @param log 要更新的借阅记录对象
+     * @return 操作是否成功
+     */
+    public boolean updateBorrowLog(BorrowLog log) {
+        // 直接调用DAO层的方法
+        return libraryDao.updateBorrowLog(log);
+    }
+
 
 }

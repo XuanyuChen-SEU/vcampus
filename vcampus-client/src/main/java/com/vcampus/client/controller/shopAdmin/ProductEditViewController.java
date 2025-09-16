@@ -5,12 +5,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import com.vcampus.client.controller.ShopAdminViewController;
 import com.vcampus.client.service.shopAdmin.ProductManagementService;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.enums.ProductStatus;
 
+import java.io.File;
 import java.util.Arrays;
 
 /**
@@ -25,15 +28,17 @@ public class ProductEditViewController {
     @FXML private TextField priceField;
     @FXML private Spinner<Integer> stockSpinner;
     @FXML private ComboBox<String> statusCombo;
-    @FXML private TextField imageUrlField;
+    @FXML private javafx.scene.image.ImageView imagePreview;
     @FXML private TextArea descriptionField;
     @FXML private Button updateButton;
     @FXML private Button resetButton;
     @FXML private Button cancelButton;
+    @FXML private Button selectImageButton;
     
     private ProductManagementService productManagementService;
     private Long productId;
     private Product originalProduct;
+    private File selectedImageFile; // 存储选择的图片文件
     
     /**
      * 初始化控制器
@@ -113,13 +118,44 @@ public class ProductEditViewController {
     private void populateForm(Product product) {
         Platform.runLater(() -> {
             try {
-                idField.setText(product.getId().toString());
-                nameField.setText(product.getName());
-                priceField.setText(String.valueOf(product.getPrice()));
-                stockSpinner.getValueFactory().setValue(product.getStock());
-                statusCombo.setValue(product.getStatus().toString());
-                imageUrlField.setText(product.getImageUrl());
-                descriptionField.setText(product.getDescription());
+                if (idField != null) {
+                    idField.setText(product.getId().toString());
+                }
+                if (nameField != null) {
+                    nameField.setText(product.getName());
+                }
+                if (priceField != null) {
+                    priceField.setText(String.valueOf(product.getPrice()));
+                }
+                if (stockSpinner != null && stockSpinner.getValueFactory() != null) {
+                    stockSpinner.getValueFactory().setValue(product.getStock());
+                }
+                if (statusCombo != null) {
+                    statusCombo.setValue(product.getStatus().toString());
+                }
+                
+                // 显示图片预览
+                if (imagePreview != null) {
+                    try {
+                        if (product.getImageData() != null && product.getImageData().length > 0) {
+                            javafx.scene.image.Image image = new javafx.scene.image.Image(
+                                new java.io.ByteArrayInputStream(product.getImageData()), 80, 80, true, true);
+                            imagePreview.setImage(image);
+                        } else if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
+                            javafx.scene.image.Image image = new javafx.scene.image.Image(product.getImagePath(), 80, 80, true, true, true);
+                            imagePreview.setImage(image);
+                        } else {
+                            imagePreview.setImage(null);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("加载图片预览失败: " + e.getMessage());
+                        imagePreview.setImage(null);
+                    }
+                }
+                
+                if (descriptionField != null) {
+                    descriptionField.setText(product.getDescription());
+                }
             } catch (Exception e) {
                 System.err.println("填充表单数据时发生错误: " + e.getMessage());
                 showError("填充表单数据失败");
@@ -141,6 +177,20 @@ public class ProductEditViewController {
             // 创建商品对象
             Product product = createProductFromForm();
             
+            // 如果有选择的图片文件，设置图片数据
+            if (selectedImageFile != null) {
+                try {
+                    // 读取图片文件为字节数组
+                    byte[] imageData = java.nio.file.Files.readAllBytes(selectedImageFile.toPath());
+                    product.setImageData(imageData);
+                    System.out.println("图片文件大小: " + imageData.length + " bytes");
+                } catch (Exception e) {
+                    System.err.println("读取图片文件失败: " + e.getMessage());
+                    showError("读取图片文件失败: " + e.getMessage());
+                    return;
+                }
+            }
+            
             // 发送更新请求
             Message result = productManagementService.updateProduct(product);
             if (result.isSuccess()) {
@@ -157,10 +207,45 @@ public class ProductEditViewController {
     }
     
     /**
-     * 处理重置表单
+     * 处理选择图片
      */
     @FXML
-    private void handleReset() {
+    private void handleSelectImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("选择商品图片");
+        
+        // 设置文件过滤器，只允许PNG文件
+        FileChooser.ExtensionFilter pngFilter = new FileChooser.ExtensionFilter("PNG图片文件", "*.png");
+        fileChooser.getExtensionFilters().add(pngFilter);
+        
+        // 设置初始目录
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        
+        // 获取当前窗口
+        Stage stage = (Stage) selectImageButton.getScene().getWindow();
+        
+        // 显示文件选择对话框
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        
+        if (selectedFile != null) {
+            // 验证文件是否为PNG格式
+            if (selectedFile.getName().toLowerCase().endsWith(".png")) {
+                selectedImageFile = selectedFile;
+                
+                // 显示图片预览
+                try {
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(selectedFile.toURI().toString());
+                    imagePreview.setImage(image);
+                    System.out.println("选择的图片文件: " + selectedFile.getAbsolutePath());
+                } catch (Exception e) {
+                    System.err.println("加载图片预览失败: " + e.getMessage());
+                    showError("加载图片预览失败: " + e.getMessage());
+                }
+            } else {
+                showError("请选择PNG格式的图片文件");
+            }
+        }
+    } {
         if (originalProduct != null) {
             populateForm(originalProduct);
         } else {
@@ -174,6 +259,18 @@ public class ProductEditViewController {
     @FXML
     private void handleCancel() {
         returnToProductManagement();
+    }
+
+    /**
+     * 处理重置表单
+     */
+    @FXML
+    private void handleReset() {
+        if (originalProduct != null) {
+            populateForm(originalProduct);
+        } else {
+            clearForm();
+        }
     }
     
     /**
@@ -237,7 +334,19 @@ public class ProductEditViewController {
             product.setStatus(ProductStatus.ON_SALE); // 默认值
         }
         
-        product.setImageUrl(imageUrlField.getText().trim());
+        // 如果有新选择的图片文件，更新图片数据
+        if (selectedImageFile != null) {
+            try {
+                byte[] imageData = java.nio.file.Files.readAllBytes(selectedImageFile.toPath());
+                product.setImageData(imageData);
+                System.out.println("更新图片数据，大小: " + imageData.length + " bytes");
+            } catch (Exception e) {
+                System.err.println("读取新图片文件失败: " + e.getMessage());
+                showError("读取新图片文件失败: " + e.getMessage());
+                return product;
+            }
+        }
+        
         product.setDescription(descriptionField.getText().trim());
         return product;
     }
@@ -247,14 +356,34 @@ public class ProductEditViewController {
      */
     private void clearForm() {
         Platform.runLater(() -> {
-            // 不清空商品ID字段，因为它应该保持不变
-            // idField.clear(); // 注释掉，保持商品ID不变
-            nameField.clear();
-            priceField.clear();
-            stockSpinner.getValueFactory().setValue(0);
-            statusCombo.setValue("在售");
-            imageUrlField.clear();
-            descriptionField.clear();
+            try {
+                // 检查字段是否已初始化
+                if (idField != null) {
+                    // 不清空商品ID字段，因为它应该保持不变
+                    // idField.clear(); // 注释掉，保持商品ID不变
+                }
+                if (nameField != null) {
+                    nameField.clear();
+                }
+                if (priceField != null) {
+                    priceField.clear();
+                }
+                // 检查ValueFactory是否已初始化
+                if (stockSpinner != null && stockSpinner.getValueFactory() != null) {
+                    stockSpinner.getValueFactory().setValue(0);
+                }
+                if (statusCombo != null) {
+                    statusCombo.setValue("在售");
+                }
+                if (imagePreview != null) {
+                    imagePreview.setImage(null); // 清除图片预览
+                }
+                if (descriptionField != null) {
+                    descriptionField.clear();
+                }
+            } catch (Exception e) {
+                System.err.println("清空表单时发生错误: " + e.getMessage());
+            }
         });
     }
     
@@ -339,6 +468,10 @@ public class ProductEditViewController {
         if (message.isSuccess()) {
             System.out.println("商品更新成功: " + message.getMessage());
             showSuccess("商品更新成功！");
+            
+            // 通知商品管理控制器刷新列表
+            notifyProductManagementRefresh();
+            
             // 延迟返回商品管理页面
             Platform.runLater(() -> {
                 try {
@@ -352,6 +485,25 @@ public class ProductEditViewController {
         } else {
             System.err.println("商品更新失败: " + message.getMessage());
             showError("商品更新失败: " + message.getMessage());
+        }
+    }
+    
+    /**
+     * 通知商品管理控制器刷新列表
+     */
+    private void notifyProductManagementRefresh() {
+        try {
+            // 通过MessageController获取ProductManagementViewController
+            com.vcampus.client.controller.MessageController messageController = 
+                com.vcampus.client.MainApp.getGlobalSocketClient().getMessageController();
+            
+            if (messageController != null && messageController.getProductManagementViewController() != null) {
+                // 触发刷新操作
+                messageController.getProductManagementViewController().refreshProductList();
+                System.out.println("已通知商品管理控制器刷新列表");
+            }
+        } catch (Exception e) {
+            System.err.println("通知刷新失败: " + e.getMessage());
         }
     }
     

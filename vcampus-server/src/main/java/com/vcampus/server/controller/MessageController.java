@@ -129,6 +129,7 @@ public class MessageController {
                     return shopController.handleGetMyFavorites(request);
                 case SHOP_GET_PRODUCT_DETAIL:
                     return shopController.handleGetProductDetail(request);
+
                 // --- 商店管理员相关 ---
                 case SHOP_ADMIN_ADD_PRODUCT:
                     return shopController.handleAddProduct(request);
@@ -160,7 +161,18 @@ public class MessageController {
                 case LIBRARY_SEARCH_USERS:
                 case LIBRARY_RETURN_BOOK:
                 case LIBRARY_GET_BOOK_PDF:
+                case LIBRARY_CREATE_BORROW_LOG:
                     return libraryController.dispatch(request);
+
+                case SHOP_CREATE_ORDER:
+                    return shopController.handleCreateOrder(request);
+
+                case SHOP_ADD_FAVORITE:
+                    return shopController.handleAddFavorite(request);
+
+                case SHOP_REMOVE_FAVORITE:
+                    return shopController.handleRemoveFavorite(request);
+
 
                 // --- 添加结束 ---
 
