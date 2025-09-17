@@ -40,15 +40,12 @@ public class MessageController {
     private OrderManagementViewController orderManagementViewController;
     private FavoriteManagementViewController favoriteManagementViewController;
     private MyTimetableController myTimetableController; // ⭐ 新增
-<<<<<<< HEAD
     private CourseAdminController courseAdminController;
 
-=======
     private BookListViewController bookListViewController;
     private BookCreateViewController bookCreateViewController;
     private BorrowLogListViewController borrowLogListViewController;
     private BorrowLogCreateController borrowLogCreateController; // 【新增】引用
->>>>>>> e41a4e653daaf4eab291cd8e37ebb63dcd12d662
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -357,6 +354,31 @@ public class MessageController {
                         System.err.println("路由警告：收到取消收藏响应，但ShopController未注册。");
                     }
                     break;
+                case SHOP_GET_BALANCE:
+                    if (shopController != null) {
+                        // 当收到获取余额的响应时，调用 ShopController 中对应的处理方法
+                        shopController.handleGetBalanceResponse(message);
+                    } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
+                        System.err.println("路由警告：收到获取余额响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_RECHARGE:
+                    if (shopController != null) {
+                        // 当收到充值的响应时，调用 ShopController 中对应的处理方法
+                        shopController.handleRechargeResponse(message);
+                    } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
+                        System.err.println("路由警告：收到充值响应，但ShopController未注册。");
+                    }
+                    break;
+                case SHOP_PAY_FOR_ORDER:
+                    if(shopController!=null){
+                        shopController.handleGetBalanceResponse(message);
+                    }else{
+                        System.err.println("路由警告：收到余额更新响应，但ShopController未注册.");
+                    }
 
 
                 // 商店管理员相关响应处理
@@ -490,7 +512,6 @@ public class MessageController {
                     }
                     break;
 
-<<<<<<< HEAD
                 // --- ⭐ 新增：处理教务管理员相关的响应 ---
                 case ADMIN_GET_ALL_COURSES_RESPONSE:
                     if (courseAdminController != null) {
@@ -550,9 +571,7 @@ public class MessageController {
 
 
 
-                default:
-                    System.out.println("未处理的消息类型: " + message.getAction());
-=======
+
                 case LIBRARY_ADD_BOOK:
                     // 【修改】将 ADD_BOOK 的响应路由给 BookCreateViewController
                     if (bookCreateViewController != null) {
@@ -592,8 +611,9 @@ public class MessageController {
                     } else {
                         System.err.println("路由警告：收到创建借阅记录响应，但BorrowLogCreateController未注册。");
                     }
->>>>>>> e41a4e653daaf4eab291cd8e37ebb63dcd12d662
                     break;
+                default:
+                    System.out.println("未处理的消息类型: " + message.getAction());
             }
             
         } catch (Exception e) {

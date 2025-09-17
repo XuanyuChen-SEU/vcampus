@@ -298,14 +298,30 @@
     </select>
 
     <!-- 保存一个新的订单 -->
-    <insert id="saveOrder" useGeneratedKeys="false">
+
+
+    <insert id="saveOrder" parameterType="com.vcampus.common.dto.ShopTransaction">
         INSERT INTO vcampus_db.tb_order (
-            orderId, userId, productId, quantity, priceAtPurchase, 
-            totalPrice, orderStatus, createTime, payTime
+        orderId,
+        userId,
+        productId,
+        quantity,
+        priceAtPurchase,
+        totalPrice,
+        orderStatus,
+        createTime,
+        payTime
         )
         VALUES (
-            #{orderId}, #{userId}, #{product.id}, #{quantity}, #{priceAtPurchase},
-            #{totalPrice}, #{orderStatus}, #{createTime}, #{payTime}
+        #{orderId},         <!-- 确保这里是 #{orderId}，它会调用 getOrderId() -->
+        #{userId},
+        #{product.id},      <!-- 从内嵌的 product 对象中获取 id -->
+        #{quantity},
+        #{priceAtPurchase},
+        #{totalPrice},
+        #{orderStatus, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{createTime},
+        #{payTime}
         )
     </insert>
 
@@ -379,6 +395,15 @@
     <!-- 更新余额 -->
     <update id="updateBalance">
         UPDATE vcampus_db.tb_balance SET balance = #{balance} WHERE userId = #{userId}
+    </update>
+
+    <update id="updateOrder" parameterType="com.vcampus.common.dto.ShopTransaction">
+        UPDATE vcampus_db.tb_order
+        SET
+        orderStatus = #{orderStatus, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        payTime = #{payTime}
+        WHERE
+        orderId = #{orderId}
     </update>
 
 </mapper>

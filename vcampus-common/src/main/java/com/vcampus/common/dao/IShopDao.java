@@ -113,4 +113,5 @@ public interface IShopDao {
      * 更新余额
      */
     boolean updateBalance(Balance balance);
+    boolean updateOrder(ShopTransaction order);
 }

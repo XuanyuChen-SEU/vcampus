@@ -16,7 +16,7 @@ public class ShopTransaction implements Serializable {
     private static final long serialVersionUID = 3L;
 
     // --- 通用字段 ---
-    private Long id;
+    private Long id;//收藏id
     private String userId;
 
     // --- 订单(Order) 和 订单项(OrderItem) 相关字段 ---
@@ -112,6 +112,7 @@ public class ShopTransaction implements Serializable {
     }
 
 
+
     // --- 所有字段的 Getter 和 Setter 方法 ---
 
     public Long getId() { return id; }
@@ -141,4 +142,81 @@ public class ShopTransaction implements Serializable {
     public void setCardNumber(String cardNumber) { this.cardNumber = cardNumber; }
     public Double getBalance() { return balance; }
     public void setBalance(Double balance) { this.balance = balance; }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("ShopTransaction{");
+
+        // --- 始终打印通用字段 ---
+        if (id != null) {
+            sb.append("id=").append(id).append(", ");
+        }
+        if (userId != null) {
+            sb.append("userId='").append(userId).append("', ");
+        }
+
+        // --- 根据角色打印特定字段 ---
+
+        // 检查是否像一个“订单” (有 orderId 或 orderStatus)
+        if (orderId != null || orderStatus != null) {
+            sb.append("role=ORDER, ");
+            if (orderId != null) {
+                sb.append("orderId='").append(orderId).append("', ");
+            }
+            if (totalPrice != null) {
+                sb.append("totalPrice=").append(totalPrice).append(", ");
+            }
+            if (orderStatus != null) {
+                sb.append("orderStatus=").append(orderStatus).append(", ");
+            }
+            if (createTime != null) {
+                sb.append("createTime=").append(createTime).append(", ");
+            }
+            if (payTime != null) {
+                sb.append("payTime=").append(payTime).append(", ");
+            }
+        }
+
+        // 检查是否像一个“订单项” (有 quantity)
+        if (quantity != null) {
+            sb.append("role=ORDER_ITEM, ");
+            if (quantity != null) {
+                sb.append("quantity=").append(quantity).append(", ");
+            }
+            if (priceAtPurchase != null) {
+                sb.append("priceAtPurchase=").append(priceAtPurchase).append(", ");
+            }
+        }
+
+        // 检查是否像一个“收藏” (有 addTime)
+        if (addTime != null) {
+            sb.append("role=FAVORITE, ");
+            sb.append("addTime=").append(addTime).append(", ");
+        }
+
+        // 检查是否像一个“用户信息” (有 balance 或 cardNumber)
+        if (balance != null || cardNumber != null) {
+            sb.append("role=USER_INFO, ");
+            if (cardNumber != null) {
+                sb.append("cardNumber='").append(cardNumber).append("', ");
+            }
+            if (balance != null) {
+                sb.append("balance=").append(balance).append(", ");
+            }
+        }
+
+        // --- 打印关联的 Product 对象 (如果存在) ---
+        if (product != null) {
+            // 只打印商品的关键信息，避免无限循环或信息过载
+            sb.append("product={id=").append(product.getId())
+                    .append(", name='").append(product.getName()).append("'}, ");
+        }
+
+        // --- 清理末尾多余的 ", " ---
+        if (sb.charAt(sb.length() - 2) == ',' && sb.charAt(sb.length() - 1) == ' ') {
+            sb.setLength(sb.length() - 2);
+        }
+
+        sb.append('}');
+        return sb.toString();
+    }
 }

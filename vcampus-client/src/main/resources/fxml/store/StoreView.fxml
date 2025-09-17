@@ -39,7 +39,7 @@
                 </Label>
 
                 <!-- 【新增】充值按钮 -->
-                <!--<Button fx:id="rechargeButton" onAction="#handleRecharge" text="充值" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>-->
+                <Button fx:id="rechargeButton" onAction="#handleRecharge" text="充值" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
 
                 <!-- 导航按钮 -->
                 <Button fx:id="myOrdersButton" onAction="#handleShowMyOrders" text="我的订单" />

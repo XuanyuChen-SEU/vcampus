@@ -129,6 +129,13 @@ public class MessageController {
                     return shopController.handleGetMyFavorites(request);
                 case SHOP_GET_PRODUCT_DETAIL:
                     return shopController.handleGetProductDetail(request);
+                case SHOP_GET_BALANCE:
+                    return shopController.handleGetBalance(request);
+                case SHOP_PAY_FOR_ORDER:
+                    return shopController.handlePayForOrder(request); // <-- 确保 (message) 在这里
+
+                case SHOP_RECHARGE:
+                    return shopController.handleRecharge(request);
 
                 // --- 商店管理员相关 ---
                 case SHOP_ADMIN_ADD_PRODUCT:

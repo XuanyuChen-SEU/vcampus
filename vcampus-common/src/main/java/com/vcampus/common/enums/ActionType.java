@@ -42,11 +42,12 @@ public enum ActionType {
     SHOP_GET_PRODUCT_DETAIL("获取商品详情"),
     // 订单管理
     SHOP_CREATE_ORDER("创建订单"),
+    SHOP_PAY_FOR_ORDER("支付订单"),
     SHOP_GET_MY_ORDERS("获取我的订单"),
     SHOP_CANCEL_ORDER("取消订单"),
     // --- 【新增】余额相关操作 ---
     SHOP_GET_BALANCE("获取用户余额"),
-    SHOP_RECHARGE_BALANCE("用户充值"),
+    SHOP_RECHARGE("用户充值"),
     // 收藏夹管理
     SHOP_ADD_FAVORITE("添加收藏"),
     SHOP_GET_MY_FAVORITES("获取我的收藏"),
@@ -96,17 +97,14 @@ public enum ActionType {
     LIBRARY_BORROW_BOOK("用户借阅图书"),
     LIBRARY_RETURN_BOOK("用户归还图书"),
     LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
-<<<<<<< HEAD
 
     // ⭐ 新增
     SEARCH_COURSES("搜索响应课程"),
     // ⭐ 新增：教务管理员相关操作
     ADMIN_GET_ALL_COURSES("管理员获取所有课程"),          // 管理员获取所有课程
     ADMIN_GET_ALL_COURSES_RESPONSE("管理员获取所有课程响应"),
-=======
     LIBRARY_UPDATE_BORROW_LOG("修改借阅记录"),
     LIBRARY_CREATE_BORROW_LOG("创建借阅记录"),
->>>>>>> e41a4e653daaf4eab291cd8e37ebb63dcd12d662
 
     ADMIN_ADD_COURSE("管理员增加课程"),               // 管理员增加课程
     ADMIN_ADD_COURSE_RESPONSE("管理员增加课程响应"),
