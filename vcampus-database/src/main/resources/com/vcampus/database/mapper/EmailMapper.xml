@@ -22,18 +22,18 @@
 
     <!-- 创建邮件 -->
     <insert id="createEmail" parameterType="com.vcampus.common.dto.Email">
-        INSERT INTO tb_email (emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment)
+        INSERT INTO vcampus_db.tb_email (emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment)
         VALUES (#{emailId}, #{senderId}, #{recipientId}, #{subject}, #{content}, #{sendTime}, #{status}, #{hasAttachment})
     </insert>
 
     <!-- 根据邮件ID获取邮件 -->
     <select id="getEmailById" resultMap="EmailResultMap">
-        SELECT * FROM tb_email WHERE emailId = #{emailId}
+        SELECT * FROM vcampus_db.tb_email WHERE emailId = #{emailId}
     </select>
 
     <!-- 更新邮件信息 -->
     <update id="updateEmail" parameterType="com.vcampus.common.dto.Email">
-        UPDATE tb_email 
+        UPDATE vcampus_db.tb_email 
         SET senderId = #{senderId}, 
             recipientId = #{recipientId}, 
             subject = #{subject}, 
@@ -46,14 +46,14 @@
 
     <!-- 删除邮件 -->
     <delete id="deleteEmail">
-        DELETE FROM tb_email WHERE emailId = #{emailId}
+        DELETE FROM vcampus_db.tb_email WHERE emailId = #{emailId}
     </delete>
 
     <!-- ==================== 邮件查询操作 ==================== -->
 
     <!-- 获取用户的收件箱邮件 -->
     <select id="getInboxEmails" resultMap="EmailResultMap">
-        SELECT * FROM tb_email 
+        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE recipientId = #{userId} AND status IN ('SENT', 'READ')
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
@@ -61,7 +61,7 @@
 
     <!-- 获取用户的发件箱邮件 -->
     <select id="getSentEmails" resultMap="EmailResultMap">
-        SELECT * FROM tb_email 
+        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE senderId = #{userId} AND status IN ('SENT', 'READ')
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
@@ -69,7 +69,7 @@
 
     <!-- 获取用户的草稿箱邮件 -->
     <select id="getDraftEmails" resultMap="EmailResultMap">
-        SELECT * FROM tb_email 
+        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE senderId = #{userId} AND status = 'DRAFT'
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
@@ -77,7 +77,7 @@
 
     <!-- 根据状态获取邮件 -->
     <select id="getEmailsByStatus" resultMap="EmailResultMap">
-        SELECT * FROM tb_email 
+        SELECT * FROM vcampus_db.tb_email 
         WHERE (senderId = #{userId} OR recipientId = #{userId}) AND status = #{status}
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
@@ -85,12 +85,9 @@
 
     <!-- 搜索邮件 -->
     <select id="searchEmails" resultMap="EmailResultMap">
-        SELECT * FROM tb_email 
+        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE (senderId = #{userId} OR recipientId = #{userId}) 
-        AND (subject LIKE CONCAT('%', #{keyword}, '%') 
-             OR content LIKE CONCAT('%', #{keyword}, '%') 
-             OR senderId LIKE CONCAT('%', #{keyword}, '%') 
-             OR recipientId LIKE CONCAT('%', #{keyword}, '%'))
+        AND subject LIKE CONCAT('%', #{keyword}, '%')
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
     </select>
@@ -99,31 +96,31 @@
 
     <!-- 标记邮件为已读 -->
     <update id="markAsRead">
-        UPDATE tb_email SET status = 'READ' WHERE emailId = #{emailId} AND status = 'SENT'
+        UPDATE vcampus_db.tb_email SET status = 'READ' WHERE emailId = #{emailId} AND status = 'SENT'
     </update>
 
     <!-- 标记邮件为未读 -->
     <update id="markAsUnread">
-        UPDATE tb_email SET status = 'SENT' WHERE emailId = #{emailId} AND status = 'READ'
+        UPDATE vcampus_db.tb_email SET status = 'SENT' WHERE emailId = #{emailId} AND status = 'READ'
     </update>
 
     <!-- 更新邮件状态 -->
     <update id="updateEmailStatus">
-        UPDATE tb_email SET status = #{status} WHERE emailId = #{emailId}
+        UPDATE vcampus_db.tb_email SET status = #{status} WHERE emailId = #{emailId}
     </update>
 
     <!-- ==================== 邮件管理员功能 ==================== -->
 
     <!-- 获取所有邮件（管理员权限） -->
     <select id="getAllEmails" resultMap="EmailResultMap">
-        SELECT * FROM tb_email 
+        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
     </select>
 
     <!-- 根据用户ID获取该用户的所有邮件（管理员权限） -->
     <select id="getUserAllEmails" resultMap="EmailResultMap">
-        SELECT * FROM tb_email 
+        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE senderId = #{userId} OR recipientId = #{userId}
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
@@ -131,13 +128,22 @@
 
     <!-- 搜索所有邮件（管理员权限） -->
     <select id="searchAllEmails" resultMap="EmailResultMap">
-        SELECT * FROM tb_email 
-        WHERE subject LIKE CONCAT('%', #{keyword}, '%') 
-           OR content LIKE CONCAT('%', #{keyword}, '%') 
-           OR senderId LIKE CONCAT('%', #{keyword}, '%') 
-           OR recipientId LIKE CONCAT('%', #{keyword}, '%')
+        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
+        WHERE subject LIKE CONCAT('%', #{keyword}, '%')
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
     </select>
+
+    <!-- 从CSV文件加载邮件数据 -->
+    <update id="loadEmailsFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_email
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        ENCLOSED BY '"'
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment)
+    </update>
 
 </mapper>

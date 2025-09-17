@@ -109,8 +109,7 @@ public class EmailController {
         try {
             Email email = (Email) message.getData();
             
-            if (email == null || email.getSenderId() == null || email.getSubject() == null || 
-                email.getContent() == null) {
+            if (email == null || email.getSenderId() == null) {
                 return Message.failure(ActionType.EMAIL_SAVE_DRAFT, "草稿数据不完整");
             }
             

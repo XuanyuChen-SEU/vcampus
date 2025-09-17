@@ -46,6 +46,10 @@ public class MessageController {
     private BookCreateViewController bookCreateViewController;
     private BorrowLogListViewController borrowLogListViewController;
     private BorrowLogCreateController borrowLogCreateController; // 【新增】引用
+    
+    // 邮件系统控制器
+    private EmailController emailController;
+    private ComposeEmailController composeEmailController;
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -137,6 +141,16 @@ public class MessageController {
     // 【新增】注册 BorrowLogCreateController 的方法
     public void setBorrowLogCreateController(BorrowLogCreateController controller) {
         this.borrowLogCreateController = controller;
+    }
+    
+    // 【新增】注册 EmailController 的方法
+    public void setEmailController(EmailController controller) {
+        this.emailController = controller;
+    }
+    
+    // 【新增】注册 ComposeEmailController 的方法
+    public void setComposeEmailController(ComposeEmailController controller) {
+        this.composeEmailController = controller;
     }
 
 
@@ -638,6 +652,42 @@ public class MessageController {
                         System.err.println("路由警告：收到创建借阅记录响应，但BorrowLogCreateController未注册。");
                     }
                     break;
+                
+                // --- 邮件系统模块 ---
+                case EMAIL_SEND:
+                case EMAIL_SAVE_DRAFT:
+                    // 发送和保存草稿的响应由ComposeEmailController处理
+                    if (composeEmailController != null) {
+                        composeEmailController.handleEmailResponse(message);
+                    } else if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("ComposeEmailController和EmailController都未设置，无法处理邮件响应");
+                    }
+                    break;
+                    
+                case EMAIL_GET_INBOX:
+                case EMAIL_GET_SENT:
+                case EMAIL_GET_DRAFT:
+                case EMAIL_READ:
+                case EMAIL_DELETE:
+                case EMAIL_MARK_READ:
+                case EMAIL_MARK_UNREAD:
+                case EMAIL_SEARCH:
+                case EMAIL_GET_UNREAD_COUNT:
+                case EMAIL_BATCH_MARK_READ:
+                case EMAIL_BATCH_DELETE:
+                case EMAIL_ADMIN_GET_ALL:
+                case EMAIL_ADMIN_GET_USER_EMAILS:
+                case EMAIL_ADMIN_DELETE:
+                case EMAIL_ADMIN_GET_STATISTICS:
+                    if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("EmailController未设置，无法处理邮件响应");
+                    }
+                    break;
+                    
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
             }

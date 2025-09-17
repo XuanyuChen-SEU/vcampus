@@ -93,7 +93,7 @@ public interface EmailMapper {
                                  @Param("limit") int limit);
 
     /**
-     * 搜索邮件（按主题、内容、发送者）
+     * 搜索邮件（按主题）
      * @param userId 用户ID
      * @param keyword 搜索关键词
      * @param offset 偏移量
@@ -162,4 +162,10 @@ public interface EmailMapper {
     List<Email> searchAllEmails(@Param("keyword") String keyword, 
                                @Param("offset") int offset, 
                                @Param("limit") int limit);
+
+    /**
+     * 从CSV文件加载邮件数据
+     * @param filePath CSV文件路径
+     */
+    void loadEmailsFromCsv(@Param("filePath") String filePath);
 }

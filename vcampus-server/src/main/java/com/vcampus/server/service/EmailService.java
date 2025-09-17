@@ -112,7 +112,7 @@ public class EmailService {
     }
 
     /**
-     * 阅读邮件（自动标记为已读）
+     * 阅读邮件（不自动标记为已读）
      * @param emailId 邮件ID
      * @param userId 用户ID
      * @return 邮件对象
@@ -120,11 +120,8 @@ public class EmailService {
     public Email readEmail(String emailId, String userId) {
         Email email = emailDao.getEmailById(emailId);
         if (email != null && email.getRecipientId().equals(userId)) {
-            // 如果是收件人阅读邮件，标记为已读
-            if (email.getStatus() == EmailStatus.SENT) {
-                emailDao.markAsRead(emailId);
-                email.setStatus(EmailStatus.READ);
-            }
+            // 只返回邮件内容，不自动标记为已读
+            // 用户需要手动点击"标记已读"按钮来设置已读状态
         }
         return email;
     }

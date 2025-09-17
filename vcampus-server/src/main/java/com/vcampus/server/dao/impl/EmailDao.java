@@ -170,7 +170,7 @@ public class EmailDao implements IEmailDao {
     }
 
     /**
-     * 搜索邮件（按主题、内容、发送者）
+     * 搜索邮件（按主题）
      * @param userId 用户ID
      * @param keyword 搜索关键词
      * @param page 页码
