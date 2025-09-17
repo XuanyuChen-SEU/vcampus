@@ -6,7 +6,7 @@ import java.time.LocalDate;
 public class StudentLeaveApplication implements Serializable {
 
     private String applicationId;      // 申请编号（可由系统生成）
-    private String studentId;          // 学生学号
+    private String userId;          // 学生user号
     private String studentName;        // 学生姓名
     private String currentStatus;      // 当前学籍状态（在读/休学/毕业）// 申请类型（休学申请/复学申请）
     private String reason;             // 申请原因// 申请提交日期
@@ -18,7 +18,7 @@ public class StudentLeaveApplication implements Serializable {
 
     public StudentLeaveApplication(String studentId, String studentName, String currentStatus,
                                    String applicationType, String reason, LocalDate applicationDate, String status) {
-        this.studentId = studentId;
+        this.userId = studentId;
         this.studentName = studentName;
         this.currentStatus = currentStatus;
         this.type = applicationType;
@@ -31,8 +31,8 @@ public class StudentLeaveApplication implements Serializable {
     public String getApplicationId() { return applicationId; }
     public void setApplicationId(String applicationId) { this.applicationId = applicationId; }
 
-    public String getStudentId() { return studentId; }
-    public void setStudentId(String studentId) { this.studentId = studentId; }
+    public String getStudentId() { return userId; }
+    public void setStudentId(String studentId) { this.userId = studentId; }
 
     public String getStudentName() { return studentName; }
     public void setStudentName(String studentName) { this.studentName = studentName; }

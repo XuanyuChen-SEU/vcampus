@@ -7,6 +7,7 @@ module vcampus.common {
     // 声明依赖
     requires com.google.gson;
     requires java.sql;
+    requires javafx.base;
     
     // 为Gson反射访问开放包
     opens com.vcampus.common.dto to com.google.gson;

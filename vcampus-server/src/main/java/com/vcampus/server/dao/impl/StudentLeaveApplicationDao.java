@@ -34,7 +34,7 @@ public class StudentLeaveApplicationDao {
     /**
      * 更新申请状态
      */
-    public boolean updateStatus(int applicationId, String status) {
+    public boolean updateStatus(String applicationId, String status) {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             StudentLeaveApplicationMapper mapper = sqlSession.getMapper(StudentLeaveApplicationMapper.class);
             int rows = mapper.updateStatus(applicationId, status);
@@ -50,6 +50,13 @@ public class StudentLeaveApplicationDao {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             StudentLeaveApplicationMapper mapper = sqlSession.getMapper(StudentLeaveApplicationMapper.class);
             return mapper.selectAllApplications();
+        }
+    }
+
+    public StudentLeaveApplication findById(String id) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            StudentLeaveApplicationMapper mapper = sqlSession.getMapper(StudentLeaveApplicationMapper.class);
+            return mapper.findById(id);
         }
     }
 }

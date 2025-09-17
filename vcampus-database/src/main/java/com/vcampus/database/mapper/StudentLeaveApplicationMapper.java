@@ -12,8 +12,10 @@ public interface StudentLeaveApplicationMapper {
 
     StudentLeaveApplication selectLatestByStudentId(@Param("studentId") String studentId);
 
-    int updateStatus(@Param("applicationId") int applicationId, @Param("status") String status);
+    int updateStatus(@Param("applicationId") String applicationId, @Param("status") String status);
 
     List<StudentLeaveApplication> selectAllApplications();
+
+    StudentLeaveApplication findById(@Param("id") String id);
 }
 

@@ -94,6 +94,7 @@
 .all-button,
 .studentlist-button,
 .applicationlist-button,
+.refresh-button,
 .status-button {
     -fx-background-color: linear-gradient(to right, #7b5fc0, #9b59b6); /* 深紫 -> 浅紫 */
     -fx-text-fill: white;
@@ -110,8 +111,24 @@
 .all-button:hover,
 .studentlist-button:hover,
 .applicationlist-button:hover,
+.refresh-button:hover,
 .status-button:hover {
     -fx-background-color: linear-gradient(to right, #9b59b6, #8e44ad); /* 浅紫 -> 深紫 */
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
 }
+
+.approve-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10;
+}
+
+.reject-button {
+    -fx-background-color: #F44336;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10;
+}
+
 

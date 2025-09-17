@@ -75,4 +75,12 @@ public class StudentService {
         // 发送给服务器
         socketClient.sendMessage(request);
     }
+
+    public void revokeApplication(StudentLeaveApplication application) {
+        // 构造请求消息，ActionType 可为 UPDATE_STUDENT（需在服务端定义对应处理逻辑）
+        Message request = new Message(ActionType.REVOKE_APPLICATION, application);
+
+        // 发送到服务端，服务端处理更新并返回结果
+        socketClient.sendMessage(request);
+    }
 }

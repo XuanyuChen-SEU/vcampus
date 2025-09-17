@@ -18,15 +18,17 @@ public enum ActionType {
     // --- 学籍模块 - 用户端 ---
     INFO_STUDENT("获取学生信息"),
     UPDATE_STUDENT("修改学生信息"),
-    STUDENT_STATUS_APPLICATION("学籍状态改变"),
+    STUDENT_STATUS_APPLICATION("学籍状态调整申请"),
+    REVOKE_APPLICATION("撤回学籍状态申请"),
     // --- 学籍模块 -管理员端 ---
     ALL_STUDENT("获取所有学生信息"),
     SEARCH_STUDENT("姓名模糊搜索"),
     INFO_STUDENT_ADMIN("查看学生详细信息"),
     UPDATE_STUDENT_ADMIN("更新学生信息"),
-    GET_ALL_APPLICATIONS("获取学籍状态调整申请表"),
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
+    GET_ALL_APPLICATIONS("获取所有的申请"),
+    UPDATE_APPLICATION_STATUS("更新申请状态"),
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
     DELETE_USER("删除用户"),                   // 删除用户
@@ -98,17 +100,14 @@ public enum ActionType {
     LIBRARY_BORROW_BOOK("用户借阅图书"),
     LIBRARY_RETURN_BOOK("用户归还图书"),
     LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
-<<<<<<< HEAD
 
-    // ⭐ 新增
+        // ⭐ 新增
     SEARCH_COURSES("搜索响应课程"),
     // ⭐ 新增：教务管理员相关操作
     ADMIN_GET_ALL_COURSES("管理员获取所有课程"),          // 管理员获取所有课程
     ADMIN_GET_ALL_COURSES_RESPONSE("管理员获取所有课程响应"),
-=======
     LIBRARY_UPDATE_BORROW_LOG("修改借阅记录"),
     LIBRARY_CREATE_BORROW_LOG("创建借阅记录"),
->>>>>>> e41a4e653daaf4eab291cd8e37ebb63dcd12d662
 
     ADMIN_ADD_COURSE("管理员增加课程"),               // 管理员增加课程
     ADMIN_ADD_COURSE_RESPONSE("管理员增加课程响应"),

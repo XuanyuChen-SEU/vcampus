@@ -96,6 +96,7 @@ public class StudentController implements IClientController {
     private String originalMotherWork;
 
     private boolean editing = false;
+    private StudentLeaveApplication latestApplication;
 
     @FXML
     private void initialize() {
@@ -354,10 +355,33 @@ public class StudentController implements IClientController {
 
     // =================== 弹出学籍异动申请对话框 ===================
     private void showStudentStatusApplicationDialog() {
+        // === 如果已有待审批申请，弹出提示对话框并支持撤回 ===
+        if (latestApplication != null && "待审批".equals(latestApplication.getStatus())) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("申请状态提示");
+            alert.setHeaderText("您有一条正在审核的申请");
+            alert.setContentText("申请编号: " + latestApplication.getApplicationId() +
+                    "\n申请类型: " + latestApplication.getType() +
+                    "\n当前状态: " + latestApplication.getStatus());
+
+            // 自定义按钮：撤回 和 关闭
+            ButtonType revokeButton = new ButtonType("撤回申请", ButtonBar.ButtonData.LEFT);
+            ButtonType closeButton = new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(revokeButton, closeButton);
+
+            alert.showAndWait().ifPresent(result -> {
+                if (result == revokeButton) {
+                    // 调用撤回逻辑
+                    revokeApplication(latestApplication);
+                }
+            });
+            return;
+        }
+
+        // === 没有待审批申请时，正常提交申请 ===
         String currentStatus = studentStatusLabel.getText();
         String applicationType;
 
-        // 根据当前学籍状态确定申请类型
         if ("在读".equals(currentStatus)) {
             applicationType = "休学申请";
         } else if ("休学".equals(currentStatus)) {
@@ -394,6 +418,8 @@ public class StudentController implements IClientController {
             }
         });
     }
+
+
 
     private void submitStatusApplication(String applicationType, String reason) {
         StudentLeaveApplication application = new StudentLeaveApplication();
@@ -533,9 +559,9 @@ public class StudentController implements IClientController {
             if (response.isSuccess()) {
                 Object data = response.getData();
                 if (data instanceof StudentLeaveApplication) {
-                    StudentLeaveApplication application = (StudentLeaveApplication) data;
-                    showInfo("申请提交成功！\n申请编号: " + application.getApplicationId() +
-                            "\n状态: " + application.getStatus());
+                    latestApplication = (StudentLeaveApplication) data; // 保存最近申请
+                    showInfo("申请提交成功！\n申请编号: " + latestApplication.getApplicationId() +
+                            "\n状态: " + latestApplication.getStatus());
                 } else {
                     showInfo("申请提交成功！");
                 }
@@ -545,5 +571,30 @@ public class StudentController implements IClientController {
             }
         });
     }
+
+    private void revokeApplication(StudentLeaveApplication application) {
+        studentService.revokeApplication(application);
+    }
+
+
+    public void handleRevokeApplicationResponse(Message response) {
+        Platform.runLater(() -> {
+            if (response == null) {
+                showError("未收到服务器响应。");
+                return;
+            }
+
+            if (response.isSuccess()) {
+                showInfo("申请已撤回成功！");
+                if (latestApplication != null) {
+                    latestApplication.setStatus("已撤回");
+                }
+            } else {
+                String errorMsg = response.getMessage() != null ? response.getMessage() : "未知错误";
+                showError("撤回失败: " + errorMsg);
+            }
+        });
+    }
+
 
 }

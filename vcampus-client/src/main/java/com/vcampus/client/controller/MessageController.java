@@ -40,15 +40,12 @@ public class MessageController {
     private OrderManagementViewController orderManagementViewController;
     private FavoriteManagementViewController favoriteManagementViewController;
     private MyTimetableController myTimetableController; // ⭐ 新增
-<<<<<<< HEAD
     private CourseAdminController courseAdminController;
 
-=======
     private BookListViewController bookListViewController;
     private BookCreateViewController bookCreateViewController;
     private BorrowLogListViewController borrowLogListViewController;
     private BorrowLogCreateController borrowLogCreateController; // 【新增】引用
->>>>>>> e41a4e653daaf4eab291cd8e37ebb63dcd12d662
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -256,6 +253,13 @@ public class MessageController {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case REVOKE_APPLICATION:
+                    if (studentController != null) {
+                        studentController.handleRevokeApplicationResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
                 case ALL_STUDENT:
                     if(studentadminController!=null){
                         studentadminController.handleAllStudentResponse(message);
@@ -291,6 +295,12 @@ public class MessageController {
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case UPDATE_APPLICATION_STATUS:
+                    if(studentadminController!=null){
+                        studentadminController.handleUpdateStatusResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
                 // --- 商店模块 ---
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
@@ -504,7 +514,6 @@ public class MessageController {
                     }
                     break;
 
-<<<<<<< HEAD
                 // --- ⭐ 新增：处理教务管理员相关的响应 ---
                 case ADMIN_GET_ALL_COURSES_RESPONSE:
                     if (courseAdminController != null) {
@@ -566,7 +575,6 @@ public class MessageController {
 
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
-=======
                 case LIBRARY_ADD_BOOK:
                     // 【修改】将 ADD_BOOK 的响应路由给 BookCreateViewController
                     if (bookCreateViewController != null) {
@@ -606,7 +614,6 @@ public class MessageController {
                     } else {
                         System.err.println("路由警告：收到创建借阅记录响应，但BorrowLogCreateController未注册。");
                     }
->>>>>>> e41a4e653daaf4eab291cd8e37ebb63dcd12d662
                     break;
             }
             

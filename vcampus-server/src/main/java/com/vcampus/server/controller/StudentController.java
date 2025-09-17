@@ -4,6 +4,8 @@ import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
 import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.enums.ActionType;
+import com.vcampus.server.dao.impl.StudentLeaveApplicationDao;
+import com.vcampus.server.service.StudentAdminService;
 import com.vcampus.server.service.StudentService;
 
 /**
@@ -14,9 +16,11 @@ import com.vcampus.server.service.StudentService;
 public class StudentController {
 
     private final StudentService studentService;
+    private final StudentAdminService studentAdminService;
 
     public StudentController() {
         this.studentService = new StudentService();
+        this.studentAdminService=new StudentAdminService();
     }
 
     /**
@@ -95,6 +99,45 @@ public class StudentController {
         }
 
         return response;
+    }
+
+    public Message handleRevokeApplication(Message request) {
+        try {
+            if (request.getData() instanceof StudentLeaveApplication application) {
+                // 更新申请状态为 "已撤回"
+                application.setStatus("已撤回");
+
+                boolean success = studentAdminService.updateApplicationStatus(
+                        application.getApplicationId(), "已撤回");
+
+                if (success) {
+                    return new Message(
+                            ActionType.REVOKE_APPLICATION,
+                            application,
+                            true,
+                            "申请已成功撤回");
+                } else {
+                    return new Message(
+                            ActionType.REVOKE_APPLICATION,
+                            null,
+                            false,
+                            "撤回失败，申请不存在或已处理");
+                }
+            } else {
+                return new Message(
+                        ActionType.REVOKE_APPLICATION,
+                        null,
+                        false,
+                        "请求数据格式错误");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Message(
+                    ActionType.REVOKE_APPLICATION,
+                    null,
+                    false,
+                    "服务器处理异常: " + e.getMessage());
+        }
     }
 
 }

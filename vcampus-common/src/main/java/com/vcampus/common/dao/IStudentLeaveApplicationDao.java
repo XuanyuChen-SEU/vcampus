@@ -24,7 +24,9 @@ public interface IStudentLeaveApplicationDao {
     /**
      * 更新申请状态
      */
-    boolean updateStatus(int applicationId, String status);
+    boolean updateStatus(String applicationId, String status);
 
     public List<StudentLeaveApplication> selectAllApplications();
+
+    StudentLeaveApplication findById(String id);
 }

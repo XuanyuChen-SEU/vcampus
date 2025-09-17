@@ -60,5 +60,21 @@
         ORDER BY a.create_time DESC
     </select>
 
+    <select id="findById" parameterType="string" resultType="com.vcampus.common.dto.StudentLeaveApplication">
+        SELECT
+        application_id AS applicationId,
+        student_id AS studentId,
+        student_name AS studentName,
+        type,
+        reason,
+        status,
+        create_time AS createTime
+        FROM vcampus_db.tb_student_leave_application
+        WHERE application_id = #{id}
+    </select>
+
+
+
+
 </mapper>
 

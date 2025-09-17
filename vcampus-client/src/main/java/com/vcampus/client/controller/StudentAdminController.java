@@ -4,6 +4,7 @@ import com.vcampus.client.service.StudentAdminService;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
 import com.vcampus.common.dto.StudentLeaveApplication;
+import com.vcampus.common.enums.ActionType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -50,6 +51,8 @@ public class StudentAdminController implements IClientController {
     @FXML private TableColumn<StudentLeaveApplication, String> colAppReason;
     @FXML private TableColumn<StudentLeaveApplication, String> colAppStatus;
     @FXML private TableColumn<StudentLeaveApplication, Void> colAppAction;
+    @FXML private Button btnRefreshList; // 刷新按钮
+
 
 
     private final StudentAdminService studentAdminService = new StudentAdminService();
@@ -62,6 +65,9 @@ public class StudentAdminController implements IClientController {
     private final Set<String> selectedMajors = new HashSet<>();
     private final Set<String> selectedStatuses = new HashSet<>();
     private boolean allSelected = false; // 当前全选状态
+    private enum CurrentTable { STUDENT, APPLICATION }
+    private CurrentTable currentTable = CurrentTable.STUDENT;
+
 
     @FXML
     public void initialize() {
@@ -143,19 +149,84 @@ public class StudentAdminController implements IClientController {
             }
         });
 
+        // 申请表操作列
+        colAppAction.setCellFactory(col -> new TableCell<StudentLeaveApplication, Void>() {
+            private final Button approveBtn = new Button("√通过");
+            private final Button rejectBtn = new Button("×不通过");
+            private final HBox buttonBox = new HBox(8, approveBtn, rejectBtn);
+
+            {
+                buttonBox.setAlignment(Pos.CENTER);
+
+                approveBtn.getStyleClass().add("approve-button"); // CSS：绿色
+                rejectBtn.getStyleClass().add("reject-button");   // CSS：红色
+
+                approveBtn.setOnAction(e -> {
+                    StudentLeaveApplication app = getTableView().getItems().get(getIndex());
+                    handleApprove(app);
+                });
+
+                rejectBtn.setOnAction(e -> {
+                    StudentLeaveApplication app = getTableView().getItems().get(getIndex());
+                    handleReject(app);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getIndex() >= getTableView().getItems().size()) {
+                    setGraphic(null);
+                } else {
+                    StudentLeaveApplication app = getTableView().getItems().get(getIndex());
+                    // === 修改：撤回后同样隐藏按钮 ===
+                    if ("已通过".equals(app.getStatus())
+                            || "未通过".equals(app.getStatus())
+                            || "已撤回".equals(app.getStatus())) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(buttonBox);
+                    }
+                }
+            }
+        });
+
+        // 申请状态列颜色显示
+        colAppStatus.setCellFactory(column -> new TableCell<StudentLeaveApplication, String>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(status);
+                    switch (status) {
+                        case "已通过" -> setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                        case "未通过" -> setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                        default -> setStyle("");
+                    }
+                }
+            }
+        });
+
+
         studentTable.setItems(filteredData);
         studentTable.getSelectionModel().setCellSelectionEnabled(false);
         studentTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         // 搜索按钮 & 回车
-        searchButton.setOnAction(event -> updateFilter());
-        searchField.setOnAction(event -> updateFilter());
+        searchButton.setOnAction(event -> updateFilterBasedOnCurrentTable());
+        searchField.setOnAction(event -> updateFilterBasedOnCurrentTable());
 
         btnSelectAll.getStyleClass().add("all-button");
         btnAdjustStatus.getStyleClass().add("status-button");
         btnStudentList.getStyleClass().add("studentlist-button");
         btnApplicationList.getStyleClass().add("applicationlist-button");
+        btnRefreshList.getStyleClass().add("refresh-button");
         // 批量学籍状态调整
         btnAdjustStatus.setOnAction(e -> adjustSelectedStudentStatus());
+        // 刷新按钮事件：同时刷新学生和申请列表
+        btnRefreshList.setOnAction(e -> refreshAllData());
 
         // 添加选择列
         colSelect.setCellValueFactory(cellData -> cellData.getValue().selectedProperty());
@@ -172,16 +243,8 @@ public class StudentAdminController implements IClientController {
             btnSelectAll.setText(allSelected ? "全不选" : "全选");
             studentTable.refresh();
         });
-        btnStudentList.setOnAction(e -> {
-            studentTable.setVisible(true);
-            applicationTable.setVisible(false);
-        });
-
-        btnApplicationList.setOnAction(e -> {
-            studentTable.setVisible(false);
-            applicationTable.setVisible(true);
-            loadAllApplications(); // 加载申请列表数据
-        });
+        btnStudentList.setOnAction(e -> handleShowStudentList());
+        btnApplicationList.setOnAction(e -> handleShowApplicationList());
         loadAllStudent();
     }
 
@@ -523,6 +586,107 @@ public class StudentAdminController implements IClientController {
             }
         });
     }
+
+    // 审核通过
+    private void handleApprove(StudentLeaveApplication app) {
+        if (app == null) return;
+        app.setStatus("已通过");
+        applicationTable.refresh();
+        studentAdminService.updateApplicationStatus(app.getApplicationId(), "已通过");
+    }
+
+    // 审核不通过
+    private void handleReject(StudentLeaveApplication app) {
+        if (app == null) return;
+        app.setStatus("未通过");
+        applicationTable.refresh();
+        studentAdminService.updateApplicationStatus(app.getApplicationId(), "未通过");
+    }
+
+    private void handleShowStudentList() {
+        currentTable = CurrentTable.STUDENT;
+        searchField.setPromptText("按学号/姓名搜索学生");
+        searchField.clear();
+
+        studentTable.setVisible(true);
+        applicationTable.setVisible(false);
+        loadAllStudent(); // 刷新学生表格
+    }
+
+
+    private void handleShowApplicationList() {
+        currentTable = CurrentTable.APPLICATION;
+        searchField.setPromptText("按学号/姓名搜索申请");
+        searchField.clear();
+
+        studentTable.setVisible(false);
+        applicationTable.setVisible(true);
+        loadAllApplications(); // 刷新申请表格
+    }
+
+
+
+
+    public void handleUpdateStatusResponse(Message message) {
+        Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                showAlert("成功", message.getMessage());
+
+                if (message.getData() instanceof StudentLeaveApplication updatedApp) {
+                    // 更新申请表格
+                    applicationTable.getItems().stream()
+                            .filter(app -> app.getApplicationId().equals(updatedApp.getApplicationId()))
+                            .findFirst()
+                            .ifPresent(app -> {
+                                app.setStatus(updatedApp.getStatus());
+                                applicationTable.refresh();
+                            });
+
+                    // 自动刷新学生列表或申请列表
+                    refreshAllData();
+                }
+            } else {
+                showAlert("失败", message.getMessage());
+            }
+        });
+    }
+
+
+    /** 刷新学生列表和申请列表 */
+    private void refreshAllData() {
+        loadAllStudent();
+        loadAllApplications();
+    }
+
+    /** 根据当前表格选择搜索逻辑 */
+    private void updateFilterBasedOnCurrentTable() {
+        String keyword = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
+
+        if (currentTable == CurrentTable.STUDENT) {
+            filteredData.setPredicate(s -> {
+                boolean matchKeyword = keyword.isEmpty() ||
+                        (s.getStudentId() != null && s.getStudentId().toLowerCase().contains(keyword)) ||
+                        (s.getName() != null && s.getName().toLowerCase().contains(keyword));
+
+                boolean matchGrade = selectedGrades.isEmpty() || selectedGrades.contains(String.valueOf(s.getGrade()));
+                boolean matchMajor = selectedMajors.isEmpty() || (s.getMajor() != null && selectedMajors.contains(s.getMajor()));
+                boolean matchStatus = selectedStatuses.isEmpty() || (s.getStudent_status() != null && selectedStatuses.contains(s.getStudent_status()));
+
+                return matchKeyword && matchGrade && matchMajor && matchStatus;
+            });
+        } else if (currentTable == CurrentTable.APPLICATION) {
+            // 搜索申请表
+            String kw = keyword.toLowerCase();
+            FilteredList<StudentLeaveApplication> filteredApps = new FilteredList<>(applicationData, app ->
+                    (kw.isEmpty()) ||
+                            (app.getStudentId() != null && app.getStudentId().toLowerCase().contains(kw)) ||
+                            (app.getStudentName() != null && app.getStudentName().toLowerCase().contains(kw))
+            );
+            applicationTable.setItems(filteredApps);
+        }
+    }
+
+
 
     private void showAlert(String title, String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

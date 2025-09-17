@@ -28,11 +28,13 @@
     </HBox>
 
     <!-- 学籍状态调整按钮 -->
+    <!-- 学籍状态调整按钮 -->
     <HBox spacing="10" alignment="CENTER">
         <Button fx:id="btnSelectAll" text="全选"/>
         <Button fx:id="btnAdjustStatus" text="调整学籍状态" styleClass="action-button"/>
         <Button fx:id="btnStudentList" text="学生列表" styleClass="action-button"/>
         <Button fx:id="btnApplicationList" text="申请列表" styleClass="action-button"/>
+        <Button fx:id="btnRefreshList" text="刷新" styleClass="action-button"/>
     </HBox>
 
     <!-- 顶部搜索栏 -->
