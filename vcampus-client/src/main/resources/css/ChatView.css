@@ -4,37 +4,21 @@
 
 /* --- 动画定义 --- */
 @keyframes cool-gradient-flow {
-    0% {
-        -fx-background-position: 0% 50%;
-    }
-
-    50% {
-        -fx-background-position: 100% 50%;
-    }
-
-    100% {
-        -fx-background-position: 0% 50%;
-    }
+    0% { -fx-background-position: 0% 50%; }
+    50% { -fx-background-position: 100% 50%; }
+    100% { -fx-background-position: 0% 50%; }
 }
 
 @keyframes fade-in-up {
-    from {
-        -fx-opacity: 0;
-        -fx-translate-y: 15px;
-    }
-
-    to {
-        -fx-opacity: 1;
-        -fx-translate-y: 0;
-    }
+    from { -fx-opacity: 0; -fx-translate-y: 15px; }
+    to { -fx-opacity: 1; -fx-translate-y: 0; }
 }
 
 /* --- 主背景：多层叠加动态背景 --- */
 .chat-background {
     /* 底层：一个深邃的、缓慢移动的紫色/蓝色渐变 */
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e1b4b 0%, #312e81 25%, #4f46e5 75%, #8b5cf6 100%);
-    -fx-background-size: 400% 400%;
-    /* 让渐变范围更大，移动起来更平滑 */
+    -fx-background-color: linear-gradient(135deg, #1e1b4b, #312e81, #4f46e5, #8b5cf6);
+    -fx-background-size: 400% 400%; /* 让渐变范围更大，移动起来更平滑 */
     -fx-animation: cool-gradient-flow 15s ease infinite;
 
     /* 顶层：半透明的科技网格纹理 (如果图片存在) */
@@ -57,12 +41,11 @@
 
 /* --- 底部输入栏：玻璃拟态效果 --- */
 .input-bar {
-    -fx-background-color: rgba(0, 0, 0, 0.2);
-    /* 半透明深色背景 */
+    -fx-background-color: rgba(0, 0, 0, 0.2); /* 半透明深色背景 */
     -fx-padding: 15px 20px;
     -fx-border-color: transparent;
     -fx-border-width: 0px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 20, 0, 0, -10);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 20, 0, 0, -10);
 }
 
 .message-field {
@@ -80,11 +63,9 @@
 .input-bar .icon {
     -fx-fill: white;
 }
-
 .input-bar .action-button {
     -fx-background-color: rgba(139, 92, 246, 0.8);
 }
-
 .input-bar .action-button:hover {
     -fx-background-color: rgba(139, 92, 246, 1.0);
 }
@@ -93,14 +74,13 @@
 .chat-bubble {
     -fx-padding: 12px 18px;
     -fx-font-size: 15px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0.2, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0.2, 0, 4);
     -fx-animation: fade-in-up 0.4s ease-out;
     -fx-wrap-text: true;
 }
 
 .user-bubble {
-    -fx-background-color: rgba(124, 58, 237, 0.7);
-    /* 半透明紫色 */
+    -fx-background-color: rgba(124, 58, 237, 0.7); /* 半透明紫色 */
     -fx-text-fill: white;
     -fx-background-radius: 20px 20px 5px 20px;
 }
@@ -108,7 +88,6 @@
 .ai-bubble {
     /* AI气泡也改为半透明深色，以适应深色背景 */
     -fx-background-color: rgba(255, 255, 255, 0.15);
-    -fx-text-fill: white;
-    /* 文字改为白色以保证可读性 */
+    -fx-text-fill: white; /* 文字改为白色以保证可读性 */
     -fx-background-radius: 20px 20px 20px 5px;
 }

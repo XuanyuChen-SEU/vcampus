@@ -57,6 +57,7 @@ public class LibraryController implements IClientController {
     @FXML private Button modifyButton;
     @FXML private TableView<Object> bookTable;
     @FXML private Label userInfoLabel;
+    @FXML private Button returnButton; // 【新增】对新按钮的引用
     @FXML private Button borrowButton;
     @FXML private HBox topBarHBox; // 【新增】顶部工具栏的引用
     @FXML private Button literatureSearchButton;
@@ -68,6 +69,7 @@ public class LibraryController implements IClientController {
     private List<Node> originalTopBarChildren; // 【新增】用于保存原始的顶部栏控件
     private HBox academicTopBarContent; // 【新增】用于存放新的学术网站按钮
     private AcademicSearchController academicSearchController; // 【新增】用于引用WebView的控制器
+
     // --- 表格列定义 ---
     @FXML private TableColumn<Object, String> colBookId;
     @FXML private TableColumn<Object, String> colBookName;
@@ -90,10 +92,11 @@ public class LibraryController implements IClientController {
     // ================== 状态管理变量 ==================
     // 状态管理变量
     private boolean isAdmin;
+    private User currentUser;
     private LibAdminView currentLibAdminView = LibAdminView.ALL_BOOKS;
     private LibUserView currentLibUserView = LibUserView.ALL_BOOKS;
     private final LibraryService libraryService = new LibraryService();
-    private User currentUser;
+
 
 
     // ================== 初始化与核心逻辑 ==================
@@ -399,7 +402,35 @@ public class LibraryController implements IClientController {
         });
     }
 
+    /**
+     * 【新增】处理“归还”按钮点击事件的方法
+     * (这个方法的代码风格和 handleBorrowBook 完全一致)
+     */
+    @FXML
+    private void handleReturnBook(ActionEvent event) {
+        Object selectedItem = bookTable.getSelectionModel().getSelectedItem();
+        // 1. 检查是否选中了项目，以及项目类型是否正确
+        if (selectedItem == null || !(selectedItem instanceof BorrowLog)) {
+            showError("请先选择一本您要归还的图书。");
+            return;
+        }
+        BorrowLog selectedLog = (BorrowLog) selectedItem;
 
+        // 2. 弹出确认对话框
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "您确定要归还《" + selectedLog.getBookName() + "》吗？", ButtonType.OK, ButtonType.CANCEL);
+        confirmation.setTitle("确认归还");
+        confirmation.setHeaderText(null);
+
+        // 3. 根据用户确认结果，调用服务发送请求
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                libraryService.returnBook(selectedLog.getLogId(), selectedLog.getBookId());
+            }
+        });
+        showUserMyBorrowsView();
+        showUserMyBorrowsView();
+        showUserMyBorrowsView();
+    }
 
 
 // ================== 异步响应处理入口 (借鉴ShopController) ==================
@@ -535,6 +566,11 @@ public class LibraryController implements IClientController {
     private void showAllBooksView() {
         configureTableForBooks();
         // 【修正】只发送请求，由响应处理器负责更新UI
+        borrowButton.setVisible(true);
+        borrowButton.setManaged(true);
+        returnButton.setVisible(false);
+        returnButton.setManaged(false);
+
         libraryService.getAllBooks();
     }
 
@@ -552,6 +588,12 @@ public class LibraryController implements IClientController {
 
     private void showUserMyBorrowsView() {
         configureTableForMyBorrows();
+
+        // 【修改】隐藏“借阅”按钮，显示“归还”按钮
+        borrowButton.setVisible(false);
+        borrowButton.setManaged(false);
+        returnButton.setVisible(true);
+        returnButton.setManaged(true);
         if (currentUser == null) return;
         // 【修正】只发送请求
         libraryService.getMyBorrows(currentUser.getUserId());
@@ -631,11 +673,19 @@ public class LibraryController implements IClientController {
             showError("未能从服务器获取PDF文件。");
         }
     }
+    /**
+     * 【修改后】的响应处理方法，能智能刷新当前视图
+     */
     public void handleBookUpdateResponse(Message message) {
         Platform.runLater(() -> {
             if (message.isSuccess()) {
                 showAlert("操作成功", message.getMessage());
-                showAllBooksView(); // 操作成功后刷新主列表
+                // 判断当前在哪个视图，就刷新哪个视图
+                if (currentLibUserView == LibUserView.MY_BORROWS) {
+                    showUserMyBorrowsView(); // 刷新“我的借阅”
+                } else {
+                    showAllBooksView(); // 刷新“所有图书”
+                }
             } else {
                 showError(message.getMessage());
             }

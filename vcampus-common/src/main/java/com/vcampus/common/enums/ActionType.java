@@ -96,17 +96,15 @@ public enum ActionType {
     LIBRARY_BORROW_BOOK("用户借阅图书"),
     LIBRARY_RETURN_BOOK("用户归还图书"),
     LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
-<<<<<<< HEAD
 
     // ⭐ 新增
     SEARCH_COURSES("搜索响应课程"),
     // ⭐ 新增：教务管理员相关操作
     ADMIN_GET_ALL_COURSES("管理员获取所有课程"),          // 管理员获取所有课程
     ADMIN_GET_ALL_COURSES_RESPONSE("管理员获取所有课程响应"),
-=======
+
     LIBRARY_UPDATE_BORROW_LOG("修改借阅记录"),
     LIBRARY_CREATE_BORROW_LOG("创建借阅记录"),
->>>>>>> e41a4e653daaf4eab291cd8e37ebb63dcd12d662
 
     ADMIN_ADD_COURSE("管理员增加课程"),               // 管理员增加课程
     ADMIN_ADD_COURSE_RESPONSE("管理员增加课程响应"),
