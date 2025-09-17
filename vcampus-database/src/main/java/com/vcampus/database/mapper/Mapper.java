@@ -18,6 +18,7 @@ public interface Mapper {
     void createProductTable();
     void createOrderTable();
     void createFavoriteTable();
+    void createBalanceTable();
 
     //课程选择模块
     void createCoursesTable();

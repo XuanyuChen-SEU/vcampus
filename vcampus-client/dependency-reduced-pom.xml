@@ -10,20 +10,37 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
-        <version>0.0.8</version>
         <configuration>
           <mainClass>com.vcampus.client.MainApp</mainClass>
+          <commandlineArgs />
+          <jlinkImageName>vcampus-client</jlinkImageName>
+          <jlinkZipName>vcampus-client-distribution</jlinkZipName>
+          <launcher>vcampus-client</launcher>
+          <noManPages>true</noManPages>
+          <noHeaderFiles>true</noHeaderFiles>
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
-        <configuration>
-          <source>17</source>
-          <target>17</target>
-        </configuration>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <includeScope>runtime</includeScope>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -40,6 +57,7 @@
                   <mainClass>com.vcampus.client.MainApp</mainClass>
                 </transformer>
               </transformers>
+              <finalName>vcampus-client-${project.version}</finalName>
             </configuration>
           </execution>
         </executions>

@@ -51,7 +51,7 @@
             <result property="price" column="price" />
             <result property="stock" column="stock" />
             <result property="description" column="description" />
-            <result property="imageUrl" column="imageUrl" />
+            <result property="imagePath" column="imagePath" />
             <result property="status" column="status" />
         </association>
     </resultMap>
@@ -80,12 +80,12 @@
         
         <!-- 商品对象映射 -->
         <association property="product" javaType="com.vcampus.common.dto.Product">
-            <id property="id" column="id" />
+            <id property="id" column="product_id" />
             <result property="name" column="name" />
             <result property="price" column="price" />
             <result property="stock" column="stock" />
             <result property="description" column="description" />
-            <result property="imageUrl" column="imageUrl" />
+            <result property="imagePath" column="imagePath" />
             <result property="status" column="status" />
         </association>
     </resultMap>
@@ -102,7 +102,7 @@
         FIELDS TERMINATED BY ','
         LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
-        (id, name, price, stock, description, imageUrl, @statusVar)
+        (id, name, price, stock, description, imagePath, @statusVar)
         SET status = REPLACE(@statusVar, '\r', '');
     </update>
 
@@ -132,6 +132,18 @@
         SET addTime = CASE WHEN @addTimeVar = '' THEN CURRENT_TIMESTAMP ELSE STR_TO_DATE(@addTimeVar, '%Y-%m-%d %H:%i:%s') END;
     </update>
 
+    <!-- 从CSV文件批量导入余额数据 -->
+    <update id="loadBalancesFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_balance
+        CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY ','
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (userId, @balance)
+        SET balance = REPLACE(@balance, '\r', '');
+    </update>
+
     <!-- ==========================================================
          商品(Product)相关操作
          ========================================================== -->
@@ -144,7 +156,7 @@
             price,
             stock,
             description,
-            imageUrl,
+            imagePath,
             status
         FROM vcampus_db.tb_product
         ORDER BY id ASC
@@ -158,7 +170,7 @@
             price,
             stock,
             description,
-            imageUrl,
+            imagePath,
             status
         FROM vcampus_db.tb_product
         WHERE id = #{productId}
@@ -172,7 +184,7 @@
             price,
             stock,
             description,
-            imageUrl,
+            imagePath,
             status
         FROM vcampus_db.tb_product
         WHERE name LIKE CONCAT('%', #{keyword}, '%')
@@ -187,7 +199,7 @@
             <if test="price != null">price = #{price},</if>
             <if test="stock != null">stock = #{stock},</if>
             <if test="description != null">description = #{description},</if>
-            <if test="imageUrl != null">imageUrl = #{imageUrl},</if>
+            <if test="imagePath != null">imagePath = #{imagePath},</if>
             <if test="status != null">status = #{status},</if>
         </set>
         WHERE id = #{id}
@@ -196,10 +208,10 @@
     <!-- 添加新商品 -->
     <insert id="addProduct" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO vcampus_db.tb_product (
-            name, price, stock, description, imageUrl, status
+            name, price, stock, description, imagePath, status
         )
         VALUES (
-            #{name}, #{price}, #{stock}, #{description}, #{imageUrl}, #{status}
+            #{name}, #{price}, #{stock}, #{description}, #{imagePath}, #{status}
         )
     </insert>
 
@@ -229,7 +241,7 @@
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_order o
         LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
@@ -253,7 +265,7 @@
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_order o
         LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
@@ -277,7 +289,7 @@
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_order o
         LEFT JOIN vcampus_db.tb_product p ON o.productId = p.id
@@ -308,12 +320,12 @@
             f.userId,
             f.productId,
             f.addTime,
-            p.id,
+            p.id as product_id,
             p.name,
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_favorite f
         LEFT JOIN vcampus_db.tb_product p ON f.productId = p.id
@@ -327,12 +339,12 @@
             f.userId,
             f.productId,
             f.addTime,
-            p.id,
+            p.id as product_id,
             p.name,
             p.price,
             p.stock,
             p.description,
-            p.imageUrl,
+            p.imagePath,
             p.status
         FROM vcampus_db.tb_favorite f
         LEFT JOIN vcampus_db.tb_product p ON f.productId = p.id
@@ -354,5 +366,19 @@
     <delete id="removeFavorite">
         DELETE FROM vcampus_db.tb_favorite WHERE id = #{favoriteId}
     </delete>
+
+    <!-- ==========================================================
+        余额(Balance)相关操作
+         ========================================================== -->
+
+    <!-- 根据用户id获取余额 -->
+    <select id="getBalanceByUserId" resultType="com.vcampus.common.entity.Balance">
+        SELECT userId, balance FROM vcampus_db.tb_balance WHERE userId = #{userId}
+    </select>
+
+    <!-- 更新余额 -->
+    <update id="updateBalance">
+        UPDATE vcampus_db.tb_balance SET balance = #{balance} WHERE userId = #{userId}
+    </update>
 
 </mapper>

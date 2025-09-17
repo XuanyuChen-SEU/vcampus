@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.vcampus.client.controller.ChatViewController">
+    <children>
+        <ImageView fx:id="watermarkLogo" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../images/LibraryIcons/logo-text.png"/>
+            </image>
+        </ImageView>
+
+        <BorderPane fx:id="mainPane" styleClass="chat-background">
+            <stylesheets>
+                <URL value="@../../css/ChatView.css"/>
+            </stylesheets>
+            <center>
+                <ScrollPane fx:id="chatScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="chat-scroll-pane">
+                    <content>
+                        <VBox fx:id="chatPane" spacing="12" styleClass="chat-pane"/>
+                    </content>
+                </ScrollPane>
+            </center>
+            <bottom>
+                <HBox alignment="CENTER" spacing="10" styleClass="input-bar">
+                    <children>
+                        <TextField fx:id="messageField" promptText="与 V-Campus AI 助手对话..."
+                                   onAction="#handleSendMessage" styleClass="message-field" HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="sendButton" onAction="#handleSendMessage" styleClass="action-button" text="">
+                            <graphic>
+                                <SVGPath content="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" styleClass="icon"/>
+                            </graphic>
+                        </Button>
+                    </children>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </children>
+</StackPane>

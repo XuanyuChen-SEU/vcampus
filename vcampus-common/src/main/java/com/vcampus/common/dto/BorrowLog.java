@@ -22,6 +22,7 @@ public class BorrowLog implements Serializable {
         this.borrowDate = borrowDate;
         this.dueDate = dueDate;
     }
+
     // 【新增】这个构造函数用于在服务器端创建一条新的借阅记录时使用
     // 它允许我们先创建一个不含 logId 的对象，之后再为其设置生成的 UUID
     public BorrowLog(String bookId, String bookName, String userId, String username, String borrowDate, String dueDate) {

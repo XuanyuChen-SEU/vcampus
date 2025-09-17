@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<GridPane hgap="10" vgap="15" style="-fx-padding: 25;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.courseAdmin.CourseDialogController">
+    <padding><Insets bottom="25.0" left="25.0" right="25.0" top="25.0" /></padding>
+
+    <Label fx:id="titleLabel" text="增加新课程" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2">
+        <font><Font name="System Bold" size="18.0" /></font>
+    </Label>
+
+    <Label text="课程号 (Course ID):" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+    <TextField fx:id="courseIdField" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+    <Label text="课程名称:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+    <TextField fx:id="courseNameField" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+    <Label text="课程性质:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+    <TextField fx:id="courseTypeField" promptText="例如：必修, 限选, 任选" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+    <Label text="开课单位:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+    <TextField fx:id="departmentField" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+    <Label text="学分:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+    <TextField fx:id="creditsField" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+    <Label text="校公选类别:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+    <TextField fx:id="categoryField" promptText="例如：美育，心理，创新" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+
+    <Label text="校区:" GridPane.rowIndex="7" GridPane.columnIndex="0" />
+    <TextField fx:id="campusField" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" GridPane.rowIndex="8" GridPane.columnIndex="1">
+        <children>
+            <Button onAction="#handleCancel" text="取消" />
+            <Button onAction="#handleSave" text="保存" styleClass="primary-button-style" />
+        </children>
+    </HBox>
+</GridPane>

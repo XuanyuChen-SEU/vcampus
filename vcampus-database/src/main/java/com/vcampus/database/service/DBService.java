@@ -1,15 +1,5 @@
 package com.vcampus.database.service;
 
-import com.vcampus.database.mapper.LibraryMapper;
-import com.vcampus.database.mapper.Mapper;
-import com.vcampus.database.mapper.StudentMapper;
-import com.vcampus.database.mapper.StudentLeaveApplicationMapper;
-import com.vcampus.database.mapper.UserMapper;
-import com.vcampus.database.mapper.ShopMapper;
-import com.vcampus.database.mapper.PasswordResetApplicationMapper;
-import com.vcampus.database.mapper.*;
-import com.vcampus.database.utils.MyBatisUtil;
-import org.apache.ibatis.session.SqlSession;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,18 +8,20 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
+import org.apache.ibatis.session.SqlSession;
 
-
-
-
-
-
-
-
+import com.vcampus.database.mapper.ClassSessionMapper;
+import com.vcampus.database.mapper.CourseMapper;
+import com.vcampus.database.mapper.CourseSelectionMapper;
+import com.vcampus.database.mapper.LibraryMapper;
+import com.vcampus.database.mapper.Mapper;
+import com.vcampus.database.mapper.PasswordResetApplicationMapper;
+import com.vcampus.database.mapper.ShopMapper;
+import com.vcampus.database.mapper.StudentMapper;
+import com.vcampus.database.mapper.StudentLeaveApplicationMapper;
+import com.vcampus.database.mapper.UserMapper;
+import com.vcampus.database.utils.MyBatisUtil;
 
 public class DBService {
 
@@ -52,6 +44,7 @@ public class DBService {
         File productCsvTempFile = null;
         File orderCsvTempFile = null;
         File favoriteCsvTempFile = null;
+        File balanceCsvTempFile = null;
         File courseCsvTempFile = null;
         File courseSelectionCsvTempFile = null;
         File classSessionCsvTempFile = null;
@@ -75,11 +68,13 @@ public class DBService {
             mapper.createProductTable();
             mapper.createOrderTable();
             mapper.createFavoriteTable();
+            mapper.createBalanceTable();
             mapper.createCoursesTable();
             mapper.createClassSessionsTable();
             mapper.createCourseSelectionsTable();
             mapper.createBookTable();
             mapper.createBorrowLogTable();
+
             System.out.println("成功在数据库 " + dbName + " 中创建表结构。");
             System.out.println("准备从CSV文件加载数据...");
 
@@ -92,16 +87,10 @@ public class DBService {
             String productCSVPath = "db/tb_product.csv";
             String orderCSVPath = "db/tb_order.csv";
             String favoriteCSVPath = "db/tb_favorite.csv";
+            String BalanceCSVPath = "db/tb_balance.csv";
             String CourseCSVPath = "db/tb_courses.csv";
             String ClassSessionCSVPath = "db/tb_class_sessions.csv";
             String CourseSelectionCSVPath = "db/tb_course_selections.csv";
-
-
-
-
-
-
-
 
             // ★ 修改点 1: 指定临时文件存放的目录
             // 在当前程序运行目录下创建一个名为 "temp_csv" 的子目录
@@ -118,16 +107,10 @@ public class DBService {
             productCsvTempFile = createTempFileFromResource(productCSVPath,tempDirectory.toFile());
             orderCsvTempFile = createTempFileFromResource(orderCSVPath,tempDirectory.toFile());
             favoriteCsvTempFile = createTempFileFromResource(favoriteCSVPath,tempDirectory.toFile());
+            balanceCsvTempFile = createTempFileFromResource(BalanceCSVPath,tempDirectory.toFile());
             courseCsvTempFile = createTempFileFromResource(CourseCSVPath,tempDirectory.toFile());
             classSessionCsvTempFile = createTempFileFromResource(ClassSessionCSVPath,tempDirectory.toFile());
             courseSelectionCsvTempFile = createTempFileFromResource(CourseSelectionCSVPath,tempDirectory.toFile());
-
-
-
-
-
-
-
 
             // getAbsolutePath() 在某些系统上可能包含'..'，改用 getCanonicalPath() 获取更规范的路径
             String userPath = userCsvTempFile.getCanonicalPath().replace('\\', '/');
@@ -139,6 +122,7 @@ public class DBService {
             String productPath = productCsvTempFile.getAbsolutePath();
             String orderPath = orderCsvTempFile.getAbsolutePath();
             String favoritePath = favoriteCsvTempFile.getAbsolutePath();
+            String balancePath = balanceCsvTempFile.getAbsolutePath();
             String coursePath = courseCsvTempFile.getAbsolutePath();
             String classSessionPath = classSessionCsvTempFile.getAbsolutePath();
             String courseSelectionPath = courseSelectionCsvTempFile.getAbsolutePath();
@@ -150,14 +134,12 @@ public class DBService {
             System.out.println("正在从临时文件加载: " + productPath);
             System.out.println("正在从临时文件加载: " + orderPath);
             System.out.println("正在从临时文件加载: " + favoritePath);
+            System.out.println("正在从临时文件加载: " + balancePath);
             System.out.println("正在从临时文件加载: " + coursePath);
             System.out.println("正在从临时文件加载: " + courseSelectionPath);
             System.out.println("正在从临时文件加载: " + classSessionPath);
-
             System.out.println("正在从临时文件加载: " + bookPath);
             System.out.println("正在从临时文件加载: " + borrowLogPath);
-
-
 
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
@@ -169,8 +151,6 @@ public class DBService {
             ClassSessionMapper classSessionMapper = sqlSession.getMapper(ClassSessionMapper.class);
             CourseSelectionMapper courseSelectionMapper = sqlSession.getMapper(CourseSelectionMapper.class);
 
-
-
             userMapper.loadUsersFromCsv(userPath);
             studentMapper.loadStudentsFromCsv(studentPath);
             studentLeaveApplicationMapper.loadStudentLeaveApplicationsFromCsv(studentLeaveApplicationPath);
@@ -180,13 +160,11 @@ public class DBService {
             shopMapper.loadProductsFromCsv(productPath);
             shopMapper.loadOrdersFromCsv(orderPath);
             shopMapper.loadFavoritesFromCsv(favoritePath);
+            shopMapper.loadBalancesFromCsv(balancePath);
             courseMapper.loadCoursesFromCsv(coursePath);
             classSessionMapper.loadClassSessionsFromCsv(classSessionPath);
             courseSelectionMapper.loadCourseSelectionsFromCsv(courseSelectionPath);
             sqlSession.commit(); // 提交事务
-
-
-
 
             System.out.println("CSV数据批量加载成功！");
             System.out.println("数据库初始化成功，所有数据已提交。");
@@ -237,6 +215,9 @@ public class DBService {
             }
             if (favoriteCsvTempFile != null && favoriteCsvTempFile.exists()) {
                 favoriteCsvTempFile.delete();
+            }
+            if (balanceCsvTempFile != null && balanceCsvTempFile.exists()) {
+                balanceCsvTempFile.delete();
             }
             if (courseCsvTempFile != null && courseCsvTempFile.exists()) {
                 courseCsvTempFile.delete();
