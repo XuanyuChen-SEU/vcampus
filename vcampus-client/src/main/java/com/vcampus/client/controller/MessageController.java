@@ -41,7 +41,6 @@ public class MessageController {
     private FavoriteManagementViewController favoriteManagementViewController;
     private MyTimetableController myTimetableController; // ⭐ 新增
     private CourseAdminController courseAdminController;
-
     private BookListViewController bookListViewController;
     private BookCreateViewController bookCreateViewController;
     private BorrowLogListViewController borrowLogListViewController;

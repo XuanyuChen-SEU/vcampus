@@ -101,11 +101,12 @@ public enum ActionType {
     LIBRARY_RETURN_BOOK("用户归还图书"),
     LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
 
-        // ⭐ 新增
+    // ⭐ 新增
     SEARCH_COURSES("搜索响应课程"),
     // ⭐ 新增：教务管理员相关操作
     ADMIN_GET_ALL_COURSES("管理员获取所有课程"),          // 管理员获取所有课程
     ADMIN_GET_ALL_COURSES_RESPONSE("管理员获取所有课程响应"),
+
     LIBRARY_UPDATE_BORROW_LOG("修改借阅记录"),
     LIBRARY_CREATE_BORROW_LOG("创建借阅记录"),
 
