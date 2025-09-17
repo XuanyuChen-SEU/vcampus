@@ -17,35 +17,35 @@ import static com.vcampus.common.enums.CourseStatus.NOT_SELECTED;
  * 使用静态 final 变量来存储所有模拟数据表，确保在服务器生命周期内全局唯一且状态持久。
  */
 public class DataSource {
-
-    // 使用 ConcurrentHashMap 保证多线程下的安全
     public static final Map<String, Course> MOCK_COURSE_TABLE = new ConcurrentHashMap<>();
     public static final Map<String, List<String>> MOCK_SELECTION_TABLE = new ConcurrentHashMap<>();
 
-    // 使用静态代码块，在类被加载时仅执行一次，初始化所有数据
     static {
-        System.out.println("DATASOURCE: 正在初始化【信息增强版】模拟数据...");
+        System.out.println("DATASOURCE: 正在初始化全局静态模拟数据...");
 
-        // ⭐ 1. 为课程添加完整信息
-        List<ClassSession> englishSessions = List.of(
-                new ClassSession("ENG_S01", "陈玉玲,任丹丽", "1-11周 星期四 11-13节 教七-203", 20, 1, false)
-        );
-        Course englishCourse = new Course("B00RW025[01]", "大学英语II", "必修", "外国语学院", NOT_SELECTED, englishSessions,2.0,"","九龙湖");
-//        englishCourse.setCredits(2.0);
-//        englishCourse.setCategory("人文社科与智慧（原文艺社科类）");
-//        englishCourse.setCampus("九龙湖");
-        MOCK_COURSE_TABLE.put("B00RW025[01]", englishCourse);
+        // ⭐ 核心修正1：使用 new ArrayList<>() 来创建【可修改】的列表
+        List<ClassSession> englishSessions = new ArrayList<>(List.of(
+                // 调用我们新添加的、包含 courseId 的构造方法
+                new ClassSession("B17M0010", "ENG_S01", "[01] 张老师", "1-16周 周二 3-4节", 60, 1, false)
+        ));
+        // 调用新添加的“全参”构造方法
+        Course englishCourse = new Course("B17M0010", "大学英语II", "必修", "外国语学院", CourseStatus.NOT_SELECTED, englishSessions, 2.0, "通识教育必修", "九龙湖");
+        MOCK_COURSE_TABLE.put("B17M0010", englishCourse);
 
-        List<ClassSession> seSessions = List.of(
-                new ClassSession("SE_S01", "任国森", "1-8周 星期二 8-9节 教三-204", 20, 1, false)
-        );
-        Course seCourse = new Course("BJSL0120[04]", "计算机组成原理", "必修", "软件学院", NOT_SELECTED, seSessions,4.0,"","九龙湖");
-//        seCourse.setCredits(1.0);
-//        seCourse.setCategory("通识教育核心课程");
-//        seCourse.setCampus("九龙湖");
-        MOCK_COURSE_TABLE.put("BJSL0120[04]", seCourse);
+        // ⭐ 同样，为其他课程也创建可修改的列表
+        List<ClassSession> seSessions = new ArrayList<>(List.of(
+                new ClassSession("B08M4000", "SE_S01", "[01] 刘老师", "1-16周 周一 5-6节", 50, 20, false)
+        ));
+        Course seCourse = new Course("B08M4000", "软件工程", "限选", "计算机学院", CourseStatus.NOT_SELECTED, seSessions, 3.0, "专业核心课程", "九龙湖");
+        MOCK_COURSE_TABLE.put("B08M4000", seCourse);
 
-        // ⭐ 2. 为学生 '1234567' 创建初始选课记录
+        List<ClassSession> networkSessions = new ArrayList<>(List.of(
+                new ClassSession("B08M3000", "CS_S01", "[01] 王教授", "1-8周 周一 1-4节", 50, 50, false)
+        ));
+        Course networkCourse = new Course("B08M3000", "计算机网络", "必修", "计算机学院", CourseStatus.NOT_SELECTED, networkSessions, 3.0, "专业核心课程", "九龙湖");
+        MOCK_COURSE_TABLE.put("B08M3000", networkCourse);
+
+        // ⭐ 核心修正2：恢复学生的初始选课记录
         MOCK_SELECTION_TABLE.put("1234567", new ArrayList<>(List.of("ENG_S01")));
 
         System.out.println("DATASOURCE: 模拟数据初始化完成。");

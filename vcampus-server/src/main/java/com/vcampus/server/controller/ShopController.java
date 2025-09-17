@@ -7,6 +7,7 @@ import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.ShopService;
+import com.vcampus.common.entity.Balance;
 
 /**
  * 商店模块的控制器 (ShopController) - 服务端 (已优化异常处理)
@@ -416,6 +417,84 @@ public class ShopController {
         } catch (Exception e) {
             e.printStackTrace();
             return Message.failure(ActionType.SHOP_REMOVE_FAVORITE, "服务器内部异常: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 【已修正】处理“获取余额”的请求。
+     * 捕获来自 Service 层的业务异常，并返回统一格式的响应。
+     * @param request 客户端请求
+     * @return 包含操作结果的响应 Message
+     */
+    public Message handleGetBalance(Message request) {
+        try {
+            // 1. 从请求中解析出 userId
+            String userId = (String) request.getData();
+
+            // 2. 调用 Service 层处理业务逻辑
+            Balance balance = shopService.getBalance(userId);
+
+            // 3. 如果成功，返回一个成功的 Message
+            // 注意：这里不再需要 new Message(true, balance, "...") 的旧写法
+            return Message.success(ActionType.SHOP_GET_BALANCE, balance, "获取余额成功");
+
+        } catch (Exception e) {
+            // 4. 【核心】捕获所有来自 Service 层的异常
+            e.printStackTrace(); // 在服务器控制台打印完整错误，方便调试
+            // 将异常信息封装成一个失败的 Message 返回给客户端
+            return Message.failure(ActionType.SHOP_GET_BALANCE, e.getMessage());
+        }
+    }
+
+    /**
+     * 【已修正】处理“充值”的请求。
+     * 捕获来自 Service 层的业务异常，并返回统一格式的响应。
+     * @param request 客户端请求
+     * @return 包含操作结果的响应 Message
+     */
+    public Message handleRecharge(Message request) {
+        try {
+            // 1. 从请求中解析出包含充值信息的 Balance 对象
+            Balance rechargeData = (Balance) request.getData();
+
+            // 2. 调用 Service 层处理业务逻辑
+            Balance updatedBalance = shopService.recharge(rechargeData);
+
+            // 3. 如果成功，返回一个成功的 Message，其中包含最新的余额信息
+            return Message.success(ActionType.SHOP_RECHARGE, updatedBalance, "充值成功");
+
+        } catch (Exception e) {
+            // 4. 【核心】捕获所有来自 Service 层的异常
+            e.printStackTrace();
+            // 将异常信息（如“金额必须大于0”、“用户不存在”）返回给客户端
+            return Message.failure(ActionType.SHOP_RECHARGE, e.getMessage());
+        }
+    }
+
+    public Message handlePayForOrder(Message message) {
+        try {
+            ShopTransaction orderToPay = (ShopTransaction) message.getData();
+
+            // 1. 调用 Service 层，执行核心业务逻辑，获取更新后的 Balance 对象
+            Balance updatedBalance = shopService.payForOrder(orderToPay);
+
+            // 2. 【核心修正】创建一个成功的 Message 对象
+            //    a. 先创建一个只包含 ActionType 和 成功数据(updatedBalance) 的消息
+            Message successResponse = new Message(ActionType.SHOP_PAY_FOR_ORDER, updatedBalance);
+
+            //    b. 手动设置状态和成功信息
+            successResponse.setStatus(true);
+            successResponse.setMessage("支付成功！");
+
+            // 3. 返回这个构造完美的成功响应
+            return successResponse;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            // 【核心修正】对于失败情况，我们使用只包含 ActionType, 状态 和 错误信息 的构造函数
+            // 这通常是所有 Message 类都会有的构造函数
+            return new Message(ActionType.SHOP_PAY_FOR_ORDER, false, e.getMessage());
         }
     }
 }

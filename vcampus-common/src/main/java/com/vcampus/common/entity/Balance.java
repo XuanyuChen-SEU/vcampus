@@ -1,5 +1,6 @@
 package com.vcampus.common.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -7,7 +8,8 @@ import java.math.BigDecimal;
  * 用于管理用户的账户余额信息
  * 编写人：AI Assistant
  */
-public class Balance {
+public class Balance implements Serializable {
+    private static final long serialVersionUID = 1L;
     
     /**
      * 用户ID（主键）

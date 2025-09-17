@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.Cursor?>
+
+<VBox spacing="5.0" styleClass="session-card" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.courseAdmin.ClassSessionAdminCardController">
+    <children>
+        <HBox fx:id="sessionInfoRow" alignment="CENTER_LEFT" spacing="15.0" onMouseClicked="#handleSelectSession">
+            <cursor><Cursor fx:constant="HAND" /></cursor>
+            <children>
+                <Label fx:id="teacherLabel" text="[01] 陈玉玲, 任丹丽" styleClass="info-label" prefWidth="150.0" />
+                <Label fx:id="scheduleLabel" text="1-16周 周二 3-4节" styleClass="info-label" HBox.hgrow="ALWAYS" />
+                <Label fx:id="capacityLabel" text="课容量: 60人" styleClass="info-label" prefWidth="100.0" />
+                <Label fx:id="enrolledLabel" text="已选人数: 16人" styleClass="info-label" prefWidth="100.0" />
+            </children>
+        </HBox>
+
+        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+            <children>
+                <Button fx:id="modifySessionButton" onAction="#handleModifySession" text="修改" />
+                <Button fx:id="deleteSessionButton" onAction="#handleDeleteSession" text="删除" styleClass="delete-button" />
+            </children>
+            <padding><Insets top="5.0" /></padding>
+        </HBox>
+    </children>
+</VBox>

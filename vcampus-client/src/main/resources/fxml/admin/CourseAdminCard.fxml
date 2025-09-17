@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10.0" styleClass="course-card" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.courseAdmin.CourseAdminCardController">
+    <children>
+        <HBox fx:id="headerRow" alignment="CENTER_LEFT" spacing="20.0" onMouseClicked="#handleSelectCourse">
+            <cursor><Cursor fx:constant="HAND" /></cursor>
+            <children>
+                <Label fx:id="courseIdLabel" text="B17M0010" styleClass="header-label" prefWidth="120.0" />
+                <Label fx:id="courseNameLabel" text="大学英语II" styleClass="header-label" prefWidth="250.0" />
+                <Label fx:id="courseTypeLabel" text="必修" styleClass="header-label" prefWidth="80.0" />
+                <Label fx:id="departmentLabel" text="外国语学院" styleClass="header-label" prefWidth="150.0" />
+            </children>
+        </HBox>
+
+        <VBox fx:id="sessionsContainer" spacing="10.0">
+            <padding><Insets left="30.0" top="10.0" /></padding>
+        </VBox>
+
+        <HBox alignment="CENTER">
+            <children>
+                <Button fx:id="addSessionButton" onAction="#handleAddSession" text="+ 添加教学班" styleClass="add-session-button" prefWidth="200" />
+            </children>
+            <padding><Insets top="10.0" /></padding>
+        </HBox>
+    </children>
+</VBox>

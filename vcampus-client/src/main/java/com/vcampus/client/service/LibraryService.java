@@ -53,7 +53,19 @@ public class LibraryService {
             return new Message(ActionType.LIBRARY_RETURN_BOOK, null, false, "客户端请求异常");
         }
     }
-
+    /**
+     * 【新增】【为 handleBorrowBook() 服务】
+     * 发送用户借阅书籍的请求。
+     * @param userId  借阅用户的ID
+     * @param bookId  要借阅的书籍ID
+     */
+    public Message borrowBook(String userId, String bookId) {
+        // 可以将 userId 和 bookId 打包成一个数组或专用的DTO对象
+        String[] params = {userId, bookId};
+        // 这里需要一个您在通用模块中新定义的 ActionType，例如 LIBRARY_BORROW_BOOK
+        Message request = new Message(ActionType.LIBRARY_BORROW_BOOK, params);
+        return socketClient.sendMessage(request);
+    }
 
 
 
@@ -182,19 +194,7 @@ public class LibraryService {
         Message request = new Message(ActionType.LIBRARY_SEARCH_MY_BORROWS, params);
         return socketClient.sendMessage(request);
     }
-    /**
-     * 【新增】【为 handleBorrowBook() 服务】
-     * 发送用户借阅书籍的请求。
-     * @param userId  借阅用户的ID
-     * @param bookId  要借阅的书籍ID
-     */
-    public Message borrowBook(String userId, String bookId) {
-        // 可以将 userId 和 bookId 打包成一个数组或专用的DTO对象
-        String[] params = {userId, bookId};
-        // 这里需要一个您在通用模块中新定义的 ActionType，例如 LIBRARY_BORROW_BOOK
-        Message request = new Message(ActionType.LIBRARY_BORROW_BOOK, params);
-        return socketClient.sendMessage(request);
-    }
+
 
     /**
      * 【异步模式】向服务器请求获取图书PDF文件。

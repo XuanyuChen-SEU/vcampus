@@ -1,6 +1,8 @@
 package com.vcampus.common.dto;
 
 import java.io.Serializable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  * 学生学籍信息 DTO
@@ -70,6 +72,25 @@ public class Student implements Serializable {
         this.motherPhone = motherPhone;
         this.motherPoliticsStatus = motherPoliticsStatus;
         this.motherWorkUnit = motherWorkUnit;
+    }
+
+    /**
+     * 多选属性，用于 TableView
+     * transient 防止序列化失败
+     */
+    private transient BooleanProperty selected;
+
+    public BooleanProperty selectedProperty() {
+        if (selected == null) selected = new SimpleBooleanProperty(false);
+        return selected;
+    }
+
+    public boolean isSelected() {
+        return selectedProperty().get();
+    }
+
+    public void setSelected(boolean selected) {
+        selectedProperty().set(selected);
     }
 
     // Getter & Setter
@@ -148,4 +169,3 @@ public class Student implements Serializable {
     public String getMotherWorkUnit() { return motherWorkUnit; }
     public void setMotherWorkUnit(String motherWorkUnit) { this.motherWorkUnit = motherWorkUnit; }
 }
-

@@ -74,6 +74,10 @@ public class MessageController {
                     return studentController.handle(request);
                 case UPDATE_STUDENT:
                     return studentController.updateStudent(request);
+                case STUDENT_STATUS_APPLICATION:
+                    return studentController.handleStudentStatusApplication(request);
+                case REVOKE_APPLICATION:
+                    return studentController.handleRevokeApplication(request);
 
                 // --- 学籍管理员相关 ---
                 case ALL_STUDENT:
@@ -84,6 +88,10 @@ public class MessageController {
                     return studentadminController.getStudentById(request);
                 case UPDATE_STUDENT_ADMIN:
                     return studentadminController.updateStudent(request);
+                case GET_ALL_APPLICATIONS:
+                    return studentadminController.getAllApplications(request);
+                case UPDATE_APPLICATION_STATUS:
+                    return studentadminController.updateApplicationStatus(request);
                 // --- 课程相关 ---
 
                 // --- 课程相关 ---调用服务端的controller层相关逻辑部分
@@ -100,6 +108,26 @@ public class MessageController {
                 case SEARCH_COURSES:
                     return courseController.handleSearchCourses(request);
 
+                // --- ⭐ 新增：路由所有教务管理员相关的请求 ---
+                case ADMIN_GET_ALL_COURSES:
+                    return courseController.handleGetAllCoursesAdmin(request);
+                case ADMIN_ADD_COURSE:
+                    return courseController.handleAddCourse(request);
+                case ADMIN_MODIFY_COURSE:
+                    return courseController.handleModifyCourse(request);
+                case ADMIN_DELETE_COURSE:
+                    return courseController.handleDeleteCourse(request);
+                case ADMIN_ADD_SESSION:
+                    return courseController.handleAddSession(request);
+                case ADMIN_MODIFY_SESSION:
+                    return courseController.handleModifySession(request);
+                case ADMIN_DELETE_SESSION:
+                    return courseController.handleDeleteSession(request);
+
+                // ⭐ 新增路由
+                case ADMIN_SEARCH_COURSES:
+                    return courseController.handleAdminSearchCourses(request);
+
                 // --- 商店相关 ---
                 case SHOP_GET_ALL_PRODUCTS:
                     return shopController.handleGetAllProducts(request);
@@ -111,6 +139,13 @@ public class MessageController {
                     return shopController.handleGetMyFavorites(request);
                 case SHOP_GET_PRODUCT_DETAIL:
                     return shopController.handleGetProductDetail(request);
+                case SHOP_GET_BALANCE:
+                    return shopController.handleGetBalance(request);
+                case SHOP_PAY_FOR_ORDER:
+                    return shopController.handlePayForOrder(request); // <-- 确保 (message) 在这里
+
+                case SHOP_RECHARGE:
+                    return shopController.handleRecharge(request);
 
                 // --- 商店管理员相关 ---
                 case SHOP_ADMIN_ADD_PRODUCT:

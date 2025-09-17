@@ -14,6 +14,7 @@ import com.vcampus.client.controller.userAdmin.UserCreateViewController;
 import com.vcampus.client.controller.userAdmin.UserListViewController;
 import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
 import com.vcampus.common.dto.Message;
+import com.vcampus.client.controller.courseAdmin.CourseAdminController; // 确保导入
 
 /**
  * 客户端消息控制器
@@ -39,6 +40,8 @@ public class MessageController {
     private OrderManagementViewController orderManagementViewController;
     private FavoriteManagementViewController favoriteManagementViewController;
     private MyTimetableController myTimetableController; // ⭐ 新增
+    private CourseAdminController courseAdminController;
+
     private BookListViewController bookListViewController;
     private BookCreateViewController bookCreateViewController;
     private BorrowLogListViewController borrowLogListViewController;
@@ -109,6 +112,11 @@ public class MessageController {
     }
     public void setFavoriteManagementViewController(FavoriteManagementViewController controller) {
         this.favoriteManagementViewController = controller;
+    }
+
+    // ... (保留所有已有的 setter)
+    public void setCourseAdminController(CourseAdminController controller) {
+        this.courseAdminController = controller;
     }
     /**
      * 【修正】注册 BookListViewController 时，注销掉学生/教师的 LibraryController。
@@ -238,6 +246,20 @@ public class MessageController {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case STUDENT_STATUS_APPLICATION:
+                    if (studentController != null) {
+                        studentController.handleStudentLeaveApplicationResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case REVOKE_APPLICATION:
+                    if (studentController != null) {
+                        studentController.handleRevokeApplicationResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
                 case ALL_STUDENT:
                     if(studentadminController!=null){
                         studentadminController.handleAllStudentResponse(message);
@@ -266,6 +288,19 @@ public class MessageController {
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case GET_ALL_APPLICATIONS:
+                    if(studentadminController!=null){
+                        studentadminController.handleAllApplicationsResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case UPDATE_APPLICATION_STATUS:
+                    if(studentadminController!=null){
+                        studentadminController.handleUpdateStatusResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
                 // --- 商店模块 ---
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
@@ -346,6 +381,31 @@ public class MessageController {
                         System.err.println("路由警告：收到取消收藏响应，但ShopController未注册。");
                     }
                     break;
+                case SHOP_GET_BALANCE:
+                    if (shopController != null) {
+                        // 当收到获取余额的响应时，调用 ShopController 中对应的处理方法
+                        shopController.handleGetBalanceResponse(message);
+                    } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
+                        System.err.println("路由警告：收到获取余额响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_RECHARGE:
+                    if (shopController != null) {
+                        // 当收到充值的响应时，调用 ShopController 中对应的处理方法
+                        shopController.handleRechargeResponse(message);
+                    } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
+                        System.err.println("路由警告：收到充值响应，但ShopController未注册。");
+                    }
+                    break;
+                case SHOP_PAY_FOR_ORDER:
+                    if(shopController!=null){
+                        shopController.handleGetBalanceResponse(message);
+                    }else{
+                        System.err.println("路由警告：收到余额更新响应，但ShopController未注册.");
+                    }
 
 
                 // 商店管理员相关响应处理
@@ -479,6 +539,65 @@ public class MessageController {
                     }
                     break;
 
+                // --- ⭐ 新增：处理教务管理员相关的响应 ---
+                case ADMIN_GET_ALL_COURSES_RESPONSE:
+                    if (courseAdminController != null) {
+                        courseAdminController.handleGetAllCoursesResponse(message);
+                    }
+                    break;
+
+                case ADMIN_ADD_COURSE_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到添加课程响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理添加课程响应");
+                    }
+                    break;
+                case ADMIN_MODIFY_COURSE_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到修改课程响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理修改课程响应");
+                    }
+                    break;
+                case ADMIN_DELETE_COURSE_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到删除课程响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理删除课程响应");
+                    }
+                    break;
+                case ADMIN_ADD_SESSION_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到添加班级响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理添加班级响应");
+                    }
+                    break;
+                case ADMIN_MODIFY_SESSION_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到修改班级响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理修改班级响应");
+                    }
+                    break;
+                case ADMIN_DELETE_SESSION_RESPONSE:
+                    if (courseAdminController != null) {
+                        System.out.println("[DEBUG] 收到删除班级响应，触发数据刷新");
+                        courseAdminController.requestDataRefresh();
+                    } else {
+                        System.err.println("CourseAdminController未设置，无法处理删除班级响应");
+                    }
+                    break;
+
+
+
+
                 case LIBRARY_ADD_BOOK:
                     // 【修改】将 ADD_BOOK 的响应路由给 BookCreateViewController
                     if (bookCreateViewController != null) {
@@ -519,6 +638,8 @@ public class MessageController {
                         System.err.println("路由警告：收到创建借阅记录响应，但BorrowLogCreateController未注册。");
                     }
                     break;
+                default:
+                    System.out.println("未处理的消息类型: " + message.getAction());
             }
             
         } catch (Exception e) {

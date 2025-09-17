@@ -28,6 +28,8 @@ public enum ActionType {
     // --- 学籍模块 - 用户端 ---
     INFO_STUDENT("获取学生信息"),
     UPDATE_STUDENT("修改学生信息"),
+    STUDENT_STATUS_APPLICATION("学籍状态调整申请"),
+    REVOKE_APPLICATION("撤回学籍状态申请"),
     // --- 学籍模块 -管理员端 ---
     ALL_STUDENT("获取所有学生信息"),
     SEARCH_STUDENT("姓名模糊搜索"),
@@ -35,7 +37,6 @@ public enum ActionType {
     UPDATE_STUDENT_ADMIN("更新学生信息"),
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
-    
 
     // --- 商店模块 - 用户端 ---
     // 商品浏览与搜索
@@ -44,11 +45,12 @@ public enum ActionType {
     SHOP_GET_PRODUCT_DETAIL("获取商品详情"),
     // 订单管理
     SHOP_CREATE_ORDER("创建订单"),
+    SHOP_PAY_FOR_ORDER("支付订单"),
     SHOP_GET_MY_ORDERS("获取我的订单"),
     SHOP_CANCEL_ORDER("取消订单"),
     // --- 【新增】余额相关操作 ---
     SHOP_GET_BALANCE("获取用户余额"),
-    SHOP_RECHARGE_BALANCE("用户充值"),
+    SHOP_RECHARGE("用户充值"),
     // 收藏夹管理
     SHOP_ADD_FAVORITE("添加收藏"),
     SHOP_GET_MY_FAVORITES("获取我的收藏"),
@@ -98,9 +100,39 @@ public enum ActionType {
     LIBRARY_BORROW_BOOK("用户借阅图书"),
     LIBRARY_RETURN_BOOK("用户归还图书"),
     LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
+
+    // ⭐ 新增
+    SEARCH_COURSES("搜索响应课程"),
+    // ⭐ 新增：教务管理员相关操作
+    ADMIN_GET_ALL_COURSES("管理员获取所有课程"),          // 管理员获取所有课程
+    ADMIN_GET_ALL_COURSES_RESPONSE("管理员获取所有课程响应"),
+
     LIBRARY_UPDATE_BORROW_LOG("修改借阅记录"),
     LIBRARY_CREATE_BORROW_LOG("创建借阅记录"),
 
+    ADMIN_ADD_COURSE("管理员增加课程"),               // 管理员增加课程
+    ADMIN_ADD_COURSE_RESPONSE("管理员增加课程响应"),
+
+    ADMIN_MODIFY_COURSE("管理员修改课程"),            // 管理员修改课程
+    ADMIN_MODIFY_COURSE_RESPONSE("管理员修改课程响应"),
+
+    ADMIN_DELETE_COURSE("管理员删除课程"),            // 管理员删除课程
+    ADMIN_DELETE_COURSE_RESPONSE("管理员删除课程响应"),
+
+    ADMIN_ADD_SESSION("管理员增加教学班"),              // 管理员增加教学班
+    ADMIN_ADD_SESSION_RESPONSE("管理员增加教学班响应"),
+
+    ADMIN_MODIFY_SESSION("管理员修改教学班"),           // 管理员修改教学班
+    ADMIN_MODIFY_SESSION_RESPONSE("管理员修改教学班响应"),
+    ADMIN_DELETE_SESSION("管理员删除教学班"),           // 管理员删除教学班
+    ADMIN_DELETE_SESSION_RESPONSE("管理员删除教学班响应"),
+
+
+    // ⭐ 新增：管理员搜索课程
+    ADMIN_SEARCH_COURSES("管理员搜索课程"),
+    // 注意：我们不需要 ADMIN_SEARCH_COURSES_RESPONSE。
+    // 搜索成功后，服务器返回的也是一个课程列表，
+    // 我们可以复用 ADMIN_GET_ALL_COURSES_RESPONSE 这个响应类型。
     // --- 图书馆模块 - 管理员端 ---
     LIBRARY_ADD_BOOK("管理员添加图书"),
     LIBRARY_DELETE_BOOK("管理员删除图书"),
@@ -108,10 +140,6 @@ public enum ActionType {
     LIBRARY_SEARCH_HISTORY   ("搜索借阅历史"),
     LIBRARY_SEARCH_USERS("搜索用户借阅历史"),
 
-    // ⭐ 新增
-    SEARCH_COURSES("搜索响应课程"),
-
-    // === 邮件系统相关操作 ===
     
     // --- 邮件系统 - 用户端 ---
     EMAIL_SEND("发送邮件"),                    // 发送邮件

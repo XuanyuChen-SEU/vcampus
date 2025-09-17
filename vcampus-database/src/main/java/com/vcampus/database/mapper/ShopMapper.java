@@ -164,4 +164,5 @@ public interface ShopMapper {
      * @return 如果更新成功，返回 true；否则返回 false
      */
     boolean updateBalance(Balance balance);
+    boolean updateOrder(ShopTransaction order);
 }

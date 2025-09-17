@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ClassSession implements Serializable {
+    // ⭐ 1. 新增 courseId 字段
+    private String courseId;
+
     private String sessionId;
     private String teacherName;
     private String scheduleInfo;//时间表
@@ -14,7 +17,8 @@ public class ClassSession implements Serializable {
     // 默认构造方法（反序列化必需）
     public ClassSession() {}
 
-    public ClassSession(String sessionId, String teacherName, String scheduleInfo, int capacity, int enrolledCount, boolean isSelectedByStudent) {
+    public ClassSession(String courseId, String sessionId, String teacherName, String scheduleInfo, int capacity, int enrolledCount, boolean isSelectedByStudent) {
+        this.courseId = courseId;
         this.sessionId = sessionId;
         this.teacherName = teacherName;
         this.scheduleInfo = scheduleInfo;
@@ -27,6 +31,7 @@ public class ClassSession implements Serializable {
     //深度拷贝
     // 在 ClassSession.java (common DTO) 中添加
     public ClassSession(ClassSession other) {
+        this.courseId = other.courseId;
         this.sessionId = other.sessionId;
         this.teacherName = other.teacherName;
         this.scheduleInfo = other.scheduleInfo; //拷贝一下时间
@@ -39,6 +44,10 @@ public class ClassSession implements Serializable {
     // --- 构造方法, Getters, Setters ---
     // (请确保为以上所有字段都提供了相应的get方法)
     // --- 构造方法, Getters, Setters ---
+    // 新增 courseId 的 Getter 和 Setter
+    public String getCourseId() { return courseId; }
+    public void setCourseId(String courseId) { this.courseId = courseId; }
+
     public String getSessionId() { return sessionId; }
     public String getTeacherName() { return teacherName; }
     public String getScheduleInfo() { return scheduleInfo; }

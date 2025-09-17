@@ -211,55 +211,41 @@ public class LibraryDao implements ILibraryDao {
 
     }
     /**
-     * 【重构】实现归还图书的事务操作
-     * @param logId 要删除的借阅记录ID
-     * @param bookId 要更新状态的图书ID
-     * @return 操作是否成功
+     * 【确保存在】实现归还图书的事务操作
      */
     @Override
     public boolean returnBook(String logId, String bookId) {
-        // 使用与 borrowBook 相同的事务管理模式
         try (SqlSession session = MyBatisUtil.openSession()) {
             try {
-                // 1. 获取 Mapper 实例
                 LibraryMapper libraryMapper = session.getMapper(LibraryMapper.class);
 
-                // 2. 【操作1：删除】删除借阅记录
+                // 操作1：删除借阅记录
                 int deletedRows = libraryMapper.deleteBorrowLogById(logId);
                 if (deletedRows == 0) {
-                    // 如果没有记录被删除，说明logId无效，直接回滚
-                    session.rollback();
+                    session.rollback(); // 如果没有记录被删除，说明logId无效，回滚
                     return false;
                 }
 
-                // 3. 【操作2：更新】获取图书，并更新其状态为“在馆”
+                // 操作2：更新图书状态为“在馆”
                 Book bookToReturn = libraryMapper.selectBookById(bookId);
                 if (bookToReturn == null) {
-                    // 如果找不到这本书，数据异常，回滚
-                    session.rollback();
+                    session.rollback(); // 找不到书，数据异常，回滚
                     return false;
                 }
                 bookToReturn.setBorrowStatus("在馆");
-                int updatedRows = libraryMapper.updateBook(bookToReturn);
-                if (updatedRows == 0) {
-                    // 更新失败，回滚
-                    session.rollback();
-                    return false;
-                }
+                libraryMapper.updateBook(bookToReturn);
 
-                // 4. 【提交事务】所有操作成功，提交
+                // 所有操作成功，提交事务
                 session.commit();
                 return true;
 
             } catch (Exception e) {
-                // 5. 【回滚事务】出现任何异常，回滚
+                // 出现任何异常，回滚事务
                 session.rollback();
-                System.err.println("还书事务执行失败，已回滚！");
                 e.printStackTrace();
                 return false;
             }
         }
-
     }
     /**
      * 【新增】实现管理员创建借阅记录的事务

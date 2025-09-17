@@ -2,15 +2,20 @@ package com.vcampus.server.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.time.LocalDateTime;
 
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
+import com.vcampus.common.entity.Balance;
 import com.vcampus.server.dao.impl.ShopDao;
+import com.vcampus.common.enums.OrderStatus;
 
 /**
  * 【重构版】商店模块的服务层 (ShopService)
@@ -303,37 +308,50 @@ public class ShopService {
         }
     }
 
-    /**
-     * 【已增强】创建订单的业务逻辑，使用异常处理来明确失败原因。
-     * @param orderRequest 包含用户和商品信息的请求
-     * @return 创建成功则返回包含了数据库ID的完整订单对象
-     * @throws RuntimeException 如果库存不足或数据库保存失败
-     */
+
     public ShopTransaction createOrder(ShopTransaction orderRequest) {
+        // 1. 数据校验和库存更新 (这部分保持不变)
         Product product = shopDao.getProductById(orderRequest.getProduct().getId().toString());
-
-        if (product == null) {
-            // 明确抛出异常，而不是返回null
-            throw new RuntimeException("商品不存在或已下架");
-        }
-        if (product.getStock() <= 0) {
-            // 明确抛出异常
-            throw new RuntimeException("商品库存不足");
-        }
-
+        if (product == null) throw new RuntimeException("商品不存在或已下架");
+        if (product.getStock() <= 0) throw new RuntimeException("商品库存不足");
         product.setStock(product.getStock() - 1);
-        shopDao.updateProductById(product);
+        if (!shopDao.updateProductById(product)) throw new RuntimeException("更新商品库存失败");
 
-        ShopTransaction newOrder = new ShopTransaction(orderRequest.getUserId(), product.getPrice());
+        // 2. 创建并准备新的订单对象
+        ShopTransaction newOrder = new ShopTransaction();
+
+
+        // --- 【核心修复】 ---
+
+        // a. 【关键】生成一个全球唯一的字符串ID
+        String generatedOrderId = UUID.randomUUID().toString();
+
+        // b. 【关键】将这个字符串ID设置到 'orderId' 字段中
+        //    这正是为了满足 ShopMapper.xml 的需要！
+        newOrder.setOrderId(generatedOrderId);
+
+        // c. 设置其他订单信息
+        newOrder.setUserId(orderRequest.getUserId());
         newOrder.setProduct(product);
+        newOrder.setTotalPrice(product.getPrice());
+        newOrder.setQuantity(1);
+        newOrder.setPriceAtPurchase(product.getPrice());
+        newOrder.setOrderStatus(OrderStatus.UNPAID);
+        newOrder.setCreateTime(LocalDateTime.now());
 
-        boolean success = shopDao.saveOrder(newOrder);
+        // d. 【我们的侦探工具】在保存前打印这个ID，确认它不是null
+        System.out.println("【服务器DEBUG】准备保存到数据库的 orderId 是: " + newOrder.getOrderId());
 
-        if (!success) {
-            // 明确抛出异常
+        // 3. 保存订单到数据库
+        boolean orderSaved = shopDao.saveOrder(newOrder);
+        if (!orderSaved) {
+            // 回滚库存
+            product.setStock(product.getStock() + 1);
+            shopDao.updateProductById(product);
             throw new RuntimeException("数据库保存订单失败");
         }
 
+        System.out.println("服务器：成功创建订单，OrderID 为: " + newOrder.getOrderId());
         return newOrder;
     }
 
@@ -480,5 +498,148 @@ public class ShopService {
             System.err.println("保存图片失败: " + e.getMessage());
             throw new RuntimeException("保存图片失败", e);
         }
+    }
+
+    /**
+     * 获取指定用户的余额信息。
+     * @param userId 用户ID
+     * @return 用户的余额对象
+     * @throws RuntimeException 如果用户不存在或查询失败
+     */
+    public Balance getBalance(String userId) {
+        Balance balance = shopDao.getBalanceByUserId(userId);
+        if (balance == null) {
+            // 在真实系统中，可能需要为新用户创建一个余额记录
+            // 这里我们先简化处理，假设用户一定有余额记录
+            throw new RuntimeException("未找到该用户的余额信息");
+        }
+        return balance;
+    }
+
+    /**
+     * 为用户账户充值。
+     * @param rechargeRequest 包含 userId 和 amount 的 Balance 对象
+     * @return 充值后最新的余额对象
+     * @throws RuntimeException 如果充值失败或用户不存在
+     */
+    public Balance recharge(Balance rechargeRequest) {
+        String userId = rechargeRequest.getUserId();
+        BigDecimal amount = rechargeRequest.getBalance();
+
+        // 业务逻辑校验
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("用户ID不能为空");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("充值金额必须大于0");
+        }
+
+        // 1. 获取当前余额
+        Balance currentBalance = shopDao.getBalanceByUserId(userId);
+        if (currentBalance == null) {
+            throw new RuntimeException("充值失败：用户不存在");
+        }
+
+        // 2. 计算新余额
+        BigDecimal newAmount = currentBalance.getBalance().add(amount);
+        currentBalance.setBalance(newAmount);
+
+        // 3. 更新数据库
+        boolean success = shopDao.updateBalance(currentBalance);
+        if (!success) {
+            throw new RuntimeException("数据库更新余额失败");
+        }
+
+        // 4. 返回更新后的完整余额对象
+        return currentBalance;
+    }
+
+    /**
+     * 【最终正确版】处理支付订单的核心业务逻辑。
+     * - 完全遵循你的要求，使用 ShopDao 进行所有数据库操作。
+     * - 所有计算逻辑都在此方法内完成。
+     *
+     * @param orderToPay 客户端传来的、包含订单ID和用户ID的支付请求对象
+     * @return 支付成功后，返回包含了最新余额的 Balance 对象
+     * @throws RuntimeException 如果发生任何业务校验失败或数据库操作失败
+     */
+    public Balance payForOrder(ShopTransaction orderToPay) {
+        // --- 1. 数据准备与安全校验 ---
+        String userId = orderToPay.getUserId();
+        String orderId = orderToPay.getOrderId();
+
+        // a. 【使用你的DAO】从数据库获取用户当前的真实余额
+        Balance currentBalance = shopDao.getBalanceByUserId(userId);
+        if (currentBalance == null) {
+            throw new RuntimeException("支付失败：无法找到该用户的账户信息。");
+        }
+        System.out.println(currentBalance);
+
+        // b. 【使用你的DAO】从数据库获取订单的真实信息
+        //    (你需要确保 shopDao.getOrderById() 能通过 orderId 正常工作)
+        ShopTransaction realOrder = shopDao.getOrderById(orderId);
+        if (realOrder == null) {
+            throw new RuntimeException("支付失败：订单不存在或已被删除。");
+        }
+        System.out.println(realOrder);
+
+        // c. 业务状态校验
+        if (realOrder.getOrderStatus() != OrderStatus.UNPAID) {
+            throw new RuntimeException("支付失败：此订单已支付或已取消，请勿重复操作。");
+        }
+
+        // --- 2. 核心计算逻辑 ---
+        BigDecimal userMoney = currentBalance.getBalance();
+        BigDecimal orderPrice = BigDecimal.valueOf(realOrder.getTotalPrice()); // 将double转为BigDecimal以保证精度
+
+        // a. 检查余额是否充足
+        if (userMoney.compareTo(orderPrice) < 0) {
+            throw new RuntimeException("支付失败：您的账户余额不足！");
+        }
+
+        // b. 计算扣款后的新余额
+        BigDecimal newBalanceAmount = userMoney.subtract(orderPrice);
+
+        // --- 3. 准备更新数据库 ---
+
+        // a. 创建一个新的 Balance 对象用于更新数据库
+        Balance balanceToUpdate = new Balance();
+        balanceToUpdate.setUserId(userId);
+        balanceToUpdate.setBalance(newBalanceAmount);
+
+
+        // b. 更新订单对象的状态和支付时间
+        //    (你需要确保 shopDao.updateProductById 这种方式可以更新订单状态)
+        //    或者最好有一个专门的 updateOrder 方法
+        realOrder.setOrderStatus(OrderStatus.PAID);
+        realOrder.setPayTime(LocalDateTime.now());
+
+        // --- 4. 执行数据库事务性操作 ---
+        // 在真实项目中，以下两步应在一个数据库事务中完成，以保证数据一致性。
+        // 对于当前项目，我们按顺序执行。
+
+        // a. 【使用你的DAO】更新用户余额
+        boolean balanceUpdated = shopDao.updateBalance(balanceToUpdate);
+        if (!balanceUpdated) {
+            // 如果更新失败，直接抛出异常，不继续执行
+            throw new RuntimeException("支付失败：更新用户余额时发生数据库错误。");
+        }
+
+        // b. 【使用一个假设的DAO方法】更新订单状态
+        //    注意：你的 ShopDao 目前没有一个完美的 updateOrder 方法，我们暂时借用
+        //    updateProductById 的逻辑，你需要一个 shopDao.updateOrder(realOrder) 才最标准。
+        //    这里需要你提供一个更新订单的方法，我们先假设它叫 updateOrder。
+        boolean orderUpdated = shopDao.updateOrder(realOrder); // <--- 你需要实现这个DAO方法
+
+        if (!orderUpdated) {
+            // 【重要】如果更新订单失败，必须把刚才扣掉的钱还给用户（数据回滚）
+            shopDao.updateBalance(currentBalance); // 恢复旧的余额
+            throw new RuntimeException("支付失败：更新订单状态时发生数据库错误，已回滚余额。");
+        }
+
+        System.out.println("用户 " + userId + " 支付成功！订单号: " + orderId);
+
+        // --- 5. 返回最新的余额信息给上层 ---
+        return balanceToUpdate;
     }
 }

@@ -10,6 +10,7 @@ public interface Mapper {
     // 创建表
     void createUserTable();
     void createStudentTable();
+    void createStudentLeaveApplicationTable();
     void createBookTable();
     void createBorrowLogTable();
     void createPasswordResetApplicationTable();
