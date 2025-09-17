@@ -87,4 +87,9 @@ public class StudentAdminService {
         socketClient.sendMessage(request);
     }
 
+    /** 获取所有请假申请 */
+    public void getAllApplications() {
+        Message request = new Message(ActionType.GET_ALL_APPLICATIONS, null);
+        socketClient.sendMessage(request);
+    }
 }

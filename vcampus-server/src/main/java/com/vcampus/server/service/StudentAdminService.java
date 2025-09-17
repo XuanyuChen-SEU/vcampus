@@ -1,6 +1,8 @@
 package com.vcampus.server.service;
 
+import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.server.dao.impl.StudentDao;
+import com.vcampus.server.dao.impl.StudentLeaveApplicationDao;
 import com.vcampus.common.dto.Student;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 public class StudentAdminService {
 
     private final StudentDao studentDao = new StudentDao();
+    private final StudentLeaveApplicationDao studentleaveapplicationDao = new StudentLeaveApplicationDao();
 
     public List<Student> findAll() {
         return studentDao.findAll();
@@ -29,6 +32,13 @@ public class StudentAdminService {
 
     public boolean updateStudentInfo(Student student) {
         return studentDao.update(student) ; // update 返回受影响行数
+    }
+
+    /**
+     * 获取所有请假申请
+     */
+    public List<StudentLeaveApplication> getAllApplications() {
+        return studentleaveapplicationDao.selectAllApplications(); // 从数据库中查询所有申请
     }
 
 }

@@ -4,6 +4,7 @@ import com.vcampus.client.service.StudentService;
 import com.vcampus.client.session.UserSession;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.enums.ActionType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -46,7 +47,7 @@ public class StudentController implements IClientController {
 
     // === 按钮 ===
     @FXML private Button editOrSaveButton;       // 修改/保存
-    @FXML private Button pdfOrCancelButton;      // 导出PDF/取消
+    @FXML private Button pdfOrCancelButton;      // 休学/复学申请按钮
 
     // === 各区块 GridPane ===
     @FXML private GridPane studentGridPane;
@@ -107,12 +108,15 @@ public class StudentController implements IClientController {
         });
 
         pdfOrCancelButton.setOnAction(event -> {
-            if (!editing) exportPdf();
-            else cancelEdit();
+            if (!editing) { // 学籍异动申请
+                showStudentStatusApplicationDialog();
+            } else { // 编辑模式下取消
+                cancelEdit();
+            }
         });
     }
 
-    // =================== 进入编辑模式（修复位置错乱核心） ===================
+    // =================== 进入编辑模式 ===================
     private void enterEditMode() {
         editing = true;
 
@@ -141,29 +145,23 @@ public class StudentController implements IClientController {
         originalMotherPolitics = safeText(motherPoliticsLabel);
         originalMotherWork = safeText(motherWorkLabel);
 
-        // === 基本信息（修正行列索引） ===
-        // 出生日期 - 第3行第3列
+        // === 基本信息 ===
         birthDatePicker = new DatePicker();
-        birthDatePicker.setStyle("-fx-pref-height: 26px;"); // 匹配行高
+        birthDatePicker.setStyle("-fx-pref-height: 26px;");
         if (!originalBirthDate.isEmpty()) {
             birthDatePicker.setValue(LocalDate.parse(originalBirthDate));
         }
-
-        // 籍贯 - 第4行第1列
         nativePlaceField = new TextField(originalNativePlace);
         nativePlaceField.setStyle("-fx-pref-height: 26px;");
-
-        // 政治面貌 - 第4行第3列
         politicsComboBox = new ComboBox<>();
         politicsComboBox.setStyle("-fx-pref-height: 26px;");
         politicsComboBox.getItems().addAll("中共党员", "预备党员", "共青团员", "群众");
         politicsComboBox.setValue(originalPoliticsStatus.isEmpty() ? "群众" : originalPoliticsStatus);
 
-        // 移除原有标签并添加编辑控件（精确指定位置）
         studentGridPane.getChildren().removeAll(birthDateLabel, nativePlaceLabel, politicsStatusLabel);
-        studentGridPane.add(birthDatePicker, 3, 3);    // 出生日期：第3行第3列
-        studentGridPane.add(nativePlaceField, 1, 4);   // 籍贯：第4行第1列
-        studentGridPane.add(politicsComboBox, 3, 4);   // 政治面貌：第4行第3列
+        studentGridPane.add(birthDatePicker, 3, 3);
+        studentGridPane.add(nativePlaceField, 1, 4);
+        studentGridPane.add(politicsComboBox, 3, 4);
 
         // === 联系方式 ===
         phoneField = new TextField(originalPhone);
@@ -172,7 +170,6 @@ public class StudentController implements IClientController {
         emailField.setStyle("-fx-pref-height: 26px;");
         dormAddressField = new TextField(originalDormAddress);
         dormAddressField.setStyle("-fx-pref-height: 26px;");
-
         contactGridPane.getChildren().removeAll(phoneLabel, emailLabel, dormAddressLabel);
         contactGridPane.add(phoneField, 1, 0);
         contactGridPane.add(emailField, 3, 0);
@@ -189,7 +186,6 @@ public class StudentController implements IClientController {
         fatherPoliticsCombo.setValue(originalFatherPolitics.isEmpty() ? "群众" : originalFatherPolitics);
         fatherWorkField = new TextField(originalFatherWork);
         fatherWorkField.setStyle("-fx-pref-height: 26px;");
-
         fatherGridPane.getChildren().removeAll(fatherNameLabel, fatherPhoneLabel, fatherPoliticsLabel, fatherWorkLabel);
         fatherGridPane.add(fatherNameField, 1, 0);
         fatherGridPane.add(fatherPhoneField, 3, 0);
@@ -207,7 +203,6 @@ public class StudentController implements IClientController {
         motherPoliticsCombo.setValue(originalMotherPolitics.isEmpty() ? "群众" : originalMotherPolitics);
         motherWorkField = new TextField(originalMotherWork);
         motherWorkField.setStyle("-fx-pref-height: 26px;");
-
         motherGridPane.getChildren().removeAll(motherNameLabel, motherPhoneLabel, motherPoliticsLabel, motherWorkLabel);
         motherGridPane.add(motherNameField, 1, 0);
         motherGridPane.add(motherPhoneField, 3, 0);
@@ -254,7 +249,6 @@ public class StudentController implements IClientController {
         motherPoliticsLabel.setText(newMotherPolitics);
         motherWorkLabel.setText(newMotherWork);
 
-        // 准备更新对象
         Student updatedStudent = new Student();
         updatedStudent.setUserId(userIdLabel.getText());
         updatedStudent.setStudentId(studentIdLabel.getText());
@@ -284,7 +278,6 @@ public class StudentController implements IClientController {
 
     // =================== 取消编辑 ===================
     private void cancelEdit() {
-        // 恢复原值
         birthDateLabel.setText(originalBirthDate);
         nativePlaceLabel.setText(originalNativePlace);
         politicsStatusLabel.setText(originalPoliticsStatus);
@@ -306,21 +299,21 @@ public class StudentController implements IClientController {
         exitEditMode();
     }
 
-    // =================== 退出编辑模式（修复位置错乱核心） ===================
+    // =================== 退出编辑模式 ===================
     private void exitEditMode() {
         editing = false;
 
-        // 按钮还原
         editOrSaveButton.setText("修改");
         editOrSaveButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6;");
-        pdfOrCancelButton.setText("导出PDF");
-        pdfOrCancelButton.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 6;");
 
-        // === 基本信息（精确还原位置） ===
+        // 根据学籍状态更新按钮
+        updateStatusButton(studentStatusLabel.getText());
+
+        // === 基本信息 ===
         studentGridPane.getChildren().removeAll(birthDatePicker, nativePlaceField, politicsComboBox);
-        studentGridPane.add(birthDateLabel, 3, 3);    // 出生日期：第3行第3列
-        studentGridPane.add(nativePlaceLabel, 1, 4);   // 籍贯：第4行第1列
-        studentGridPane.add(politicsStatusLabel, 3, 4); // 政治面貌：第4行第3列
+        studentGridPane.add(birthDateLabel, 3, 3);
+        studentGridPane.add(nativePlaceLabel, 1, 4);
+        studentGridPane.add(politicsStatusLabel, 3, 4);
 
         // === 联系方式 ===
         contactGridPane.getChildren().removeAll(phoneField, emailField, dormAddressField);
@@ -343,9 +336,79 @@ public class StudentController implements IClientController {
         motherGridPane.add(motherWorkLabel, 3, 1);
     }
 
-    private void exportPdf() {
-        showInfo("导出 PDF 功能待实现");
+    // =================== 根据学籍状态设置按钮 ===================
+    private void updateStatusButton(String studentStatus) {
+        Platform.runLater(() -> {
+            pdfOrCancelButton.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 6;");
+            if ("在读".equals(studentStatus)) {
+                pdfOrCancelButton.setText("休学申请");
+                pdfOrCancelButton.setVisible(true);
+            } else if ("休学".equals(studentStatus)) {
+                pdfOrCancelButton.setText("复学申请");
+                pdfOrCancelButton.setVisible(true);
+            } else { // 毕业或其他状态
+                pdfOrCancelButton.setVisible(false);
+            }
+        });
     }
+
+    // =================== 弹出学籍异动申请对话框 ===================
+    private void showStudentStatusApplicationDialog() {
+        String currentStatus = studentStatusLabel.getText();
+        String applicationType;
+
+        // 根据当前学籍状态确定申请类型
+        if ("在读".equals(currentStatus)) {
+            applicationType = "休学申请";
+        } else if ("休学".equals(currentStatus)) {
+            applicationType = "复学申请";
+        } else {
+            showInfo("当前学生状态无法进行学籍申请");
+            return;
+        }
+
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle(applicationType);
+        dialog.setHeaderText("请填写学籍异动申请内容");
+
+        ButtonType submitButtonType = new ButtonType("提交", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(submitButtonType, ButtonType.CANCEL);
+
+        TextArea reasonArea = new TextArea();
+        reasonArea.setPromptText("请输入申请理由...");
+        reasonArea.setPrefRowCount(5);
+        dialog.getDialogPane().setContent(reasonArea);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == submitButtonType) {
+                return reasonArea.getText();
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(reason -> {
+            if (reason != null && !reason.trim().isEmpty()) {
+                submitStatusApplication(applicationType, reason);
+            } else {
+                showInfo("申请内容不能为空");
+            }
+        });
+    }
+
+    private void submitStatusApplication(String applicationType, String reason) {
+        StudentLeaveApplication application = new StudentLeaveApplication();
+        application.setStudentId(userIdLabel.getText());
+        application.setStudentName(nameLabel.getText());
+        application.setCurrentStatus(studentStatusLabel.getText());
+        application.setType(applicationType);
+        application.setReason(reason);
+        application.setCreateTime(java.time.LocalDate.now());
+        application.setStatus("待审批");
+
+        // 调用 service 提交
+        studentService.submitStatusApplication(application);
+    }
+
 
     // =================== 网络消息回调 ===================
     public void handleStudentInfoResponse(Message message) {
@@ -377,6 +440,9 @@ public class StudentController implements IClientController {
                 motherPhoneLabel.setText(student.getMotherPhone());
                 motherPoliticsLabel.setText(student.getMotherPoliticsStatus());
                 motherWorkLabel.setText(student.getMotherWorkUnit());
+
+                // 更新按钮显示
+                updateStatusButton(student.getStudent_status());
             } else {
                 showError("加载学生信息失败：" + message.getMessage());
             }
@@ -456,10 +522,28 @@ public class StudentController implements IClientController {
     private String safeText(Label label) {
         return (label != null && label.getText() != null) ? label.getText() : "";
     }
+
+    public void handleStudentLeaveApplicationResponse(Message response) {
+        Platform.runLater(() -> {
+            if (response == null) {
+                showError("未收到服务器响应。");
+                return;
+            }
+
+            if (response.isSuccess()) {
+                Object data = response.getData();
+                if (data instanceof StudentLeaveApplication) {
+                    StudentLeaveApplication application = (StudentLeaveApplication) data;
+                    showInfo("申请提交成功！\n申请编号: " + application.getApplicationId() +
+                            "\n状态: " + application.getStatus());
+                } else {
+                    showInfo("申请提交成功！");
+                }
+            } else {
+                String errorMsg = response.getMessage() != null ? response.getMessage() : "未知错误";
+                showError("申请失败: " + errorMsg);
+            }
+        });
+    }
+
 }
-
-
-
-
-
-

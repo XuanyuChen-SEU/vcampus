@@ -21,10 +21,10 @@ public interface IStudentDao {
      */
     List<Student> findByNameLike(String name);
 
-    /**
-     * 通过学号模糊搜索学生
-     */
-//    List<Student> findByStudentId(String name);
+    List<Student> findByGrade(Integer grade);
+
+    List<Student> findByMajor(String major);
+
 
     /**
      * 插入新学生信息

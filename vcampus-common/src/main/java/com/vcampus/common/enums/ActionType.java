@@ -18,11 +18,13 @@ public enum ActionType {
     // --- 学籍模块 - 用户端 ---
     INFO_STUDENT("获取学生信息"),
     UPDATE_STUDENT("修改学生信息"),
+    STUDENT_STATUS_APPLICATION("学籍状态改变"),
     // --- 学籍模块 -管理员端 ---
     ALL_STUDENT("获取所有学生信息"),
     SEARCH_STUDENT("姓名模糊搜索"),
     INFO_STUDENT_ADMIN("查看学生详细信息"),
     UPDATE_STUDENT_ADMIN("更新学生信息"),
+    GET_ALL_APPLICATIONS("获取学籍状态调整申请表"),
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
     // === 用户管理相关操作 ===

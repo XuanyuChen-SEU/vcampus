@@ -2,10 +2,11 @@ package com.vcampus.server.service;
 
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.dto.User;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.dao.impl.StudentDao;
-
+import com.vcampus.server.dao.impl.StudentLeaveApplicationDao;
 import java.sql.SQLException;
 
 /**
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 public class StudentService {
 
     private final StudentDao studentDao;
+    private final StudentLeaveApplicationDao applicationDAO = new StudentLeaveApplicationDao();
 
     public StudentService() {
         this.studentDao = new StudentDao();
@@ -53,6 +55,20 @@ public class StudentService {
 
         } catch (Exception e) {
             System.err.println("更新学生信息时发生异常: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 保存休学/复学申请
+     * @param application 申请对象
+     * @return true 成功，false 失败
+     */
+    public boolean saveApplication(StudentLeaveApplication application) {
+        try {
+            return applicationDAO.insert(application);
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

@@ -194,6 +194,13 @@ public class MessageController {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case STUDENT_STATUS_APPLICATION:
+                    if (studentController != null) {
+                        studentController.handleStudentLeaveApplicationResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
                 case ALL_STUDENT:
                     if(studentadminController!=null){
                         studentadminController.handleAllStudentResponse(message);
@@ -218,6 +225,13 @@ public class MessageController {
                 case UPDATE_STUDENT_ADMIN:
                     if(studentadminController!=null){
                         studentadminController.handleUpdateStudentResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case GET_ALL_APPLICATIONS:
+                    if(studentadminController!=null){
+                        studentadminController.handleAllApplicationsResponse(message);
                     }else{
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
                     }

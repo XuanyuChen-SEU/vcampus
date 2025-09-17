@@ -2,6 +2,7 @@ package com.vcampus.server.controller;
 
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.StudentAdminService;
 
@@ -89,6 +90,17 @@ public class StudentAdminController {
             return Message.failure(ActionType.UPDATE_STUDENT_ADMIN, "服务端异常: " + e.getMessage());
         }
     }
-
+    /**
+     * 获取所有学生请假申请
+     */
+    public Message getAllApplications(Message request) {
+        try {
+            List<StudentLeaveApplication> list = studentAdminService.getAllApplications();
+            return Message.success(ActionType.GET_ALL_APPLICATIONS, list, "获取所有请假申请成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.GET_ALL_APPLICATIONS, "获取所有请假申请失败: " + e.getMessage());
+        }
+    }
 }
 

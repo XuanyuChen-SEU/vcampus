@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vcampus.database.mapper.StudentLeaveApplicationMapper">
+
+    <!-- 插入新的学籍异动申请 -->
+    <insert id="insertApplication" parameterType="com.vcampus.common.dto.StudentLeaveApplication" useGeneratedKeys="true" keyProperty="applicationId">
+        INSERT INTO vcampus_db.tb_student_leave_application
+        (student_id, student_name, type, reason, status, create_time)
+        VALUES
+        (#{studentId}, #{studentName}, #{type}, #{reason}, #{status}, #{createTime})
+    </insert>
+
+    <!-- 查询某学生最新的一条申请 -->
+    <select id="selectLatestByStudentId" parameterType="String" resultType="com.vcampus.common.dto.StudentLeaveApplication">
+        SELECT application_id,
+        student_id,
+        student_name,
+        type,
+        reason,
+        status,
+        create_time
+        FROM vcampus_db.tb_student_leave_application
+        WHERE student_id = #{studentId}
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
+    <!-- 更新申请状态 -->
+    <update id="updateStatus">
+        UPDATE vcampus_db.tb_student_leave_application
+        SET status = #{status}
+        WHERE application_id = #{applicationId}
+    </update>
+
+    <!-- 从 CSV 导入数据（包含 student_name） -->
+    <update id="loadStudentLeaveApplicationsFromCsv" parameterType="java.lang.String">
+        LOAD DATA LOCAL INFILE #{filePath}
+        INTO TABLE vcampus_db.tb_student_leave_application
+        FIELDS TERMINATED BY ','
+        ENCLOSED BY '"'
+        LINES TERMINATED BY '\n'
+        IGNORE 1 LINES
+        (student_id, student_name, type, reason, status, create_time);
+    </update>
+
+    <!-- 获取所有请假申请（包含学生姓名） -->
+    <select id="selectAllApplications" resultType="com.vcampus.common.dto.StudentLeaveApplication">
+        SELECT
+        a.application_id AS applicationId,
+        a.student_id AS studentId,
+        a.student_name AS studentName,
+        a.type AS type,
+        a.reason AS reason,
+        a.status AS status,
+        a.create_time AS createTime
+        FROM vcampus_db.tb_student_leave_application a
+        ORDER BY a.create_time DESC
+    </select>
+
+</mapper>
+

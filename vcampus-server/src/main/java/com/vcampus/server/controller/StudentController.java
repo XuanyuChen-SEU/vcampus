@@ -2,6 +2,7 @@ package com.vcampus.server.controller;
 
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.StudentService;
 
@@ -67,6 +68,33 @@ public class StudentController {
             System.err.println("更新学生信息过程中发生异常: " + e.getMessage());
             return Message.failure(ActionType.UPDATE_STUDENT, "服务器内部错误");
         }
+    }
+
+    /**
+     * 处理学籍异动申请（休学/复学）
+     */
+    public Message handleStudentStatusApplication(Message message) {
+        Message response = new Message();
+        response.setAction(ActionType.STUDENT_STATUS_APPLICATION);
+
+        try {
+            Object data = message.getData();
+            if (data instanceof StudentLeaveApplication application) {
+                // 保存到数据库
+                boolean success = studentService.saveApplication(application);
+                response.setStatus(success);
+                response.setMessage(success ? "申请提交成功" : "申请提交失败");
+                response.setData(application);
+            } else {
+                response.setStatus(false);
+                response.setMessage("无效数据类型");
+            }
+        } catch (Exception e) {
+            response.setStatus(false);
+            response.setMessage("处理申请时发生异常：" + e.getMessage());
+        }
+
+        return response;
     }
 
 }
