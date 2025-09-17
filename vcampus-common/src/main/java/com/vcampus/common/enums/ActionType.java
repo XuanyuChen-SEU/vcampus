@@ -15,6 +15,16 @@ public enum ActionType {
     SYSTEM_BROADCAST("系统广播"),
     EMERGENCY_NOTIFICATION("紧急通知"),
 
+    // === 用户管理相关操作 ===
+    CREATE_USER("创建用户"),                   // 创建新用户
+    DELETE_USER("删除用户"),                   // 删除用户
+    RESET_USER_PASSWORD("重置用户密码"),        // 重置用户密码
+    SEARCH_USERS("搜索用户"),                  // 搜索用户
+    GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请
+    APPROVE_FORGET_PASSWORD_APPLICATION("批准忘记密码申请"),        // 批准忘记密码申请
+    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请
+
+
     // --- 学籍模块 - 用户端 ---
     INFO_STUDENT("获取学生信息"),
     UPDATE_STUDENT("修改学生信息"),
@@ -25,15 +35,7 @@ public enum ActionType {
     UPDATE_STUDENT_ADMIN("更新学生信息"),
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
-    // === 用户管理相关操作 ===
-    CREATE_USER("创建用户"),                   // 创建新用户
-    DELETE_USER("删除用户"),                   // 删除用户
-    RESET_USER_PASSWORD("重置用户密码"),        // 重置用户密码
-    SEARCH_USERS("搜索用户"),                  // 搜索用户
-    GET_FORGET_PASSWORD_TABLE("获取忘记密码申请"),                  // 获取忘记密码申请
-    APPROVE_FORGET_PASSWORD_APPLICATION("批准忘记密码申请"),        // 批准忘记密码申请
-    REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请
-
+    
 
     // --- 商店模块 - 用户端 ---
     // 商品浏览与搜索
@@ -107,7 +109,34 @@ public enum ActionType {
     LIBRARY_SEARCH_USERS("搜索用户借阅历史"),
 
     // ⭐ 新增
-    SEARCH_COURSES("搜索响应课程");
+    SEARCH_COURSES("搜索响应课程"),
+
+    // === 邮件系统相关操作 ===
+    
+    // --- 邮件系统 - 用户端 ---
+    EMAIL_SEND("发送邮件"),                    // 发送邮件
+    EMAIL_SAVE_DRAFT("保存草稿"),              // 保存草稿
+    EMAIL_GET_INBOX("获取收件箱"),             // 获取收件箱
+    EMAIL_GET_SENT("获取发件箱"),              // 获取发件箱
+    EMAIL_GET_DRAFT("获取草稿箱"),             // 获取草稿箱
+    EMAIL_READ("阅读邮件"),                    // 阅读邮件
+    EMAIL_DELETE("删除邮件"),                  // 删除邮件
+    EMAIL_MARK_READ("标记已读"),               // 标记已读
+    EMAIL_MARK_UNREAD("标记未读"),             // 标记未读
+    EMAIL_SEARCH("搜索邮件"),                  // 搜索邮件
+    EMAIL_GET_UNREAD_COUNT("获取未读数量"),     // 获取未读邮件数量
+    EMAIL_BATCH_MARK_READ("批量标记已读"),      // 批量标记已读
+    EMAIL_BATCH_DELETE("批量删除邮件"),        // 批量删除邮件
+    
+    // --- 邮件系统 - 管理员端 ---
+    EMAIL_ADMIN_GET_ALL("管理员获取所有邮件"),  // 管理员获取所有邮件
+    EMAIL_ADMIN_GET_USER_EMAILS("管理员获取用户邮件"), // 管理员获取指定用户的邮件
+    EMAIL_ADMIN_SEARCH_ALL("管理员搜索所有邮件"), // 管理员搜索所有邮件
+    EMAIL_ADMIN_DELETE("管理员删除邮件"),       // 管理员删除邮件
+    EMAIL_ADMIN_GET_STATISTICS("管理员获取邮件统计"), // 管理员获取邮件统计信息
+    
+    // === 错误处理 ===
+    ERROR("错误"); // 通用错误类型
 
     private final String description;
 

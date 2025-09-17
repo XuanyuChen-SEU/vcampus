@@ -24,4 +24,7 @@ public interface Mapper {
     void createClassSessionsTable();
     void createCourseSelectionsTable();
 
+    //邮件模块
+    void createEmailTable();
+
 }
