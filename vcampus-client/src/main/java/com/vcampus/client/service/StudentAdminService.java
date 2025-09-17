@@ -87,4 +87,38 @@ public class StudentAdminService {
         socketClient.sendMessage(request);
     }
 
+    /** 获取所有请假申请 */
+    public void getAllApplications() {
+        Message request = new Message(ActionType.GET_ALL_APPLICATIONS, null);
+        socketClient.sendMessage(request);
+    }
+
+    /**
+     * 更新请假申请的审核状态
+     *
+     * @param applicationId 申请的唯一ID
+     * @param status        审核结果（已通过/未通过）
+     */
+    public void updateApplicationStatus(String applicationId, String status) {
+        try {
+            // 封装 data，这里简单传一个 Map，或者你可以定义 DTO
+            var data = new java.util.HashMap<String, Object>();
+            data.put("applicationId", applicationId);
+            data.put("status", status);
+
+            Message request = new Message(ActionType.UPDATE_APPLICATION_STATUS, data);
+
+            // 发送到服务器
+            Message response = socketClient.sendMessage(request);
+
+            if (response == null || !response.isStatus()) {
+                System.err.println("更新申请状态失败：" + (response != null ? response.getMessage() : "无响应"));
+            } else {
+                System.out.println("申请状态更新成功 -> ID=" + applicationId + " 状态=" + status);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

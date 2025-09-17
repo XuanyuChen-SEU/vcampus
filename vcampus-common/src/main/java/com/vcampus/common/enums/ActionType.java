@@ -18,6 +18,8 @@ public enum ActionType {
     // --- 学籍模块 - 用户端 ---
     INFO_STUDENT("获取学生信息"),
     UPDATE_STUDENT("修改学生信息"),
+    STUDENT_STATUS_APPLICATION("学籍状态调整申请"),
+    REVOKE_APPLICATION("撤回学籍状态申请"),
     // --- 学籍模块 -管理员端 ---
     ALL_STUDENT("获取所有学生信息"),
     SEARCH_STUDENT("姓名模糊搜索"),
@@ -25,6 +27,8 @@ public enum ActionType {
     UPDATE_STUDENT_ADMIN("更新学生信息"),
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
+    GET_ALL_APPLICATIONS("获取所有的申请"),
+    UPDATE_APPLICATION_STATUS("更新申请状态"),
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
     DELETE_USER("删除用户"),                   // 删除用户
@@ -103,6 +107,7 @@ public enum ActionType {
     // ⭐ 新增：教务管理员相关操作
     ADMIN_GET_ALL_COURSES("管理员获取所有课程"),          // 管理员获取所有课程
     ADMIN_GET_ALL_COURSES_RESPONSE("管理员获取所有课程响应"),
+
     LIBRARY_UPDATE_BORROW_LOG("修改借阅记录"),
     LIBRARY_CREATE_BORROW_LOG("创建借阅记录"),
 

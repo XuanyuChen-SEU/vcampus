@@ -2,10 +2,12 @@ package com.vcampus.server.controller;
 
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.StudentAdminService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 服务端管理员学生信息控制器
@@ -89,6 +91,49 @@ public class StudentAdminController {
             return Message.failure(ActionType.UPDATE_STUDENT_ADMIN, "服务端异常: " + e.getMessage());
         }
     }
+    /**
+     * 获取所有学生请假申请
+     */
+    public Message getAllApplications(Message request) {
+        try {
+            List<StudentLeaveApplication> list = studentAdminService.getAllApplications();
+            return Message.success(ActionType.GET_ALL_APPLICATIONS, list, "获取所有请假申请成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.GET_ALL_APPLICATIONS, "获取所有请假申请失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 更新请假申请状态
+     */
+    public Message updateApplicationStatus(Message request) {
+        try {
+            if (!(request.getData() instanceof Map map)) {
+                return Message.failure(ActionType.UPDATE_APPLICATION_STATUS, "参数错误");
+            }
+
+            String applicationId = String.valueOf(map.get("applicationId"));
+            String status = String.valueOf(map.get("status"));
+
+            if (applicationId == null || status == null) {
+                return Message.failure(ActionType.UPDATE_APPLICATION_STATUS, "参数错误");
+            }
+
+            boolean ok = studentAdminService.updateApplicationStatus(applicationId, status);
+
+            if (ok) {
+                StudentLeaveApplication updated = studentAdminService.getApplicationById(applicationId);
+                return Message.success(ActionType.UPDATE_APPLICATION_STATUS, updated, "申请状态更新成功");
+            } else {
+                return Message.failure(ActionType.UPDATE_APPLICATION_STATUS, "申请状态更新失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.UPDATE_APPLICATION_STATUS, "服务端异常: " + e.getMessage());
+        }
+    }
+
 
 }
 

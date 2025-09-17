@@ -189,7 +189,9 @@
         <HBox spacing="10" alignment="CENTER_RIGHT"
               AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="20.0">
             <Button fx:id="editOrSaveButton" text="修改" styleClass="student-record-button-edit" prefWidth="80" prefHeight="30"/>
-            <Button fx:id="pdfOrCancelButton" text="导出PDF" styleClass="student-record-button-pdf" prefWidth="80" prefHeight="30"/>
+            <Button fx:id="pdfOrCancelButton" text="申请"
+                    styleClass="student-record-button-status" prefWidth="120" prefHeight="30"
+                    visible="false"/>
         </HBox>
     </children>
 </AnchorPane>

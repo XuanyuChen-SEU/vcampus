@@ -246,6 +246,20 @@ public class MessageController {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case STUDENT_STATUS_APPLICATION:
+                    if (studentController != null) {
+                        studentController.handleStudentLeaveApplicationResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case REVOKE_APPLICATION:
+                    if (studentController != null) {
+                        studentController.handleRevokeApplicationResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
                 case ALL_STUDENT:
                     if(studentadminController!=null){
                         studentadminController.handleAllStudentResponse(message);
@@ -274,6 +288,19 @@ public class MessageController {
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case GET_ALL_APPLICATIONS:
+                    if(studentadminController!=null){
+                        studentadminController.handleAllApplicationsResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case UPDATE_APPLICATION_STATUS:
+                    if(studentadminController!=null){
+                        studentadminController.handleUpdateStatusResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
                 // --- 商店模块 ---
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
@@ -567,7 +594,6 @@ public class MessageController {
                         System.err.println("CourseAdminController未设置，无法处理删除班级响应");
                     }
                     break;
-
 
 
 

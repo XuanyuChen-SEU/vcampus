@@ -78,6 +78,21 @@
         `motherWorkUnit` VARCHAR(100) COMMENT '母亲工作单位'
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生信息表（以userId为主键）';
     </update>
+    <update id="createStudentLeaveApplicationTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_student_leave_application (
+        application_id INT NOT NULL AUTO_INCREMENT COMMENT '申请ID（主键）',
+        student_id VARCHAR(50) NOT NULL COMMENT '学生ID（userId）',
+        student_name VARCHAR(50) NOT NULL COMMENT '学生姓名',
+        type VARCHAR(20) NOT NULL COMMENT '申请类型：休学/复学',
+        reason TEXT COMMENT '申请理由',
+        status VARCHAR(20) NOT NULL DEFAULT '待审批' COMMENT '申请状态：待审批/已批准/已拒绝',
+        create_time DATETIME NOT NULL COMMENT '申请时间',
+        PRIMARY KEY (application_id),
+        INDEX idx_student_id (student_id),
+        FOREIGN KEY (student_id) REFERENCES tb_student(userId) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生学籍异动申请表';
+    </update>
+
     <update id="createBookTable">
         CREATE TABLE IF NOT EXISTS vcampus_db.`tb_book` (
                                                             `book_id`       VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '图书ID',

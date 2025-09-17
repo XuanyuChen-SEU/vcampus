@@ -19,6 +19,7 @@ import com.vcampus.database.mapper.Mapper;
 import com.vcampus.database.mapper.PasswordResetApplicationMapper;
 import com.vcampus.database.mapper.ShopMapper;
 import com.vcampus.database.mapper.StudentMapper;
+import com.vcampus.database.mapper.StudentLeaveApplicationMapper;
 import com.vcampus.database.mapper.UserMapper;
 import com.vcampus.database.utils.MyBatisUtil;
 
@@ -36,6 +37,7 @@ public class DBService {
         SqlSession sqlSession = null;
         File userCsvTempFile = null;
         File studentCsvTempFile = null;
+        File studentLeaveApplicationCsvTempFile = null;
         File bookCsvTempFile = null;
         File borrowLogCsvTempFile = null;
         File passwordResetApplicationCsvTempFile = null;
@@ -61,6 +63,7 @@ public class DBService {
 
             mapper.createUserTable();
             mapper.createStudentTable();
+            mapper.createStudentLeaveApplicationTable();
             mapper.createPasswordResetApplicationTable();
             mapper.createProductTable();
             mapper.createOrderTable();
@@ -77,6 +80,7 @@ public class DBService {
 
             String userCSVPath = "db/tb_user.csv";
             String studentCSVPath = "db/tb_student.csv";
+            String studentLeaveApplicationCSVPath = "db/tb_student_leave_application.csv";
             String BookCSVPath = "db/tb_book.csv";
             String BorrowLogCSVPath = "db/tb_borrow_log.csv";
             String passwordResetApplicationCSVPath = "db/tb_password_reset_application.csv";
@@ -96,6 +100,7 @@ public class DBService {
             // 将资源文件写入我们指定的临时目录中
             userCsvTempFile = createTempFileFromResource(userCSVPath, tempDirectory.toFile());
             studentCsvTempFile = createTempFileFromResource(studentCSVPath, tempDirectory.toFile());
+            studentLeaveApplicationCsvTempFile = createTempFileFromResource(studentLeaveApplicationCSVPath, tempDirectory.toFile());
             bookCsvTempFile = createTempFileFromResource(BookCSVPath, tempDirectory.toFile());
             borrowLogCsvTempFile = createTempFileFromResource(BorrowLogCSVPath, tempDirectory.toFile());
             passwordResetApplicationCsvTempFile = createTempFileFromResource(passwordResetApplicationCSVPath,tempDirectory.toFile());
@@ -110,6 +115,7 @@ public class DBService {
             // getAbsolutePath() 在某些系统上可能包含'..'，改用 getCanonicalPath() 获取更规范的路径
             String userPath = userCsvTempFile.getCanonicalPath().replace('\\', '/');
             String studentPath = studentCsvTempFile.getCanonicalPath().replace('\\', '/');
+            String studentLeaveApplicationPath = studentLeaveApplicationCsvTempFile.getAbsolutePath();
             String bookPath = bookCsvTempFile.getCanonicalPath().replace('\\', '/');
             String borrowLogPath = borrowLogCsvTempFile.getCanonicalPath().replace('\\', '/');
             String passwordResetApplicationPath = passwordResetApplicationCsvTempFile.getAbsolutePath();
@@ -123,6 +129,7 @@ public class DBService {
 
             System.out.println("正在从临时文件加载: " + userPath);
             System.out.println("正在从临时文件加载: " + studentPath);
+            System.out.println("正在从临时文件加载: " + studentLeaveApplicationPath);
             System.out.println("正在从临时文件加载: " + passwordResetApplicationPath);
             System.out.println("正在从临时文件加载: " + productPath);
             System.out.println("正在从临时文件加载: " + orderPath);
@@ -136,6 +143,7 @@ public class DBService {
 
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
+            StudentLeaveApplicationMapper studentLeaveApplicationMapper = sqlSession.getMapper(StudentLeaveApplicationMapper.class);
             LibraryMapper libraryMapper = sqlSession.getMapper(LibraryMapper.class);
             PasswordResetApplicationMapper passwordResetApplicationMapper = sqlSession.getMapper(PasswordResetApplicationMapper.class);
             ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
@@ -145,6 +153,7 @@ public class DBService {
 
             userMapper.loadUsersFromCsv(userPath);
             studentMapper.loadStudentsFromCsv(studentPath);
+            studentLeaveApplicationMapper.loadStudentLeaveApplicationsFromCsv(studentLeaveApplicationPath);
             libraryMapper.loadBooksFromCsv(bookPath);
             libraryMapper.loadBorrowLogsFromCsv(borrowLogPath);
             passwordResetApplicationMapper.loadPasswordResetApplicationsFromCsv(passwordResetApplicationPath);
@@ -175,6 +184,9 @@ public class DBService {
             }
             if (studentCsvTempFile != null && studentCsvTempFile.exists()) {
                 studentCsvTempFile.delete();
+            }
+            if (studentLeaveApplicationCsvTempFile != null && studentLeaveApplicationCsvTempFile.exists()) {
+                studentLeaveApplicationCsvTempFile.delete();
             }
             if (bookCsvTempFile != null) {
                 bookCsvTempFile.delete();

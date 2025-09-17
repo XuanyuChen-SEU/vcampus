@@ -4,6 +4,7 @@ import com.vcampus.client.MainApp;
 import com.vcampus.client.net.SocketClient;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.enums.ActionType;
 
 /**
@@ -59,5 +60,27 @@ public class StudentService {
             return (Student) message.getData();
         }
         return null;
+    }
+
+    /**
+     * 提交学籍异动申请（休学/复学）
+     * @param application 学籍申请 DTO
+     */
+    public void submitStatusApplication(StudentLeaveApplication application) {
+        if (socketClient == null || socketClient.getMessageController() == null) {
+            System.err.println("未连接服务器，无法提交申请");
+            return;
+        }
+        Message request = new Message(ActionType.STUDENT_STATUS_APPLICATION, application);
+        // 发送给服务器
+        socketClient.sendMessage(request);
+    }
+
+    public void revokeApplication(StudentLeaveApplication application) {
+        // 构造请求消息，ActionType 可为 UPDATE_STUDENT（需在服务端定义对应处理逻辑）
+        Message request = new Message(ActionType.REVOKE_APPLICATION, application);
+
+        // 发送到服务端，服务端处理更新并返回结果
+        socketClient.sendMessage(request);
     }
 }

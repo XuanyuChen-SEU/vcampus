@@ -27,6 +27,16 @@
         </children>
     </HBox>
 
+    <!-- 学籍状态调整按钮 -->
+    <!-- 学籍状态调整按钮 -->
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="btnSelectAll" text="全选"/>
+        <Button fx:id="btnAdjustStatus" text="调整学籍状态" styleClass="action-button"/>
+        <Button fx:id="btnStudentList" text="学生列表" styleClass="action-button"/>
+        <Button fx:id="btnApplicationList" text="申请列表" styleClass="action-button"/>
+        <Button fx:id="btnRefreshList" text="刷新" styleClass="action-button"/>
+    </HBox>
+
     <!-- 顶部搜索栏 -->
     <HBox spacing="10" alignment="CENTER_LEFT">
         <TextField fx:id="searchField" promptText="请输入学号或姓名"
@@ -34,19 +44,38 @@
         <Button fx:id="searchButton" text="🔍 搜索" styleClass="search-button"/>
     </HBox>
 
-    <!-- 学生信息表格 -->
-    <TableView fx:id="studentTable" VBox.vgrow="ALWAYS" styleClass="data-table">
-        <columns>
-            <TableColumn fx:id="colUserId" text="用户ID" prefWidth="100"/>
-            <TableColumn fx:id="colStudentId" text="学号" prefWidth="100"/>
-            <TableColumn fx:id="colName" text="姓名" prefWidth="80"/>
-            <TableColumn fx:id="colGender" text="性别" prefWidth="60"/>
-            <TableColumn fx:id="colCollege" text="学院" prefWidth="120"/>
-            <TableColumn fx:id="colMajor" text="专业" prefWidth="120"/>
-            <TableColumn fx:id="colGrade" text="年级" prefWidth="80"/>
-            <TableColumn fx:id="colAction" text="操作" prefWidth="210"/>
-        </columns>
-    </TableView>
+    <!-- 学生表格和申请表格叠加显示 -->
+    <StackPane VBox.vgrow="ALWAYS">
+        <children>
+            <!-- 学生信息表格 -->
+            <TableView fx:id="studentTable" styleClass="data-table">
+                <columns>
+                    <TableColumn fx:id="colSelect" text="" prefWidth="40"/>
+                    <TableColumn fx:id="colUserId" text="用户ID" prefWidth="100"/>
+                    <TableColumn fx:id="colStudentId" text="学号" prefWidth="100"/>
+                    <TableColumn fx:id="colName" text="姓名" prefWidth="80"/>
+                    <TableColumn fx:id="colGender" text="性别" prefWidth="60"/>
+                    <TableColumn fx:id="colCollege" text="学院" prefWidth="120"/>
+                    <TableColumn fx:id="colMajor" text="专业" prefWidth="120"/>
+                    <TableColumn fx:id="colGrade" text="年级" prefWidth="80"/>
+                    <TableColumn fx:id="colStudentStatus" text="学籍状态" prefWidth="80"/>
+                    <TableColumn fx:id="colAction" text="操作" prefWidth="210"/>
+                </columns>
+            </TableView>
+
+            <!-- 申请信息表格 -->
+            <TableView fx:id="applicationTable" styleClass="data-table" visible="false">
+                <columns>
+                    <TableColumn fx:id="colAppStudentId" text="学号" prefWidth="100"/>
+                    <TableColumn fx:id="colAppName" text="姓名" prefWidth="100"/>
+                    <TableColumn fx:id="colAppReason" text="请假原因" prefWidth="200"/>
+                    <TableColumn fx:id="colAppStatus" text="状态" prefWidth="80"/>
+                    <TableColumn fx:id="colAppAction" text="操作" prefWidth="150"/>
+                </columns>
+            </TableView>
+        </children>
+    </StackPane>
+
 
 </VBox>
 
