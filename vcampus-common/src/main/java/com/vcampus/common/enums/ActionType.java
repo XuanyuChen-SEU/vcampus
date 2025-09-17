@@ -35,6 +35,8 @@ public enum ActionType {
     SEARCH_STUDENT("姓名模糊搜索"),
     INFO_STUDENT_ADMIN("查看学生详细信息"),
     UPDATE_STUDENT_ADMIN("更新学生信息"),
+    GET_ALL_APPLICATIONS("获取所有请假申请"),
+    UPDATE_APPLICATION_STATUS("更新请假申请状态"),
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
 
