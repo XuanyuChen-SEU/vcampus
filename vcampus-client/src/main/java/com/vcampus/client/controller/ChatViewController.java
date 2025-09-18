@@ -17,15 +17,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
-import java.io.FileInputStream;
-import java.io.IOException;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
 /**
  * ChatViewController（修改版）
@@ -75,17 +74,17 @@ public class ChatViewController {
         Label thinkingLabel = new Label("思考中...");
         addAIMessageLabel(thinkingLabel);
 
-        Task<String> task = new Task<String>() {
+        Task<String> task = new Task<>() {
             @Override
             protected String call() throws Exception {
 
-                // 读取 Word 文件内容
-                String wordContent = readWordFile("D:/IdeaProjects/untitled/vcampus/vcampus-client/src/main/resources/ai_prompt/系统使用说明.docx");
+                // 使用 classpath 读取 Word 文件内容
+                String wordContent = readWordFile("/ai_prompt/系统使用说明.docx");
 
                 JsonObject systemMessage = new JsonObject();
                 systemMessage.addProperty("role", "system");
                 systemMessage.addProperty("content",
-                        GLOBAL_SYSTEM_PROMPT + "\n以下是额外背景信息:\n" + wordContent);
+                        GLOBAL_SYSTEM_PROMPT + "\n以下是系统功能说明:\n" + wordContent);
 
                 JsonObject userMessage = new JsonObject();
                 userMessage.addProperty("role", "user");
@@ -133,11 +132,33 @@ public class ChatViewController {
         new Thread(task).start();
     }
 
+    // ======================================
+    // 读取 Word 文件（classpath 方式）
+    // ======================================
+    public String readWordFile(String resourcePath) {
+        StringBuilder sb = new StringBuilder();
 
-    // ==========================================================
+        try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                System.err.println("找不到资源文件: " + resourcePath);
+                return "";
+            }
+
+            try (XWPFDocument document = new XWPFDocument(is)) {
+                for (XWPFParagraph para : document.getParagraphs()) {
+                    sb.append(para.getText()).append("\n");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+    }
+
+    // ======================================
     // UI 更新方法
-    // ==========================================================
-
+    // ======================================
     private void addUserMessage(String message) {
         HBox row = new HBox();
         row.setAlignment(Pos.CENTER_RIGHT);
@@ -163,17 +184,5 @@ public class ChatViewController {
 
     private void addAIMessage(String message) {
         addAIMessageLabel(new Label(message));
-    }
-
-    public String readWordFile(String filePath) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        try (FileInputStream fis = new FileInputStream(filePath);
-             XWPFDocument document = new XWPFDocument(fis)) {
-
-            for (XWPFParagraph para : document.getParagraphs()) {
-                sb.append(para.getText()).append("\n");
-            }
-        }
-        return sb.toString();
     }
 }
