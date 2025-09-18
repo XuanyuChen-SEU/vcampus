@@ -15,7 +15,7 @@ import com.vcampus.common.dto.Message;
  */
 public class SocketClient implements IMessageClientSrv {
     
-    private static final String DEFAULT_HOST = "192.168.17.188";
+    private static final String DEFAULT_HOST = "localhost";
     private static final int DEFAULT_PORT = 9090;
     private static final int CONNECTION_TIMEOUT = 5000; // 5秒连接超时
     private static final int READ_TIMEOUT = 10000; // 10秒读取超时

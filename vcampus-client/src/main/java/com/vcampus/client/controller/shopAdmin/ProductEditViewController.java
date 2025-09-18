@@ -184,8 +184,17 @@ public class ProductEditViewController {
                     byte[] imageData = java.nio.file.Files.readAllBytes(selectedImageFile.toPath());
                     product.setImageData(imageData);
                     System.out.println("图片文件大小: " + imageData.length + " bytes");
+                    System.out.println("图片文件路径: " + selectedImageFile.getAbsolutePath());
+                    
+                    // 验证图片数据是否有效
+                    if (imageData.length == 0) {
+                        System.err.println("警告：图片文件为空");
+                        showError("选择的图片文件为空，请重新选择");
+                        return;
+                    }
                 } catch (Exception e) {
                     System.err.println("读取图片文件失败: " + e.getMessage());
+                    e.printStackTrace();
                     showError("读取图片文件失败: " + e.getMessage());
                     return;
                 }

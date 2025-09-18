@@ -1,5 +1,7 @@
 package com.vcampus.server.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -423,7 +425,7 @@ public class ShopService {
     }
 
     /**
-     * 为商品加载图片数据
+     * 为商品加载图片数据（支持缓存刷新）
      * @param product 商品对象
      */
     private void loadProductImage(Product product) {
@@ -432,18 +434,67 @@ public class ShopService {
         }
         
         try {
-            String resourcePath = product.getImagePath();
-            InputStream inputStream = getClass().getResourceAsStream(resourcePath);
+            String imagePath = product.getImagePath();
+            InputStream inputStream = null;
+            
+            // 检测是否在JAR包中运行
+            String jarPath = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            boolean isRunningFromJar = jarPath.endsWith(".jar");
+            
+            if (isRunningFromJar) {
+                // JAR包运行模式：优先从外部文件系统加载（支持实时更新）
+                if (imagePath.startsWith("images/")) {
+                    String jarDir = new File(jarPath).getParent();
+                    String fullPath = jarDir + File.separator + imagePath.replace("/", File.separator);
+                    File imageFile = new File(fullPath);
+                    if (imageFile.exists()) {
+                        inputStream = new FileInputStream(imageFile);
+                        System.out.println("从外部文件系统加载图片: " + fullPath);
+                        System.out.println("文件最后修改时间: " + new java.util.Date(imageFile.lastModified()));
+                    }
+                }
+                
+                // 如果外部文件不存在，尝试从JAR包内部资源加载
+                if (inputStream == null && imagePath.startsWith("/db_img/")) {
+                    inputStream = getClass().getResourceAsStream(imagePath);
+                    if (inputStream != null) {
+                        System.out.println("从JAR包内部资源加载图片: " + imagePath);
+                    }
+                }
+            } else {
+                // IDE运行模式：优先从文件系统加载（支持实时更新）
+                if (imagePath.startsWith("/db_img/")) {
+                    // 尝试从文件系统加载（绕过IDE缓存）
+                    String projectRoot = System.getProperty("user.dir");
+                    if (projectRoot.endsWith("vcampus-server")) {
+                        projectRoot = projectRoot.substring(0, projectRoot.lastIndexOf("vcampus-server"));
+                    }
+                    String fullPath = projectRoot + imagePath.replace("/", File.separator);
+                    File imageFile = new File(fullPath);
+                    if (imageFile.exists()) {
+                        inputStream = new FileInputStream(imageFile);
+                        System.out.println("从文件系统加载图片: " + fullPath);
+                        System.out.println("文件最后修改时间: " + new java.util.Date(imageFile.lastModified()));
+                    }
+                }
+                
+                // 如果文件系统加载失败，尝试从资源路径加载
+                if (inputStream == null && imagePath.startsWith("/db_img/")) {
+                    inputStream = getClass().getResourceAsStream(imagePath);
+                    if (inputStream != null) {
+                        System.out.println("从资源路径加载图片: " + imagePath);
+                    }
+                }
+            }
             
             if (inputStream != null) {
                 byte[] imageBytes = readAllBytes(inputStream);
-                // 将图片数据存储到商品对象中
                 product.setImageData(imageBytes);
                 System.out.println("成功加载商品图片: " + product.getName() + " (" + imageBytes.length + " bytes)");
             } else {
-                System.out.println("未找到商品图片: " + product.getName() + " - " + resourcePath);
+                System.out.println("未找到商品图片: " + product.getName() + " - " + imagePath);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("加载商品图片失败: " + product.getName() + " - " + e.getMessage());
         }
     }
@@ -471,18 +522,32 @@ public class ShopService {
      */
     private String saveProductImage(byte[] imageData, Long productId) {
         try {
-            // 获取项目根目录的绝对路径
-            String projectRoot = System.getProperty("user.dir");
-            System.out.println("当前工作目录: " + projectRoot);
+            // 检测是否在JAR包中运行
+            String jarPath = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            boolean isRunningFromJar = jarPath.endsWith(".jar");
             
-            // 如果当前在vcampus-server目录，需要回到上级目录
-            if (projectRoot.endsWith("vcampus-server")) {
-                projectRoot = projectRoot.substring(0, projectRoot.lastIndexOf("vcampus-server"));
-                System.out.println("调整后的项目根目录: " + projectRoot);
+            System.out.println("运行环境检测: " + (isRunningFromJar ? "JAR包" : "IDE"));
+            System.out.println("JAR路径: " + jarPath);
+            
+            Path imageDir;
+            String relativePath;
+            
+            if (isRunningFromJar) {
+                // JAR包运行模式：保存到JAR包同级目录的images文件夹
+                String jarDir = new File(jarPath).getParent();
+                imageDir = Paths.get(jarDir, "images", "products");
+                relativePath = "images/products/";
+            } else {
+                // IDE运行模式：保存到项目资源目录
+                String projectRoot = System.getProperty("user.dir");
+                if (projectRoot.endsWith("vcampus-server")) {
+                    projectRoot = projectRoot.substring(0, projectRoot.lastIndexOf("vcampus-server"));
+                }
+                imageDir = Paths.get(projectRoot, "vcampus-database", "src", "main", "resources", "db_img", "products");
+                relativePath = "/db_img/products/";
             }
             
-            // 创建图片目录 - 使用绝对路径
-            Path imageDir = Paths.get(projectRoot, "vcampus-database", "src", "main", "resources", "db_img", "products");
+            // 创建图片目录
             if (!Files.exists(imageDir)) {
                 Files.createDirectories(imageDir);
                 System.out.println("创建图片目录: " + imageDir.toAbsolutePath());
@@ -493,7 +558,6 @@ public class ShopService {
             if (productId != null) {
                 fileName = productId + ".png";
             } else {
-                // 对于新商品，使用时间戳作为临时文件名
                 fileName = "temp_" + System.currentTimeMillis() + ".png";
             }
             
@@ -502,13 +566,21 @@ public class ShopService {
             Files.write(imagePath, imageData);
             
             // 返回相对路径
-            String relativePath = "/db_img/products/" + fileName;
+            String finalPath = relativePath + fileName;
             System.out.println("图片已保存: " + imagePath.toAbsolutePath());
-            System.out.println("相对路径: " + relativePath);
+            System.out.println("相对路径: " + finalPath);
             
-            return relativePath;
-        } catch (IOException e) {
+            // 验证文件是否真的保存成功
+            if (Files.exists(imagePath) && Files.size(imagePath) > 0) {
+                System.out.println("图片保存验证成功: " + fileName + " (" + Files.size(imagePath) + " bytes)");
+            } else {
+                System.err.println("图片保存验证失败: " + fileName);
+            }
+            
+            return finalPath;
+        } catch (Exception e) {
             System.err.println("保存图片失败: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("保存图片失败", e);
         }
     }
