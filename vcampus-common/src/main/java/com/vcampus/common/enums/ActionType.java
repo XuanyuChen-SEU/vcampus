@@ -154,7 +154,6 @@ public enum ActionType {
     EMAIL_MARK_READ("标记已读"),               // 标记已读
     EMAIL_MARK_UNREAD("标记未读"),             // 标记未读
     EMAIL_SEARCH("搜索邮件"),                  // 搜索邮件
-    EMAIL_GET_UNREAD_COUNT("获取未读数量"),     // 获取未读邮件数量
     EMAIL_BATCH_MARK_READ("批量标记已读"),      // 批量标记已读
     EMAIL_BATCH_DELETE("批量删除邮件"),        // 批量删除邮件
     
@@ -162,6 +161,7 @@ public enum ActionType {
     EMAIL_ADMIN_GET_ALL("管理员获取所有邮件"),  // 管理员获取所有邮件
     EMAIL_ADMIN_GET_USER_EMAILS("管理员获取用户邮件"), // 管理员获取指定用户的邮件
     EMAIL_ADMIN_SEARCH_ALL("管理员搜索所有邮件"), // 管理员搜索所有邮件
+    EMAIL_ADMIN_SEARCH_BY_USER("管理员按用户搜索邮件"), // 管理员按用户ID搜索邮件
     EMAIL_ADMIN_DELETE("管理员删除邮件"),       // 管理员删除邮件
     EMAIL_ADMIN_GET_STATISTICS("管理员获取邮件统计"), // 管理员获取邮件统计信息
     

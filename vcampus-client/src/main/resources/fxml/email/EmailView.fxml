@@ -59,7 +59,7 @@
             
             <!-- 左侧：邮件列表区域 -->
             <items>
-                <VBox fx:id="emailListContainer" prefWidth="300.0" styleClass="email-list-container">
+                <VBox fx:id="emailListContainer" minWidth="250.0" maxWidth="500.0" styleClass="email-list-container" VBox.vgrow="ALWAYS">
                     
                     <!-- 邮件分类标签页 -->
                     <HBox alignment="CENTER_LEFT" spacing="0.0" styleClass="email-tabs">
@@ -74,7 +74,7 @@
                     </HBox>
 
                     <!-- 邮件列表 -->
-                    <TableView fx:id="emailTable" styleClass="email-table">
+                    <TableView fx:id="emailTable" styleClass="email-table" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="senderColumn" prefWidth="25.0" text="发件人" />
                             <TableColumn fx:id="subjectColumn" prefWidth="45.0" text="主题" />
@@ -91,7 +91,7 @@
                         <children>
                             <Button fx:id="prevPageButton" onAction="#handlePrevPage" text="◀ 上一页" 
                                     styleClass="email-page-button" />
-                            <Label fx:id="pageInfoLabel" text="第 1 页" styleClass="email-page-info" />
+                            <Label fx:id="pageInfoLabel" text="第 1 页，共 1 页" styleClass="email-page-info" />
                             <Button fx:id="nextPageButton" onAction="#handleNextPage" text="下一页 ▶" 
                                     styleClass="email-page-button" />
                         </children>
@@ -99,7 +99,7 @@
                 </VBox>
 
                 <!-- 右侧：邮件详情区域 -->
-                <VBox fx:id="emailDetailContainer" prefWidth="700.0" styleClass="email-detail-container">
+                <VBox fx:id="emailDetailContainer" minWidth="300.0" styleClass="email-detail-container" VBox.vgrow="ALWAYS">
                     
                     <!-- 邮件详情头部 -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="email-detail-header">
@@ -124,7 +124,7 @@
                     </HBox>
 
                     <!-- 邮件详情内容 -->
-                    <ScrollPane fx:id="emailDetailScrollPane" fitToWidth="true" styleClass="email-detail-scroll">
+                    <ScrollPane fx:id="emailDetailScrollPane" fitToWidth="true" styleClass="email-detail-scroll" VBox.vgrow="ALWAYS">
                         <content>
                             <VBox fx:id="emailDetailContent" spacing="10.0" styleClass="email-detail-content">
                                 <padding>
@@ -163,7 +163,7 @@
                                     <!-- 邮件内容 -->
                                     <Label text="邮件内容:" styleClass="email-content-label" />
                                     <ScrollPane fx:id="emailContentScrollPane" fitToWidth="true" 
-                                               prefHeight="300.0" styleClass="email-content-scroll">
+                                               styleClass="email-content-scroll" VBox.vgrow="ALWAYS">
                                         <content>
                                             <Label fx:id="detailContentLabel" text="" 
                                                    styleClass="email-content-text" wrapText="true" />
@@ -178,16 +178,4 @@
         </SplitPane>
     </center>
 
-    <!-- 底部状态栏 -->
-    <bottom>
-        <HBox alignment="CENTER_LEFT" prefHeight="30.0" styleClass="email-status-bar">
-            <padding>
-                <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
-            </padding>
-            <children>
-                <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="unreadCountLabel" text="未读邮件: 0" styleClass="email-unread-count" />
-            </children>
-        </HBox>
-    </bottom>
 </BorderPane>

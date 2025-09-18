@@ -103,6 +103,22 @@ public class Email implements Serializable {
         this.hasAttachment = hasAttachment;
     }
 
+    /**
+     * 判断邮件是否已读
+     * @return true表示已读，false表示未读
+     */
+    public boolean isRead() {
+        return status == EmailStatus.READ;
+    }
+
+    /**
+     * 设置邮件已读状态
+     * @param read true表示已读，false表示未读
+     */
+    public void setRead(boolean read) {
+        this.status = read ? EmailStatus.READ : EmailStatus.SENT;
+    }
+
     @Override
     public String toString() {
         return "Email{" +

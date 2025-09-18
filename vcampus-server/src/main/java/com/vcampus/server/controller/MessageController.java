@@ -201,10 +201,11 @@ public class MessageController {
                 case EMAIL_MARK_READ:
                 case EMAIL_MARK_UNREAD:
                 case EMAIL_SEARCH:
-                case EMAIL_GET_UNREAD_COUNT:
                 case EMAIL_BATCH_MARK_READ:
                 case EMAIL_BATCH_DELETE:
                 case EMAIL_ADMIN_GET_ALL:
+                case EMAIL_ADMIN_SEARCH_ALL:
+                case EMAIL_ADMIN_SEARCH_BY_USER:
                 case EMAIL_ADMIN_GET_USER_EMAILS:
                 case EMAIL_ADMIN_DELETE:
                 case EMAIL_ADMIN_GET_STATISTICS:

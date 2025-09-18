@@ -72,6 +72,27 @@ public interface IEmailDao {
     List<Email> getDraftEmails(String userId, int page, int pageSize);
 
     /**
+     * 获取用户收件箱邮件总数
+     * @param userId 用户ID
+     * @return 收件箱邮件总数
+     */
+    int getInboxCount(String userId);
+
+    /**
+     * 获取用户发件箱邮件总数
+     * @param userId 用户ID
+     * @return 发件箱邮件总数
+     */
+    int getSentCount(String userId);
+
+    /**
+     * 获取用户草稿箱邮件总数
+     * @param userId 用户ID
+     * @return 草稿箱邮件总数
+     */
+    int getDraftCount(String userId);
+
+    /**
      * 根据状态获取邮件
      * @param userId 用户ID
      * @param status 邮件状态

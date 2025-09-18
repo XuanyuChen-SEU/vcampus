@@ -179,18 +179,6 @@ public class EmailService {
 
     // ==================== 统计信息 ====================
 
-    /**
-     * 获取未读邮件数量
-     * @param userId 用户ID
-     */
-    public void getUnreadCount(String userId) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("userId", userId);
-        
-        Message request = new Message(ActionType.EMAIL_GET_UNREAD_COUNT, data);
-        socketClient.sendMessage(request);
-    }
-
     // ==================== 批量操作 ====================
 
     /**
@@ -298,21 +286,5 @@ public class EmailService {
             return (Email) message.getData();
         }
         return null;
-    }
-
-    /**
-     * 处理服务端返回的未读数量
-     * @param message 服务端返回消息
-     * @return 未读数量，失败返回 0
-     */
-    public int handleUnreadCountResponse(Message message) {
-        if (message.isSuccess() && message.getData() != null) {
-            try {
-                return Integer.parseInt(message.getData().toString());
-            } catch (NumberFormatException e) {
-                return 0;
-            }
-        }
-        return 0;
     }
 }
