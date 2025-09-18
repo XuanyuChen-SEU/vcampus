@@ -51,6 +51,9 @@ public class MessageController {
     private EmailController emailController;
     private ComposeEmailController composeEmailController;
     private EmailAdminViewController emailAdminViewController;
+    
+    // 教师端标识
+    private boolean isTeacherMode = false;
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例

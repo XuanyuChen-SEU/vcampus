@@ -16,7 +16,7 @@
         <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="welcome-background" 
                    AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <content>
-                <VBox fx:id="mainContentBox" alignment="CENTER" spacing="50.0" minHeight="800.0" styleClass="welcome-background">
+                <VBox fx:id="mainContentBox" alignment="CENTER" spacing="50.0" styleClass="welcome-background" VBox.vgrow="ALWAYS">
                     <children>
                         <!-- 主标题区域 -->
                         <VBox fx:id="topContentBox" alignment="CENTER" spacing="20.0" prefWidth="800.0">
