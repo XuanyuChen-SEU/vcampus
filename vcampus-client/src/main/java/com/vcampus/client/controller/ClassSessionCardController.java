@@ -1,11 +1,22 @@
 package com.vcampus.client.controller;
 
 //import com.vcampus.client.model.ClassSession;(目前暂时不用）
+import com.vcampus.client.controller.courseAdmin.SessionDialogController;
 import com.vcampus.client.service.CourseService;
 import com.vcampus.common.dto.ClassSession;//（这个我一定要自己实现）
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.function.Consumer;
 
 public class ClassSessionCardController {
@@ -90,5 +101,46 @@ public class ClassSessionCardController {
             actionButton.setStyle("-fx-background-color: #42A5F5; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 5 15; -fx-font-size: 12px;");
         }
     }
+
+    /**
+     * ⭐ 新增：处理“教学班详情”按钮的点击事件
+     */
+    @FXML
+    private void handleSessionDetailsClick() {
+        if (session == null ) return;
+
+        System.out.println("UI: “教学班详情”被点击，准备为教学班 " + session.getSessionId() + " 弹出详情窗口...");
+
+        try {
+            // 1. 加载弹窗的 FXML 文件
+            String fxmlPath = "/fxml/academic/SessionDetailDialog.fxml";
+            URL resourceUrl = getClass().getResource(fxmlPath);
+            if (resourceUrl == null) {
+                System.err.println("错误：找不到详情弹窗 FXML 文件: " + fxmlPath);
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(resourceUrl);
+            GridPane page = loader.load();
+
+            // 2. 创建并显示一个新的 Stage (窗口)
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("教学班详情");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(actionButton.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // 3. 将教学班和父课程数据传递给弹窗的 Controller
+            SessionDetailDialogController controller = loader.getController();
+            controller.initData(session);
+
+            dialogStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 }

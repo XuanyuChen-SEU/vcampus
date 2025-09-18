@@ -60,6 +60,27 @@ public class AcademicController implements IClientController {
         }
     }
 
+    // 在 AcademicController.java 的 handleShowTimetable 方法中
+    @FXML
+    private void handleShowMyTimetable(ActionEvent event) {
+        updateButtonStyles(timetableButton);
+        courseListHeader.setVisible(false);
+        courseListHeader.setManaged(false); // 让页眉不占据布局空间
+        searchBarContainer.setVisible(false);
+        searchBarContainer.setManaged(false);
+        try {
+            courseListContainer.getChildren().clear();
+
+            // ⭐ 加载我们新的时间表视图
+            URL resourceUrl = getClass().getResource("/fxml/academic/TimetableView.fxml");
+            Node timetableView = FXMLLoader.load(resourceUrl);
+
+            courseListContainer.getChildren().add(timetableView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     private void handleShowTimetable(ActionEvent event) {
         // ⭐ 3. 隐藏页眉

@@ -6,18 +6,26 @@ import com.vcampus.client.service.CourseService;
 import com.vcampus.common.dto.ClassSession;
 import com.vcampus.common.dto.Course;
 import com.vcampus.common.dto.Message;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
+import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.net.URL;
 import java.util.function.Consumer;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
 /**
  * 中间层“三明治”结构的控制器：课程卡片（或称课程行）。
  *
@@ -44,6 +52,8 @@ public class CourseCardController {
 
     // 持有该卡片所代表的课程数据
     private Course course;
+    // 定义一个伪类常量，代表“展开”状态
+    //private static final PseudoClass expandedPseudoClass = PseudoClass.get("expanded");
 
     @FXML
     public void initialize() {
@@ -142,14 +152,16 @@ public class CourseCardController {
         departmentLabel.setTextFill(darkTextColor);
         // statusLabel 由 updateStatusLabel 方法控制颜色，所以这里不设置
         sessionCountLabel.setTextFill(darkTextColor);
+        // ⭐ 核心修正：不再使用 setStyle，而是切换伪类状态
+        //headerRow.pseudoClassStateChanged(expandedPseudoClass, isVisible);
     }
 
 
-    @FXML
-    private void handleDetailsLinkClick(MouseEvent event) {
-        System.out.println("点击了课程详情: " + course.getCourseId());
-        event.consume();
-    }
+//    @FXML
+//    private void handleDetailsLinkClick(MouseEvent event) {
+//        System.out.println("点击了课程详情: " + course.getCourseId());
+//        event.consume();
+//    }
 
     /**
      * 私有辅助方法：加载并初始化所有的教学班卡片。
@@ -217,7 +229,40 @@ public class CourseCardController {
     }
 
 
+    public void handleDetailsLinkClick(javafx.event.ActionEvent actionEvent) {
+        System.out.println("UI: “课程详情”被点击，准备为课程 " + course.getCourseId() + " 弹出详情窗口...");
 
+        try {
+            // 1. 创建 FXMLLoader 来加载弹窗的 FXML 文件
+            String fxmlPath = "/fxml/academic/CourseDetailDialog.fxml";
+            URL resourceUrl = getClass().getResource(fxmlPath);
+            if (resourceUrl == null) {
+                System.err.println("错误：找不到详情弹窗 FXML 文件: " + fxmlPath);
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(resourceUrl);
+            GridPane page = loader.load();
 
+            // 2. 创建一个新的 Stage (窗口)
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("课程详情: " + course.getCourseName());
+            dialogStage.initModality(Modality.WINDOW_MODAL); // 设置为模态窗口，会阻塞父窗口
+            dialogStage.initOwner(headerRow.getScene().getWindow()); // 设置父窗口
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
 
+            // 3. 获取弹窗的 Controller
+            CourseDetailDialogController controller = loader.getController();
+
+            // 4. 将【当前卡片的 Course 对象】传递给弹窗的 Controller
+            controller.initData(this.course);
+
+            // 5. 显示弹窗，并“等待”用户在弹窗中完成操作
+            dialogStage.showAndWait();
+
+        } catch (IOException e) {
+            System.err.println("加载课程详情弹窗失败 for course: " + course.getCourseId());
+            e.printStackTrace();
+        }
+    }
 }

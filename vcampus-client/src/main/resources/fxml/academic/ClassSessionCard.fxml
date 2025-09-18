@@ -13,8 +13,7 @@
             <children>
                 <Label fx:id="teacherNameLabel" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;" text="[081] 王晨星" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="conflictLabel" style="-fx-background-color: #FFCDD2; -fx-text-fill: #B71C1C; -fx-padding: 2 6; -fx-background-radius: 3; -fx-font-size: 12px;" text="课程冲突" visible="false" />
-                <Label fx:id="selectedTagLabel" style="-fx-background-color: #C8E6C9; -fx-text-fill: #1B5E20; -fx-padding: 2 6; -fx-background-radius: 3; -fx-font-size: 12px;" text="已选" visible="false" />
+                <Label fx:id="selectedTagLabel" style="-fx-background-color: #C8E6C9; -fx-text-fill: #1B5E20; -fx-padding: 2 6;" text="已选" visible="false" />
             </children>
         </HBox>
 
@@ -22,9 +21,9 @@
         <Label fx:id="capacityLabel" text="课容量: 85人" style="-fx-font-size: 13px; -fx-text-fill: #555555;" />
         <Label fx:id="enrolledLabel" text="已选人数: 2" style="-fx-font-size: 13px; -fx-text-fill: #555555;" />
 
-        <HBox spacing="10.0" alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS" fillHeight="false">
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
             <children>
-                <Button mnemonicParsing="false" text="教学班详情" style="-fx-background-color: #e0e0e0; -fx-text-fill: #333333;" />
+                <Button mnemonicParsing="false" onAction="#handleSessionDetailsClick" text="教学班详情" style="-fx-background-color: #e0e0e0; -fx-text-fill: #333333;" />
                 <Button fx:id="actionButton" mnemonicParsing="false" onAction="#handleSelectAction" text="选择" style="-fx-background-color: #42A5F5; -fx-text-fill: white;" />
             </children>
             <VBox.margin>

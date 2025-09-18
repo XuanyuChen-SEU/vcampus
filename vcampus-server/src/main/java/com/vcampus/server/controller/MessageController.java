@@ -98,6 +98,10 @@ public class MessageController {
                 case SEARCH_COURSES:
                     return courseController.handleSearchCourses(request);
 
+                // ⭐ 新增路由
+                case GET_MY_TIMETABLE:
+                    return courseController.handleGetMyTimetable(request);
+
                 // --- ⭐ 新增：路由所有教务管理员相关的请求 ---
                 case ADMIN_GET_ALL_COURSES:
                     return courseController.handleGetAllCoursesAdmin(request);
@@ -117,6 +121,9 @@ public class MessageController {
                 // ⭐ 新增路由
                 case ADMIN_SEARCH_COURSES:
                     return courseController.handleAdminSearchCourses(request);
+                // ⭐ 新增路由
+                case GET_DROP_LOG:
+                    return courseController.handleGetDropLog(request);
 
                 // --- 商店相关 ---
                 case SHOP_GET_ALL_PRODUCTS:

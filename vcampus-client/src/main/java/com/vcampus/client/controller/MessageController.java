@@ -38,6 +38,8 @@ public class MessageController {
     private MyTimetableController myTimetableController; // ⭐ 新增
     private CourseAdminController courseAdminController;
 
+    private TimetableController timetableController;
+
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -61,6 +63,10 @@ public class MessageController {
     }
     public void setMyTimetableController(MyTimetableController controller) {
         this.myTimetableController = controller;
+    }
+
+    public void setTimetableController(TimetableController controller) { // ⭐ 新增
+        this.timetableController = controller;
     }
 
     public void setUserListViewController(UserListViewController controller) {
@@ -341,6 +347,22 @@ public class MessageController {
                         myTimetableController.handleMyCoursesResponse(message);
                     }else {
                         System.err.println("路由警告：收到我的课程响应，但 MyTimetableController 未注册！");
+                    }
+                    break;
+
+                case GET_MY_TIMETABLE_RESPONSE:
+                    if (timetableController != null) {
+                        timetableController.handleMyTimetableResponse(message);
+                    }
+                    break;
+
+                // --- ⭐ 3. 新增：处理“退课日志”的响应 ---
+                case GET_DROP_LOG_RESPONSE:
+                    if (myTimetableController != null) {
+                        // 将响应消息路由给 MyTimetableController 的处理方法
+                        myTimetableController.handleDropLogResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到退课日志响应，但 MyTimetableController 未注册！");
                     }
                     break;
 

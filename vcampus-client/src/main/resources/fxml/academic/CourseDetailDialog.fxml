@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.text.Font?>
+
+<GridPane hgap="20.0" vgap="12.0" style="-fx-background-color: #f8f9fa; -fx-padding: 25;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.CourseDetailDialogController">
+    <padding>
+        <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+    </padding>
+
+    <Label fx:id="lblCourseName" text="课程详细信息" style="-fx-font-weight: bold; -fx-font-size: 20px;" GridPane.columnIndex="0" GridPane.columnSpan="4" />
+
+    <Label text="开课单位:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+    <Label fx:id="lblDepartment" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+    <Label text="课程性质:" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+    <Label fx:id="lblCourseType" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+    <Label text="学分:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+    <Label fx:id="lblCredits" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+    <Label text="校公选类别:" GridPane.rowIndex="2" GridPane.columnIndex="2" />
+    <Label fx:id="lblCategory" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="3" />
+
+    <Label text="授课语种:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+    <Label fx:id="lblLanguage" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+    <Label text="校区:" GridPane.rowIndex="3" GridPane.columnIndex="2" />
+    <Label fx:id="lblCampus" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="3" />
+
+</GridPane>

@@ -101,6 +101,7 @@ import com.vcampus.common.dao.ICourseDao;
 import com.vcampus.common.dto.ClassSession;
 import com.vcampus.common.dto.Course;
 import com.vcampus.common.dto.CourseSelection;
+import com.vcampus.common.dto.DropLogEntry;
 import com.vcampus.server.data.DataSource; // ⭐ 1. 引入全局数据源
 
 import java.util.ArrayList;
@@ -122,6 +123,20 @@ public class FakeCourseDao implements ICourseDao {
      */
     public FakeCourseDao() {}
 
+    @Override
+    public boolean addDropLogEntry(DropLogEntry entry) {
+        System.out.println("FakeDAO: [State Changed] 正在写入退课日志...");
+        DataSource.MOCK_DROP_LOG_TABLE.add(entry);
+        return true;
+    }
+
+    @Override
+    public List<DropLogEntry> getDropLogsByStudentId(String studentId) {
+        System.out.println("FakeDAO: 正在获取学生" + studentId + "的退课日志...");
+        return DataSource.MOCK_DROP_LOG_TABLE.stream()
+                .filter(entry -> entry.getDroppedBy().equals(studentId))
+                .collect(Collectors.toList());
+    }
 
     /**
      * 从 DataSource 中获取所有课程的深拷贝。
@@ -133,6 +148,15 @@ public class FakeCourseDao implements ICourseDao {
         return DataSource.MOCK_COURSE_TABLE.values().stream()
                 .map(Course::new) // 使用 Course 的拷贝构造函数
                 .collect(Collectors.toList());
+    }
+
+    // 根据教学班ID查找父课程信息
+    @Override
+    public Course findCourseBySessionId(String sessionId) {
+        return DataSource.MOCK_COURSE_TABLE.values().stream()
+                .filter(course -> course.getSessions().stream()
+                        .anyMatch(s -> s.getSessionId().equals(sessionId)))
+                .findFirst().orElse(null);
     }
 
     /**
@@ -151,6 +175,8 @@ public class FakeCourseDao implements ICourseDao {
                 .map(sessionId -> new CourseSelection(studentId, sessionId, "已选"))
                 .collect(Collectors.toList());
     }
+
+
 
     /**
      * 向 DataSource 中添加一条新的选课记录，并更新对应教学班的已选人数。
@@ -384,14 +410,14 @@ public class FakeCourseDao implements ICourseDao {
         return wasRemoved;
     }
 
-    @Override
-    public boolean updateSessionCapacity(String sessionId, int newCapacity) {
-        Optional<ClassSession> sessionOpt = findSessionById(sessionId);
-        if (sessionOpt.isPresent()) {
-            sessionOpt.get().setCapacity(newCapacity);
-            return true;
-        }
-        return false;
-    }
+//    @Override
+//    public boolean updateSessionCapacity(String sessionId, int newCapacity) {
+//        Optional<ClassSession> sessionOpt = findSessionById(sessionId);
+//        if (sessionOpt.isPresent()) {
+//            sessionOpt.get().setCapacity(newCapacity);
+//            return true;
+//        }
+//        return false;
+//    }
 
 }

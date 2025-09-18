@@ -1,10 +1,7 @@
 package com.vcampus.server.service;
 
 import com.vcampus.common.dao.ICourseDao;
-import com.vcampus.common.dto.ClassSession;
-import com.vcampus.common.dto.Course;
-import com.vcampus.common.dto.CourseSelection;
-import com.vcampus.common.dto.Message;
+import com.vcampus.common.dto.*;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.common.enums.CourseStatus;
 // 导入新的DAO实现类
@@ -72,6 +69,42 @@ public class CourseService {
         }
     }
 
+
+
+    /**
+     * ⭐ 新增：获取指定学生【已选】的课程列表（用于图形化时间表）
+     */
+    public Message getMyTimetable(String userId) {
+        try {
+            // 1. 从 DAO 获取所有课程
+            List<Course> allCourses = courseDAO.getAllCourses();
+            // 2. 从 DAO 获取该学生的所有选课记录
+            List<CourseSelection> userSelections = courseDAO.getSelectionsByStudentId(userId);
+            Set<String> selectedSessionIds = userSelections.stream()
+                    .map(CourseSelection::getSessionId)
+                    .collect(Collectors.toSet());
+
+            // 3. 核心逻辑：筛选出被选中的课程
+            List<Course> selectedCourses = new ArrayList<>();
+            for (Course course : allCourses) {
+                // 检查这门课下是否有任何一个教学班被该生选中
+                boolean isCourseSelected = course.getSessions().stream()
+                        .anyMatch(session -> selectedSessionIds.contains(session.getSessionId()));
+
+                if (isCourseSelected) {
+                    // 如果被选中，则将这门课的【完整信息】加入到返回列表
+                    selectedCourses.add(course);
+                }
+            }
+
+            // 4. 返回包含【已筛选】课程列表的成功消息
+            return Message.success(ActionType.GET_MY_TIMETABLE_RESPONSE, selectedCourses, "成功获取课程时间表数据");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.GET_MY_TIMETABLE_RESPONSE, "获取课程时间表数据时服务器出错");
+        }
+    }
+
     /**
      * 处理学生选课的业务逻辑。
      * @param studentId 发起选课请求的学生ID
@@ -110,8 +143,32 @@ public class CourseService {
      */
     public Message dropCourse(String studentId, String sessionId) {
         try {
+            // 1. 在删除前，先获取课程和教学班的完整信息，用于记录日志
+            Course course = courseDAO.findCourseBySessionId(sessionId);
+            ClassSession session = course != null ? course.getSessions().stream()
+                    .filter(s -> s.getSessionId().equals(sessionId)).findFirst().orElse(null) : null;
+
+            if (course == null || session == null) {
+                return Message.failure(ActionType.DROP_COURSE_RESPONSE, "退课失败：课程信息不存在");
+            }
+
             boolean success = courseDAO.removeCourseSelection(studentId, sessionId);
             if(success) {
+                // 3. ⭐ 如果删除成功，立即创建并保存一条退课日志
+                System.out.println("SERVICE: 选课记录删除成功，正在创建退课日志...");
+
+                DropLogEntry logEntry = new DropLogEntry();
+                logEntry.setCourseIdAndName(course.getCourseId() + "\n" + course.getCourseName());
+                logEntry.setTeacherName(session.getTeacherName());
+                logEntry.setCourseType(course.getCourseType());
+                logEntry.setCredits(course.getCredits());
+                // 设置当前时间为退课时间
+                //logEntry.setDropTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                logEntry.setDroppedBy(studentId); // 实际项目中可能是学生姓名
+                logEntry.setDropType("个人退选");
+                logEntry.setPriority("无");
+
+                courseDAO.addDropLogEntry(logEntry); // 写入日志
                 return Message.success(ActionType.DROP_COURSE_RESPONSE, "退课成功！");
             } else {
                 return Message.failure(ActionType.DROP_COURSE_RESPONSE, "退课失败，您可能未选此课");
@@ -358,6 +415,23 @@ public class CourseService {
         } catch (Exception e) {
             e.printStackTrace();
             return Message.failure(ActionType.ADMIN_DELETE_SESSION_RESPONSE, "服务器处理删除教学班请求时出错");
+        }
+    }
+
+
+    /**
+     * 获取指定学生的退课日志
+     * @param studentId 学生ID
+     * @return 包含退课日志列表的 Message 对象
+     */
+    public Message getDropLog(String studentId) {
+        try {
+            System.out.println("SERVICE: 正在获取学生" + studentId + "的退课日志...");
+            List<DropLogEntry> dropLogs = courseDAO.getDropLogsByStudentId(studentId);
+            return Message.success(ActionType.GET_DROP_LOG_RESPONSE, dropLogs, "成功获取退课日志");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.GET_DROP_LOG_RESPONSE, "获取退课日志时服务器出错");
         }
     }
 

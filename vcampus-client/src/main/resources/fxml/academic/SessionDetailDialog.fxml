@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.text.Font?>
+
+<GridPane hgap="20.0" vgap="12.0" style="-fx-background-color: #f8f9fa; -fx-padding: 25;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.SessionDetailDialogController">
+    <padding><Insets bottom="25.0" left="25.0" right="25.0" top="25.0" /></padding>
+
+    <Label text="教学班详情" style="-fx-font-weight: bold; -fx-font-size: 20px;" GridPane.columnIndex="0" GridPane.columnSpan="2" />
+
+    <Label text="教学班号:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+    <Label fx:id="lblSessionId" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+    <Label text="授课教师:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+    <Label fx:id="lblTeacherName" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+    <Label text="时间地点:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+    <Label fx:id="lblScheduleInfo" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+    <Label text="课容量:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+    <Label fx:id="lblCapacity" style="-fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+    <Label text="已选人数:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+    <Label fx:id="lblEnrolledCount" style="-fx-font-weight: bold;" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+</GridPane>

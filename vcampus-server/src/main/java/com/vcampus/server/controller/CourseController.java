@@ -27,6 +27,16 @@ public class CourseController {
         return courseService.getAllCourses(userId);
     }
 
+    /**
+     * ⭐ 新增：处理“获取我的课程时间表”的请求
+     */
+    public Message handleGetMyTimetable(Message request) {
+        Map<String, Object> payload = (Map<String, Object>) request.getData();
+        String userId = (String) payload.get("userId");
+        return courseService.getMyTimetable(userId);
+    }
+
+
     public Message handleSelectCourse(Message request) {
         Map<String, Object> payload = (Map<String, Object>) request.getData();
         String studentId = (String) payload.get("userId");
@@ -127,5 +137,16 @@ public class CourseController {
 
         // 2. 将任务直接传递给 Service 层
         return courseService.searchCoursesForAdmin(keyword);
+    }
+
+    /**
+     * ⭐ 新增：处理“获取退课日志”的请求
+     * @param request 包含学生ID的消息
+     * @return 包含退课日志列表的响应消息
+     */
+    public Message handleGetDropLog(Message request) {
+        Map<String, Object> payload = (Map<String, Object>) request.getData();
+        String userId = (String) payload.get("userId");
+        return courseService.getDropLog(userId);
     }
 }

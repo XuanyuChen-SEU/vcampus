@@ -43,3 +43,66 @@
 .drop-button:hover {
     -fx-background-color: #d32f2f; /* 鼠标悬浮时颜色变深 */
 }
+
+/* academic-styles.css */
+
+.timetable-grid {
+    -fx-background-color: #ffffff;
+    -fx-grid-lines-visible: true; /* 显示网格线 */
+}
+
+/* 课程色块的基础样式 */
+.course-block {
+    -fx-background-color: #FFF3E0; /* 柔和的橙色 */
+    -fx-background-radius: 4;
+    -fx-padding: 5px;
+    -fx-text-alignment: center;
+}
+
+.course-block .label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #BF360C;
+    -fx-text-alignment: center;
+}
+
+/* =============================================================== */
+/* 教务管理模块 (Academic Module) 样式表              */
+/* =============================================================== */
+
+/* --- 1. 通用 Label 样式 --- */
+/* 为所有普通 Label 设置一个清晰的深灰色，让所有文字默认都是清晰的 */
+.label {
+    -fx-text-fill: #333333;
+}
+
+/* --- 2. 课程卡片 (CourseCard) 样式 --- */
+/*
+ * 为课程标题行 HBox 添加一个样式类。
+ * 无论背景色如何变化，都强制其内部的 Label 字体为深色。
+ * 这能从根本上解决“白字”问题。
+ */
+.course-card-header .label {
+    -fx-text-fill: #333333;
+}
+
+/* 课程卡片展开时的背景高亮样式 */
+.course-card-header:expanded {
+    -fx-background-color: #e7f5ff; /* 淡蓝色高亮背景 */
+}
+
+
+/* --- 3. TableView (我的课表) 专属样式 --- */
+
+/* 设置表格中【所有单元格】的默认字体颜色 */
+.table-cell {
+    -fx-text-fill: #333333; /* 设置单元格文字为深灰色 */
+    -fx-font-size: 13px;
+    -fx-padding: 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* 设置表格【表头】的字体样式 */
+.table-view .column-header .label {
+    -fx-text-fill: #111111; /* 表头文字颜色更深一些 */
+    -fx-font-weight: bold;
+}

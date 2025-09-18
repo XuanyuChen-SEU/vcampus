@@ -2,6 +2,8 @@ package com.vcampus.common.dao;
 import com.vcampus.common.dto.ClassSession;
 import com.vcampus.common.dto.Course;
 import com.vcampus.common.dto.CourseSelection;
+import com.vcampus.common.dto.DropLogEntry;
+
 import java.util.List;
 
 /**
@@ -25,7 +27,9 @@ public interface ICourseDao {
     boolean removeCourseSelection(String studentId, String sessionId);
     // 检查学生是否已选过该课程
     boolean isAlreadyEnrolled(String studentId, String sessionId);
-
+    Course findCourseBySessionId(String sessionId); // 根据教学班ID查找父课程信息
+    boolean addDropLogEntry(DropLogEntry entry);   // 添加一条退课日志
+    List<DropLogEntry> getDropLogsByStudentId(String studentId); // 获取学生的退课日志
     // --- ⭐ 新增：管理员功能 ---
     boolean addCourse(Course course);
     boolean updateCourse(Course course);
@@ -33,5 +37,5 @@ public interface ICourseDao {
     boolean addSession(ClassSession session);
     boolean updateSession(ClassSession session);
     boolean deleteSession(String sessionId);
-    boolean updateSessionCapacity(String sessionId, int newCapacity);
+    //boolean updateSessionCapacity(String sessionId, int newCapacity);
 }

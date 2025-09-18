@@ -27,7 +27,7 @@
             <children>
                 <Button fx:id="timetableButton" mnemonicParsing="false" onAction="#handleShowTimetable" text="我的课表" styleClass="tab-button" />
                 <Button fx:id="selectCoursesButton" mnemonicParsing="false" onAction="#handleShowSelectCourses" text="选课" styleClass="tab-button" />
-
+                <Button fx:id="scheduleButton" mnemonicParsing="false" onAction="#handleShowMyTimetable" text="我的课程时间表" styleClass="tab-button" />
                 <Region HBox.hgrow="ALWAYS" />
 
                 <HBox fx:id="searchBarContainer" spacing="10.0" alignment="CENTER">

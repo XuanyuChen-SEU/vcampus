@@ -116,7 +116,32 @@ public class CourseService {
     }
 
 
+    /**
+     * ⭐ 旧方法 getMySelectedCourses() 已重命名为 getMyTimetable()
+     * 向服务器请求“我的课表”数据。
+     */
+    public void getMyTimetable() {
+        if (!checkConnectionAndLogin()) return;
 
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", UserSession.getInstance().getCurrentUserId());
+
+        // ⭐ 使用新的 ActionType
+        Message request = new Message(ActionType.GET_MY_TIMETABLE, payload);
+        socketClient.sendMessage(request);
+    }
+
+    //获取所有东西
+    public void getDropLog() {
+        if (!checkConnectionAndLogin()) return;
+
+        // 发送请求时，附带上当前用户的ID
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", UserSession.getInstance().getCurrentUserId());
+
+        Message request = new Message(ActionType.GET_DROP_LOG, payload);
+        socketClient.sendMessage(request);
+    }
 
     //我想了一下这个是请求，也就是说客户端向服务端拉取课表（根据前端学生id)
 //    public Message getCourseTable() {

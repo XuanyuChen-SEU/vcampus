@@ -13,7 +13,7 @@
       xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.vcampus.client.controller.CourseCardController">
     <children>
-        <HBox fx:id="headerRow" alignment="CENTER_LEFT" style="-fx-padding: 15 20;" onMouseClicked="#toggleSessions">
+        <HBox fx:id="headerRow" alignment="CENTER_LEFT" styleClass="course-card-header" style="-fx-padding: 15 20;" onMouseClicked="#toggleSessions">
             <cursor><Cursor fx:constant="HAND" /></cursor>
             <children>
                 <VBox prefWidth="140.0" spacing="5.0">

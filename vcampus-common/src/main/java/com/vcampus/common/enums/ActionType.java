@@ -80,6 +80,10 @@ public enum ActionType {
     GET_MY_COURSES("获取我的课表"),
     GET_MY_COURSES_RESPONSE("对获取我的课表请求的响应"),
 
+    //获取我的课程时间表
+    GET_MY_TIMETABLE("获取我的课程时间表"),
+    GET_MY_TIMETABLE_RESPONSE("对获取我的课程时间表请求的响应"),
+
     // --- 图书馆模块 - 通用端 ---
 
     LIBRARY_GET_ALL_BOOKS("获取所有图书"),
@@ -93,6 +97,10 @@ public enum ActionType {
     LIBRARY_BORROW_BOOK("用户借阅图书"),
     LIBRARY_RETURN_BOOK("用户归还图书"),
     LIBRARY_GET_BOOK_PDF("获取图书PDF文件"),
+
+    // ⭐ 新增：获取退课日志
+    GET_DROP_LOG("获得退课日记"),
+    GET_DROP_LOG_RESPONSE("获得退课日记响应"),
 
     // ⭐ 新增
     SEARCH_COURSES("搜索响应课程"),
