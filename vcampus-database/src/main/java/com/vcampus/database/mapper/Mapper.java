@@ -11,6 +11,7 @@ public interface Mapper {
     void createUserTable();
     void createStudentTable();
     void createStudentLeaveApplicationTable();
+    void createTeacherTable();
     void createBookTable();
     void createBorrowLogTable();
     void createPasswordResetApplicationTable();
@@ -25,7 +26,7 @@ public interface Mapper {
     void createClassSessionsTable();
     void createCourseSelectionsTable();
 
+    void useDatabase(String dbName);
     //邮件模块
     void createEmailTable();
-
 }

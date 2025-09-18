@@ -88,10 +88,18 @@ public class MessageController {
                     return studentadminController.getStudentById(request);
                 case UPDATE_STUDENT_ADMIN:
                     return studentadminController.updateStudent(request);
+                case UPDATE_STUDENTS:
+                    return studentadminController.updateStudents(request);
                 case GET_ALL_APPLICATIONS:
                     return studentadminController.getAllApplications(request);
                 case UPDATE_APPLICATION_STATUS:
                     return studentadminController.updateApplicationStatus(request);
+                case ALL_TEACHER:
+                    return studentadminController.getAllTeachers(request);
+
+                // --- 教师相关 ---
+                case INFO_TEACHER:
+                    return studentController.handleInfoTeacher(request);
                 // --- 课程相关 ---
 
                 // --- 课程相关 ---调用服务端的controller层相关逻辑部分
@@ -202,10 +210,11 @@ public class MessageController {
                 case EMAIL_MARK_READ:
                 case EMAIL_MARK_UNREAD:
                 case EMAIL_SEARCH:
-                case EMAIL_GET_UNREAD_COUNT:
                 case EMAIL_BATCH_MARK_READ:
                 case EMAIL_BATCH_DELETE:
                 case EMAIL_ADMIN_GET_ALL:
+                case EMAIL_ADMIN_SEARCH_ALL:
+                case EMAIL_ADMIN_SEARCH_BY_USER:
                 case EMAIL_ADMIN_GET_USER_EMAILS:
                 case EMAIL_ADMIN_DELETE:
                 case EMAIL_ADMIN_GET_STATISTICS:

@@ -1,6 +1,8 @@
 package com.vcampus.common.dao;
 
 import com.vcampus.common.dto.Student;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -46,5 +48,5 @@ public interface IStudentDao {
      */
     List<Student> findAll();
 
-
+    void updateStudents(@Param("students") List<Student> students);
 }

@@ -1,0 +1,135 @@
+/* 背景 */
+.stack-pane {
+    -fx-background-color: #f4f6f9;
+}
+
+/* 标题 */
+.title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* 卡片 */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 3);
+}
+
+/* 字段名称 */
+.field-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #34495e;
+    -fx-font-weight: bold;
+}
+
+/* 字段值 */
+.field-value {
+    -fx-font-size: 14px;
+    -fx-text-fill: #2c3e50;
+}
+
+/* 按钮样式 */
+.primary-button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 6 16;
+}
+.primary-button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.success-button {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 6 16;
+}
+.success-button:hover {
+    -fx-background-color: #27ae60;
+}
+
+.danger-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 6 16;
+}
+.danger-button:hover {
+    -fx-background-color: #c0392b;
+}
+
+.secondary-button {
+    -fx-background-color: #95a5a6;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 6 16;
+}
+.secondary-button:hover {
+    -fx-background-color: #7f8c8d;
+}
+
+.white-icon {
+    -fx-effect: innershadow(gaussian, white, 100, 1.0, 0, 0);
+    -fx-opacity: 1.0;
+}
+
+/* 确保所有按钮文字为白色并添加交互效果 */
+.student-record-button-export,
+.student-record-button-edit,
+.student-record-button-status {
+    -fx-text-fill: white; /* 强制设置白色文字 */
+    -fx-background-radius: 6;
+    -fx-pref-height: 34px;
+    -fx-font-size: 14px;
+    -fx-padding: 0 15px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s; /* 平滑过渡效果 */
+}
+
+/* 导出PDF按钮样式及交互 */
+.student-record-button-export {
+    -fx-background-color: #27ae60;
+}
+.student-record-button-export:pressed {
+    -fx-background-color: #219653; /* 点击时颜色加深 */
+    -fx-translate-y: 1px; /* 轻微下移效果 */
+}
+
+/* 修改按钮样式及交互 */
+.student-record-button-edit {
+    -fx-background-color: #3498db;
+}
+.student-record-button-edit.save-mode {
+    -fx-background-color: #2ecc71;
+}
+.student-record-button-edit:pressed {
+    -fx-background-color: #2980b9; /* 点击时颜色加深 */
+    -fx-translate-y: 1px;
+}
+
+/* 申请/取消按钮样式及交互 */
+.student-record-button-status {
+    -fx-background-color: #f39c12;
+}
+.student-record-button-status.cancel-mode {
+    -fx-background-color: #e74c3c;
+}
+.student-record-button-status.pending-mode {
+    -fx-background-color: #95a5a6;
+}
+.student-record-button-status:pressed {
+    -fx-background-color: #d35400; /* 点击时颜色加深 */
+    -fx-translate-y: 1px;
+}
+
+/* 统一悬停效果 */
+.student-record-button-export:hover,
+.student-record-button-edit:hover,
+.student-record-button-status:hover {
+    -fx-opacity: 0.9;
+}
+

@@ -3,6 +3,7 @@ package com.vcampus.server.controller;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
 import com.vcampus.common.dto.StudentLeaveApplication;
+import com.vcampus.common.dto.Teacher;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.service.StudentAdminService;
 
@@ -134,6 +135,88 @@ public class StudentAdminController {
         }
     }
 
+    // 服务端 StudentController.java
+    public Message updateStudents(Message request) {
+        if (!(request.getData() instanceof List<?> students)) {
+            return Message.failure(ActionType.UPDATE_STUDENTS, "参数错误，必须是学生列表");
+        }
+        boolean result = studentAdminService.updateStudents((List<Student>) students);
+        return result
+                ? Message.success(ActionType.UPDATE_STUDENTS, students, "批量更新成功")
+                : Message.failure(ActionType.UPDATE_STUDENTS, "批量更新失败");
+    }
 
+    /**
+     * 获取所有教师信息
+     */
+    public Message getAllTeachers(Message request) {
+        try {
+            List<Teacher> allTeachers = studentAdminService.getAllTeachers();
+            return Message.success(ActionType.ALL_TEACHER, allTeachers, "所有教师信息获取成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.ALL_TEACHER, "服务端异常: " + e.getMessage());
+        }
+    }
+
+//    /**
+//     * 根据姓名关键字模糊搜索教师
+//     */
+//    public Message searchTeachers(Message request) {
+//        try {
+//            Object data = request.getData();
+//            if (!(data instanceof String)) {
+//                return Message.failure(ActionType.SEARCH_TEACHER, "参数错误，必须是 String 对象");
+//            }
+//            String nameKeyword = (String) data;
+//            List<Teacher> filteredTeachers = teacherAdminService.findByNameLike(nameKeyword);
+//            return Message.success(ActionType.SEARCH_TEACHER, filteredTeachers, "教师信息模糊搜索成功");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return Message.failure(ActionType.SEARCH_TEACHER, "服务端异常: " + e.getMessage());
+//        }
+//    }
+//
+//    /**
+//     * 根据工号获取单个教师详细信息
+//     */
+//    public Message getTeacherById(Message request) {
+//        try {
+//            Object data = request.getData();
+//            if (!(data instanceof String)) {
+//                return Message.failure(ActionType.INFO_TEACHER, "参数错误，必须是 String 对象");
+//            }
+//            String userId = (String) data;
+//            Teacher teacher = teacherAdminService.getTeacherById(userId);
+//            if (teacher != null) {
+//                return Message.success(ActionType.INFO_TEACHER, teacher, "教师详细信息查找成功");
+//            } else {
+//                return Message.failure(ActionType.INFO_TEACHER, "未找到该教师信息");
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return Message.failure(ActionType.INFO_TEACHER, "服务端异常: " + e.getMessage());
+//        }
+//    }
+//
+//    /**
+//     * 更新单个教师信息
+//     */
+//    public Message updateTeacher(Message request) {
+//        try {
+//            if (!(request.getData() instanceof Teacher updatedTeacher)) {
+//                return Message.failure(ActionType.UPDATE_TEACHER_ADMIN, "参数错误，必须是教师对象");
+//            }
+//            boolean ok = teacherAdminService.updateTeacherInfo(updatedTeacher);
+//            if (ok) {
+//                return Message.success(ActionType.UPDATE_TEACHER_ADMIN, "更新教师成功");
+//            } else {
+//                return Message.failure(ActionType.UPDATE_TEACHER_ADMIN, "更新教师失败");
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return Message.failure(ActionType.UPDATE_TEACHER_ADMIN, "服务端异常: " + e.getMessage());
+//        }
+//    }
 }
 

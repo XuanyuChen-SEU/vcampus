@@ -95,6 +95,7 @@
 .studentlist-button,
 .applicationlist-button,
 .refresh-button,
+.teacherlist-button,
 .status-button {
     -fx-background-color: linear-gradient(to right, #7b5fc0, #9b59b6); /* 深紫 -> 浅紫 */
     -fx-text-fill: white;
@@ -111,6 +112,7 @@
 .all-button:hover,
 .studentlist-button:hover,
 .applicationlist-button:hover,
+.teacherlist-button:hover,
 .refresh-button:hover,
 .status-button:hover {
     -fx-background-color: linear-gradient(to right, #9b59b6, #8e44ad); /* 浅紫 -> 深紫 */

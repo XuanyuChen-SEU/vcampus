@@ -103,6 +103,25 @@
         FOREIGN KEY (student_id) REFERENCES tb_student(userId) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生学籍异动申请表';
     </update>
+    <!-- 创建教师信息表 -->
+    <update id="createTeacherTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.`teacher` (
+        `userId` VARCHAR(50) NOT NULL COMMENT '教师用户ID（主键）',
+        `teacherId` CHAR(8) COMMENT '教师工号（8位数字）',
+        `name` VARCHAR(50) NOT NULL COMMENT '姓名',
+        `gender` VARCHAR(10) COMMENT '性别',
+        `college` VARCHAR(100) COMMENT '学院',
+        `department` VARCHAR(100) COMMENT '系/部门',
+        `title` VARCHAR(50) COMMENT '职称',
+        `phone` VARCHAR(20) COMMENT '手机号',
+        `email` VARCHAR(100) COMMENT '电子邮箱',
+        `birth_date` DATE COMMENT '出生日期',
+        `politics_status` VARCHAR(50) COMMENT '政治面貌',
+        `office` VARCHAR(100) COMMENT '办公室',  -- 新增
+        PRIMARY KEY (`userId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='教师信息表（以userId为主键）';
+
+    </update>
 
     <update id="createBookTable">
         CREATE TABLE IF NOT EXISTS vcampus_db.`tb_book` (
@@ -251,6 +270,10 @@
             userId VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '用户ID（主键）',
             balance DECIMAL(10,2) NOT NULL COMMENT '余额'
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='余额表';
+    </update>
+
+    <update id="useDatabase">
+        USE ${dbName}
     </update>
 
     <!-- 创建邮件表 -->

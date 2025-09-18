@@ -199,7 +199,13 @@
         );
     </update>
 
-
+    <update id="updateStudents">
+        <foreach collection="list" item="s" separator=";">
+            UPDATE student
+            SET student_status = #{s.student_status}
+            WHERE student_id = #{s.student_id}
+        </foreach>
+    </update>
 
 
 </mapper>

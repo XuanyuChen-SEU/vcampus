@@ -2,8 +2,10 @@ package com.vcampus.server.service;
 
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.StudentLeaveApplication;
+import com.vcampus.common.dto.Teacher;
 import com.vcampus.server.dao.impl.StudentDao;
 import com.vcampus.server.dao.impl.StudentLeaveApplicationDao;
+import com.vcampus.server.dao.impl.TeacherDao;
 import com.vcampus.common.dto.Student;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 public class StudentAdminService {
 
     private final StudentDao studentDao = new StudentDao();
+    private final TeacherDao teacherDao=new TeacherDao();
     private final StudentLeaveApplicationDao studentleaveapplicationDao = new StudentLeaveApplicationDao();
 
     public List<Student> findAll() {
@@ -77,6 +80,37 @@ public class StudentAdminService {
 
     public StudentLeaveApplication getApplicationById(String applicationId) {
         return studentleaveapplicationDao.findById(applicationId);
+    }
+
+    public boolean updateStudents(List<Student> students) {
+        try {
+            // 直接调用 DAO 的批量更新方法
+            studentDao.updateStudents(students);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /** 获取所有教师 */
+    public List<Teacher> getAllTeachers() {
+        return teacherDao.getAllTeachers();
+    }
+
+//    /** 根据姓名模糊搜索教师 */
+//    public List<Teacher> searchTeachersByName(String nameKeyword) {
+//        return teacherDao.findByName(nameKeyword);
+//    }
+//
+//    /** 根据工号获取教师 */
+//    public Teacher getTeacherById(String userId) {
+//        return teacherDao.findById(userId);
+//    }
+
+    /** 更新教师信息 */
+    public boolean updateTeacher(Teacher teacher) {
+        return teacherDao.updateTeacher(teacher);
     }
 }
 

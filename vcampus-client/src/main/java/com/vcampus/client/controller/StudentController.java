@@ -2,6 +2,7 @@ package com.vcampus.client.controller;
 
 import com.vcampus.client.service.StudentService;
 import com.vcampus.client.session.UserSession;
+import com.vcampus.client.util.StudentPdfExporter;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
 import com.vcampus.common.dto.StudentLeaveApplication;
@@ -9,6 +10,8 @@ import com.vcampus.common.enums.ActionType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
 import java.time.LocalDate;
@@ -27,6 +30,8 @@ public class StudentController implements IClientController {
     @FXML private Label nativePlaceLabel;
     @FXML private Label politicsStatusLabel;
     @FXML private Label studentStatusLabel;
+    @FXML
+    private ImageView studentImageView; // FXML 中绑定
 
     // === 联系方式 ===
     @FXML private Label phoneLabel;
@@ -47,7 +52,8 @@ public class StudentController implements IClientController {
 
     // === 按钮 ===
     @FXML private Button editOrSaveButton;       // 修改/保存
-    @FXML private Button pdfOrCancelButton;      // 休学/复学申请按钮
+    @FXML private Button pdfOrCancelButton;
+    @FXML private Button exportPdfButton;    // 休学/复学申请按钮
 
     // === 各区块 GridPane ===
     @FXML private GridPane studentGridPane;
@@ -97,6 +103,8 @@ public class StudentController implements IClientController {
 
     private boolean editing = false;
     private StudentLeaveApplication latestApplication;
+    private final String MAN_IMAGE = "/images/StudentIcons/man.png";
+    private final String WOMAN_IMAGE = "/images/StudentIcons/woman.png";
 
     @FXML
     private void initialize() {
@@ -115,6 +123,7 @@ public class StudentController implements IClientController {
                 cancelEdit();
             }
         });
+        exportPdfButton.setOnAction(event -> exportStudentInfoToPdf());
     }
 
     // =================== 进入编辑模式 ===================
@@ -123,9 +132,10 @@ public class StudentController implements IClientController {
 
         // 按钮切换
         editOrSaveButton.setText("保存");
-        editOrSaveButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 6;");
+        editOrSaveButton.getStyleClass().add("save-mode");
         pdfOrCancelButton.setText("取消");
-        pdfOrCancelButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 6;");
+        pdfOrCancelButton.getStyleClass().add("cancel-mode");
+        exportPdfButton.setVisible(false);
 
         // 保存原始值
         originalBirthDate = safeText(birthDateLabel);
@@ -305,7 +315,9 @@ public class StudentController implements IClientController {
         editing = false;
 
         editOrSaveButton.setText("修改");
-        editOrSaveButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6;");
+        editOrSaveButton.getStyleClass().remove("save-mode");
+        exportPdfButton.setVisible(true);
+        exportPdfButton.setOnAction(event -> exportStudentInfoToPdf());
 
         // 根据学籍状态更新按钮
         updateStatusButton(studentStatusLabel.getText());
@@ -340,14 +352,16 @@ public class StudentController implements IClientController {
     // =================== 根据学籍状态设置按钮 ===================
     private void updateStatusButton(String studentStatus) {
         Platform.runLater(() -> {
-            pdfOrCancelButton.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 6;");
+            // 先移除所有状态类，避免样式冲突
+            pdfOrCancelButton.getStyleClass().removeAll("cancel-mode", "pending-mode");
+
             if ("在读".equals(studentStatus)) {
                 pdfOrCancelButton.setText("休学申请");
                 pdfOrCancelButton.setVisible(true);
             } else if ("休学".equals(studentStatus)) {
                 pdfOrCancelButton.setText("复学申请");
                 pdfOrCancelButton.setVisible(true);
-            } else { // 毕业或其他状态
+            } else {
                 pdfOrCancelButton.setVisible(false);
             }
         });
@@ -469,6 +483,8 @@ public class StudentController implements IClientController {
 
                 // 更新按钮显示
                 updateStatusButton(student.getStudent_status());
+                updateStudentImage(student.getGender());
+
             } else {
                 showError("加载学生信息失败：" + message.getMessage());
             }
@@ -565,12 +581,17 @@ public class StudentController implements IClientController {
                 } else {
                     showInfo("申请提交成功！");
                 }
+                // === 提交后立即更新按钮状态 ===
+                pdfOrCancelButton.setVisible(true);
+                pdfOrCancelButton.setText("查看申请/撤回");
+                pdfOrCancelButton.getStyleClass().add("pending-mode"); // 新增：添加灰色样式类
             } else {
                 String errorMsg = response.getMessage() != null ? response.getMessage() : "未知错误";
                 showError("申请失败: " + errorMsg);
             }
         });
     }
+
 
     private void revokeApplication(StudentLeaveApplication application) {
         studentService.revokeApplication(application);
@@ -589,12 +610,68 @@ public class StudentController implements IClientController {
                 if (latestApplication != null) {
                     latestApplication.setStatus("已撤回");
                 }
+                // === 允许重新发起申请 ===
+                latestApplication = null;
+                updateStatusButton(studentStatusLabel.getText());
             } else {
                 String errorMsg = response.getMessage() != null ? response.getMessage() : "未知错误";
                 showError("撤回失败: " + errorMsg);
             }
         });
     }
+
+    private void exportStudentInfoToPdf() {
+        try {
+            Student student = new Student();
+            student.setUserId(userIdLabel.getText());
+            student.setStudentId(studentIdLabel.getText());
+            student.setName(nameLabel.getText());
+            student.setGender(genderLabel.getText());
+            student.setCollege(collegeLabel.getText());
+            student.setMajor(majorLabel.getText());
+            student.setGrade(Integer.parseInt(gradeLabel.getText()));
+            student.setBirth_date(birthDateLabel.getText());
+            student.setNative_place(nativePlaceLabel.getText());
+            student.setPolitics_status(politicsStatusLabel.getText());
+            student.setStudent_status(studentStatusLabel.getText());
+            student.setPhone(phoneLabel.getText());
+            student.setEmail(emailLabel.getText());
+            student.setDormAddress(dormAddressLabel.getText());
+            student.setFatherName(fatherNameLabel.getText());
+            student.setFatherPhone(fatherPhoneLabel.getText());
+            student.setFatherPoliticsStatus(fatherPoliticsLabel.getText());
+            student.setFatherWorkUnit(fatherWorkLabel.getText());
+            student.setMotherName(motherNameLabel.getText());
+            student.setMotherPhone(motherPhoneLabel.getText());
+            student.setMotherPoliticsStatus(motherPoliticsLabel.getText());
+            student.setMotherWorkUnit(motherWorkLabel.getText());
+
+            StudentPdfExporter.exportStudentData(student);
+            showInfo("学生信息已成功导出为 PDF！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("导出 PDF 失败: " + e.getMessage());
+        }
+    }
+
+    private void updateStudentImage(String gender) {
+        if (gender == null) gender = "";
+
+        String imagePath = gender.contains("女") ? WOMAN_IMAGE : MAN_IMAGE;
+
+        try {
+            java.net.URL url = getClass().getResource(imagePath);
+            if (url != null) {
+                Image image = new Image(url.toExternalForm());
+                studentImageView.setImage(image);
+            } else {
+                System.out.println("找不到头像资源: " + imagePath);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

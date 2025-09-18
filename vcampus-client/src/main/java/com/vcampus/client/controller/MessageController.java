@@ -1,5 +1,6 @@
 package com.vcampus.client.controller;
 
+import com.vcampus.client.controller.courseAdmin.CourseAdminController;
 import com.vcampus.client.controller.libraryAdmin.BookCreateViewController;
 import com.vcampus.client.controller.libraryAdmin.BookListViewController;
 import com.vcampus.client.controller.libraryAdmin.BorrowLogCreateController;
@@ -13,8 +14,7 @@ import com.vcampus.client.controller.userAdmin.ForgetPasswordTableViewController
 import com.vcampus.client.controller.userAdmin.UserCreateViewController;
 import com.vcampus.client.controller.userAdmin.UserListViewController;
 import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
-import com.vcampus.common.dto.Message;
-import com.vcampus.client.controller.courseAdmin.CourseAdminController; // 确保导入
+import com.vcampus.common.dto.Message; // 确保导入
 
 /**
  * 客户端消息控制器
@@ -50,6 +50,10 @@ public class MessageController {
     // 邮件系统控制器
     private EmailController emailController;
     private ComposeEmailController composeEmailController;
+    private EmailAdminViewController emailAdminViewController;
+    
+    // 教师端标识
+    private boolean isTeacherMode = false;
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -146,6 +150,11 @@ public class MessageController {
     // 【新增】注册 EmailController 的方法
     public void setEmailController(EmailController controller) {
         this.emailController = controller;
+    }
+    
+    // 【新增】注册 EmailAdminViewController 的方法
+    public void setEmailAdminViewController(EmailAdminViewController controller) {
+        this.emailAdminViewController = controller;
     }
     
     // 【新增】注册 ComposeEmailController 的方法
@@ -315,6 +324,15 @@ public class MessageController {
                     }else{
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
                     }
+                    break;
+                case ALL_TEACHER:
+                    if(studentadminController!=null){
+                        studentadminController.handleAllTeachersResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+
                 // --- 商店模块 ---
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
@@ -674,17 +692,49 @@ public class MessageController {
                 case EMAIL_MARK_READ:
                 case EMAIL_MARK_UNREAD:
                 case EMAIL_SEARCH:
-                case EMAIL_GET_UNREAD_COUNT:
                 case EMAIL_BATCH_MARK_READ:
                 case EMAIL_BATCH_DELETE:
-                case EMAIL_ADMIN_GET_ALL:
-                case EMAIL_ADMIN_GET_USER_EMAILS:
-                case EMAIL_ADMIN_DELETE:
-                case EMAIL_ADMIN_GET_STATISTICS:
                     if (emailController != null) {
                         emailController.handleEmailResponse(message);
                     } else {
                         System.err.println("EmailController未设置，无法处理邮件响应");
+                    }
+                    break;
+                    
+                // 邮件管理员相关响应
+                case EMAIL_ADMIN_GET_ALL:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleGetAllEmailsResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理获取所有邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_SEARCH_ALL:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleSearchEmailsResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理搜索邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_SEARCH_BY_USER:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleSearchEmailsByUserResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理用户搜索邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_GET_USER_EMAILS:
+                    if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("EmailController未设置，无法处理邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_DELETE:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleDeleteEmailResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理删除邮件响应");
                     }
                     break;
                     

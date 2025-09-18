@@ -1,5 +1,6 @@
 package com.vcampus.server.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +53,6 @@ public class EmailController {
                     return handleMarkAsUnread(message);
                 case EMAIL_SEARCH:
                     return handleSearchEmails(message);
-                case EMAIL_GET_UNREAD_COUNT:
-                    return handleGetUnreadCount(message);
                 case EMAIL_BATCH_MARK_READ:
                     return handleBatchMarkAsRead(message);
                 case EMAIL_BATCH_DELETE:
@@ -62,6 +61,10 @@ public class EmailController {
                 // ==================== 管理员操作 ====================
                 case EMAIL_ADMIN_GET_ALL:
                     return handleAdminGetAllEmails(message);
+                case EMAIL_ADMIN_SEARCH_ALL:
+                    return handleAdminSearchAllEmails(message);
+                case EMAIL_ADMIN_SEARCH_BY_USER:
+                    return handleAdminSearchByUser(message);
                 case EMAIL_ADMIN_GET_USER_EMAILS:
                     return handleAdminGetUserEmails(message);
                 case EMAIL_ADMIN_DELETE:
@@ -140,7 +143,17 @@ public class EmailController {
             }
             
             List<Email> emails = emailService.getInbox(userId, page, pageSize);
-            return new Message(ActionType.EMAIL_GET_INBOX, emails != null ? emails : List.of(), true, "获取收件箱成功");
+            int totalCount = emailService.getInboxCount(userId);
+            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+            
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("emails", emails != null ? emails : List.of());
+            responseData.put("totalCount", totalCount);
+            responseData.put("currentPage", page);
+            responseData.put("pageSize", pageSize);
+            responseData.put("totalPages", totalPages);
+            
+            return new Message(ActionType.EMAIL_GET_INBOX, responseData, true, "获取收件箱成功");
         } catch (Exception e) {
             return Message.failure(ActionType.EMAIL_GET_INBOX, "获取收件箱失败: " + e.getMessage());
         }
@@ -163,7 +176,17 @@ public class EmailController {
             }
             
             List<Email> emails = emailService.getSentBox(userId, page, pageSize);
-            return new Message(ActionType.EMAIL_GET_SENT, emails != null ? emails : List.of(), true, "获取发件箱成功");
+            int totalCount = emailService.getSentCount(userId);
+            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+            
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("emails", emails != null ? emails : List.of());
+            responseData.put("totalCount", totalCount);
+            responseData.put("currentPage", page);
+            responseData.put("pageSize", pageSize);
+            responseData.put("totalPages", totalPages);
+            
+            return new Message(ActionType.EMAIL_GET_SENT, responseData, true, "获取发件箱成功");
         } catch (Exception e) {
             return Message.failure(ActionType.EMAIL_GET_SENT, "获取发件箱失败: " + e.getMessage());
         }
@@ -186,7 +209,17 @@ public class EmailController {
             }
             
             List<Email> emails = emailService.getDraftBox(userId, page, pageSize);
-            return new Message(ActionType.EMAIL_GET_DRAFT, emails != null ? emails : List.of(), true, "获取草稿箱成功");
+            int totalCount = emailService.getDraftCount(userId);
+            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+            
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("emails", emails != null ? emails : List.of());
+            responseData.put("totalCount", totalCount);
+            responseData.put("currentPage", page);
+            responseData.put("pageSize", pageSize);
+            responseData.put("totalPages", totalPages);
+            
+            return new Message(ActionType.EMAIL_GET_DRAFT, responseData, true, "获取草稿箱成功");
         } catch (Exception e) {
             return Message.failure(ActionType.EMAIL_GET_DRAFT, "获取草稿箱失败: " + e.getMessage());
         }
@@ -287,27 +320,6 @@ public class EmailController {
     }
 
     /**
-     * 处理获取未读数量请求
-     */
-    private Message handleGetUnreadCount(Message message) {
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, String> data = (Map<String, String>) message.getData();
-            
-            String userId = data.get("userId");
-            
-            if (userId == null) {
-                return Message.failure(ActionType.EMAIL_GET_UNREAD_COUNT, "用户ID不能为空");
-            }
-            
-            int count = emailService.getUnreadCount(userId);
-            return Message.success(ActionType.EMAIL_GET_UNREAD_COUNT, String.valueOf(count));
-        } catch (Exception e) {
-            return Message.failure(ActionType.EMAIL_GET_UNREAD_COUNT, "获取未读数量失败: " + e.getMessage());
-        }
-    }
-
-    /**
      * 处理标记未读请求
      */
     private Message handleMarkAsUnread(Message message) {
@@ -393,9 +405,53 @@ public class EmailController {
             int pageSize = data.get("pageSize") != null ? (Integer) data.get("pageSize") : 10;
             
             List<Email> emails = emailService.getAllEmails(page, pageSize);
-            return new Message(ActionType.EMAIL_ADMIN_GET_ALL, emails != null ? emails : List.of(), true, "获取所有邮件成功");
+            int totalCount = emailService.getAllEmailsCount();
+            
+            // 创建包含邮件列表和总数信息的响应数据
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("emails", emails != null ? emails : List.of());
+            responseData.put("totalCount", totalCount);
+            responseData.put("currentPage", page);
+            responseData.put("pageSize", pageSize);
+            responseData.put("totalPages", (int) Math.ceil((double) totalCount / pageSize));
+            
+            return new Message(ActionType.EMAIL_ADMIN_GET_ALL, responseData, true, "获取所有邮件成功");
         } catch (Exception e) {
             return Message.failure(ActionType.EMAIL_ADMIN_GET_ALL, "获取所有邮件失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理管理员搜索所有邮件请求
+     */
+    private Message handleAdminSearchAllEmails(Message message) {
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) message.getData();
+            
+            String keyword = (String) data.get("keyword");
+            int page = data.get("page") != null ? (Integer) data.get("page") : 1;
+            int pageSize = data.get("pageSize") != null ? (Integer) data.get("pageSize") : 10;
+            
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return Message.failure(ActionType.EMAIL_ADMIN_SEARCH_ALL, "搜索关键词不能为空");
+            }
+            
+            List<Email> emails = emailService.searchAllEmails(keyword, page, pageSize);
+            int totalCount = emailService.searchAllEmailsCount(keyword);
+            
+            // 创建包含邮件列表和总数信息的响应数据
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("emails", emails != null ? emails : List.of());
+            responseData.put("totalCount", totalCount);
+            responseData.put("currentPage", page);
+            responseData.put("pageSize", pageSize);
+            responseData.put("totalPages", (int) Math.ceil((double) totalCount / pageSize));
+            responseData.put("keyword", keyword);
+            
+            return new Message(ActionType.EMAIL_ADMIN_SEARCH_ALL, responseData, true, "搜索邮件成功");
+        } catch (Exception e) {
+            return Message.failure(ActionType.EMAIL_ADMIN_SEARCH_ALL, "搜索邮件失败: " + e.getMessage());
         }
     }
 
@@ -416,9 +472,54 @@ public class EmailController {
             }
             
             List<Email> emails = emailService.getUserAllEmails(userId, page, pageSize);
-            return new Message(ActionType.EMAIL_ADMIN_GET_USER_EMAILS, emails != null ? emails : List.of(), true, "获取用户邮件成功");
+            int totalCount = emailService.getUserAllEmailsCount(userId);
+            
+            // 创建包含邮件列表和总数信息的响应数据
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("emails", emails != null ? emails : List.of());
+            responseData.put("totalCount", totalCount);
+            responseData.put("currentPage", page);
+            responseData.put("pageSize", pageSize);
+            responseData.put("totalPages", (int) Math.ceil((double) totalCount / pageSize));
+            responseData.put("userId", userId);
+            
+            return new Message(ActionType.EMAIL_ADMIN_GET_USER_EMAILS, responseData, true, "获取用户邮件成功");
         } catch (Exception e) {
             return Message.failure(ActionType.EMAIL_ADMIN_GET_USER_EMAILS, "获取用户邮件失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理管理员按用户搜索邮件请求
+     */
+    private Message handleAdminSearchByUser(Message message) {
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) message.getData();
+            
+            String userId = (String) data.get("userId");
+            int page = data.get("page") != null ? (Integer) data.get("page") : 1;
+            int pageSize = data.get("pageSize") != null ? (Integer) data.get("pageSize") : 10;
+            
+            if (userId == null || userId.trim().isEmpty()) {
+                return Message.failure(ActionType.EMAIL_ADMIN_SEARCH_BY_USER, "用户ID不能为空");
+            }
+            
+            List<Email> emails = emailService.getUserAllEmails(userId, page, pageSize);
+            int totalCount = emailService.getUserAllEmailsCount(userId);
+            
+            // 创建包含邮件列表和总数信息的响应数据
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("emails", emails != null ? emails : List.of());
+            responseData.put("totalCount", totalCount);
+            responseData.put("currentPage", page);
+            responseData.put("pageSize", pageSize);
+            responseData.put("totalPages", (int) Math.ceil((double) totalCount / pageSize));
+            responseData.put("userId", userId);
+            
+            return new Message(ActionType.EMAIL_ADMIN_SEARCH_BY_USER, responseData, true, "按用户搜索邮件成功");
+        } catch (Exception e) {
+            return Message.failure(ActionType.EMAIL_ADMIN_SEARCH_BY_USER, "按用户搜索邮件失败: " + e.getMessage());
         }
     }
 

@@ -150,6 +150,54 @@ public class EmailDao implements IEmailDao {
     }
 
     /**
+     * 获取用户收件箱邮件总数
+     * @param userId 用户ID
+     * @return 收件箱邮件总数
+     */
+    @Override
+    public int getInboxCount(String userId) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            EmailMapper mapper = sqlSession.getMapper(EmailMapper.class);
+            return mapper.getInboxCount(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 获取用户发件箱邮件总数
+     * @param userId 用户ID
+     * @return 发件箱邮件总数
+     */
+    @Override
+    public int getSentCount(String userId) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            EmailMapper mapper = sqlSession.getMapper(EmailMapper.class);
+            return mapper.getSentCount(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 获取用户草稿箱邮件总数
+     * @param userId 用户ID
+     * @return 草稿箱邮件总数
+     */
+    @Override
+    public int getDraftCount(String userId) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            EmailMapper mapper = sqlSession.getMapper(EmailMapper.class);
+            return mapper.getDraftCount(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
      * 根据状态获取邮件
      * @param userId 用户ID
      * @param status 邮件状态
@@ -302,6 +350,50 @@ public class EmailDao implements IEmailDao {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * 获取所有邮件总数（管理员权限）
+     * @return 邮件总数
+     */
+    public int getAllEmailsCount() {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            EmailMapper mapper = sqlSession.getMapper(EmailMapper.class);
+            return mapper.getAllEmailsCount();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 获取用户邮件总数（管理员权限）
+     * @param userId 用户ID
+     * @return 该用户的邮件总数
+     */
+    public int getUserAllEmailsCount(String userId) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            EmailMapper mapper = sqlSession.getMapper(EmailMapper.class);
+            return mapper.getUserAllEmailsCount(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 搜索所有邮件总数（管理员权限）
+     * @param keyword 搜索关键词
+     * @return 搜索结果总数
+     */
+    public int searchAllEmailsCount(String keyword) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            EmailMapper mapper = sqlSession.getMapper(EmailMapper.class);
+            return mapper.searchAllEmailsCount(keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 

@@ -4,6 +4,7 @@ import com.vcampus.client.service.StudentAdminService;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
 import com.vcampus.common.dto.StudentLeaveApplication;
+import com.vcampus.common.dto.Teacher;
 import com.vcampus.common.enums.ActionType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -17,6 +18,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 
@@ -31,6 +33,7 @@ public class StudentAdminController implements IClientController {
     @FXML private Button searchButton;
     @FXML private TableView<Student> studentTable;
     @FXML private Button btnAdjustStatus;
+    @FXML private Button btnTeacherList;
 
     @FXML private TableColumn<Student, Boolean> colSelect;
     @FXML private TableColumn<Student, String> colUserId;
@@ -52,20 +55,37 @@ public class StudentAdminController implements IClientController {
     @FXML private TableColumn<StudentLeaveApplication, String> colAppStatus;
     @FXML private TableColumn<StudentLeaveApplication, Void> colAppAction;
     @FXML private Button btnRefreshList; // 刷新按钮
+    @FXML private TableView<Teacher> teacherTable;
+    @FXML private TableColumn<Teacher, Boolean> colTeacherSelect;
+    @FXML private TableColumn<Teacher, String> colTeacherUserId;
+    @FXML private TableColumn<Teacher, String> colTeacherName;
+    @FXML private TableColumn<Teacher, String> colTeacherGender;
+    @FXML private TableColumn<Teacher, String> colTeacherCollege;
+    @FXML private TableColumn<Teacher, String> colTeacherDepartment;
+    @FXML private TableColumn<Teacher, String> colTeacherTitle;
+    @FXML private TableColumn<Teacher, String> colTeacherPhone;
+    @FXML private TableColumn<Teacher, String> colTeacherEmail;
+    @FXML private TableColumn<Teacher, String> colTeacherOffice;
+    @FXML private TableColumn<Teacher, Void> colTeacherAction;
 
+    private final ObservableList<Teacher> teacherData = FXCollections.observableArrayList();
+    private final FilteredList<Teacher> filteredTeacherData = new FilteredList<>(teacherData, t -> true);
+    private final Set<String> selectedDepartments = new HashSet<>();
+    private final Set<String> selectedTitles = new HashSet<>();
 
 
     private final StudentAdminService studentAdminService = new StudentAdminService();
     private final ObservableList<Student> studentData = FXCollections.observableArrayList();
     private final FilteredList<Student> filteredData = new FilteredList<>(studentData, s -> true);
     private final ObservableList<StudentLeaveApplication> applicationData = FXCollections.observableArrayList();
+    private boolean isBatchUpdating = false;
 
     // 存储筛选选项
     private final Set<String> selectedGrades = new HashSet<>();
     private final Set<String> selectedMajors = new HashSet<>();
     private final Set<String> selectedStatuses = new HashSet<>();
     private boolean allSelected = false; // 当前全选状态
-    private enum CurrentTable { STUDENT, APPLICATION }
+    private enum CurrentTable { STUDENT, APPLICATION, TEACHER}
     private CurrentTable currentTable = CurrentTable.STUDENT;
 
 
@@ -86,6 +106,49 @@ public class StudentAdminController implements IClientController {
         colAppName.setCellValueFactory(new PropertyValueFactory<>("studentName"));
         colAppReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
         colAppStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        colSelect.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.05));
+        colUserId.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.07));
+        colStudentId.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.10));
+        colName.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.08));
+        colGender.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.04));
+        colCollege.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.10));
+        colMajor.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.13));
+        colGrade.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.08));
+        colStudentStatus.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.10));
+        colAction.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.25));
+
+        // 绑定教师表列
+        colTeacherUserId.setCellValueFactory(new PropertyValueFactory<>("userId"));
+        colTeacherName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colTeacherGender.setCellValueFactory(new PropertyValueFactory<>("gender"));
+        colTeacherCollege.setCellValueFactory(new PropertyValueFactory<>("college"));
+        colTeacherDepartment.setCellValueFactory(new PropertyValueFactory<>("department"));
+        colTeacherTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        colTeacherPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        colTeacherEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colTeacherOffice.setCellValueFactory(new PropertyValueFactory<>("office"));
+
+        colTeacherUserId.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.08));
+        colTeacherName.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.12));
+        colTeacherCollege.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.12)); // 新增
+        colTeacherGender.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.06));
+        colTeacherDepartment.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.12));
+        colTeacherTitle.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.10));
+        colTeacherPhone.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.10));
+        colTeacherEmail.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.10));
+        colTeacherOffice.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.10));
+        colTeacherAction.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.10));
+
+        teacherTable.setItems(filteredTeacherData);
+        teacherTable.setPlaceholder(new Label("暂无教师数据"));
+
+        // 动态列宽绑定 - 申请表
+        colAppStudentId.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.15));
+        colAppName.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.15));
+        colAppReason.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.30));
+        colAppStatus.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.15));
+        colAppAction.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.25));
 
         // 添加多选筛选按钮
         addFilterToGradeColumn();
@@ -127,6 +190,17 @@ public class StudentAdminController implements IClientController {
                 btnDetail.getStyleClass().add("clear-button");
                 btnEdit.getStyleClass().add("create-button");
 
+                btnDetail.setMaxWidth(Double.MAX_VALUE);
+                btnEdit.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(btnDetail, Priority.ALWAYS);
+                HBox.setHgrow(btnEdit, Priority.ALWAYS);
+
+                // 将按钮宽度绑定到列宽的比例
+                box.widthProperty().addListener((obs, oldW, newW) -> {
+                    btnDetail.setPrefWidth(newW.doubleValue() * 0.5 - 3); // 留出间距
+                    btnEdit.setPrefWidth(newW.doubleValue() * 0.5 - 3);
+                });
+
                 btnDetail.setOnAction(event -> {
                     int idx = getIndex();
                     if (idx < 0 || idx >= getTableView().getItems().size()) return;
@@ -147,7 +221,9 @@ public class StudentAdminController implements IClientController {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : box);
             }
+
         });
+
 
         // 申请表操作列
         colAppAction.setCellFactory(col -> new TableCell<StudentLeaveApplication, Void>() {
@@ -158,8 +234,18 @@ public class StudentAdminController implements IClientController {
             {
                 buttonBox.setAlignment(Pos.CENTER);
 
-                approveBtn.getStyleClass().add("approve-button"); // CSS：绿色
-                rejectBtn.getStyleClass().add("reject-button");   // CSS：红色
+                approveBtn.setMaxWidth(Double.MAX_VALUE);
+                rejectBtn.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(approveBtn, Priority.ALWAYS);
+                HBox.setHgrow(rejectBtn, Priority.ALWAYS);
+
+                buttonBox.widthProperty().addListener((obs, oldW, newW) -> {
+                    approveBtn.setPrefWidth(newW.doubleValue() * 0.5 - 4);
+                    rejectBtn.setPrefWidth(newW.doubleValue() * 0.5 - 4);
+                });
+
+                approveBtn.getStyleClass().add("approve-button");
+                rejectBtn.getStyleClass().add("reject-button");
 
                 approveBtn.setOnAction(e -> {
                     StudentLeaveApplication app = getTableView().getItems().get(getIndex());
@@ -179,7 +265,6 @@ public class StudentAdminController implements IClientController {
                     setGraphic(null);
                 } else {
                     StudentLeaveApplication app = getTableView().getItems().get(getIndex());
-                    // === 修改：撤回后同样隐藏按钮 ===
                     if ("已通过".equals(app.getStatus())
                             || "未通过".equals(app.getStatus())
                             || "已撤回".equals(app.getStatus())) {
@@ -190,6 +275,7 @@ public class StudentAdminController implements IClientController {
                 }
             }
         });
+
 
         // 申请状态列颜色显示
         colAppStatus.setCellFactory(column -> new TableCell<StudentLeaveApplication, String>() {
@@ -209,6 +295,17 @@ public class StudentAdminController implements IClientController {
                 }
             }
         });
+        // 切换显示
+        btnTeacherList.setOnAction(e -> {
+            currentTable = CurrentTable.TEACHER;
+            searchField.setPromptText("按工号/姓名搜索教师");
+            searchField.clear();
+            studentTable.setVisible(false);
+            applicationTable.setVisible(false);
+            teacherTable.setVisible(true);
+            loadAllTeachers();
+        });
+
 
 
         studentTable.setItems(filteredData);
@@ -217,12 +314,15 @@ public class StudentAdminController implements IClientController {
         // 搜索按钮 & 回车
         searchButton.setOnAction(event -> updateFilterBasedOnCurrentTable());
         searchField.setOnAction(event -> updateFilterBasedOnCurrentTable());
+        searchButton.setOnAction(e -> updateFilterBasedOnCurrentTable());
+        searchField.setOnAction(e -> updateFilterBasedOnCurrentTable());
 
         btnSelectAll.getStyleClass().add("all-button");
         btnAdjustStatus.getStyleClass().add("status-button");
         btnStudentList.getStyleClass().add("studentlist-button");
         btnApplicationList.getStyleClass().add("applicationlist-button");
         btnRefreshList.getStyleClass().add("refresh-button");
+        btnTeacherList.getStyleClass().add("teacherlist-button");
         // 批量学籍状态调整
         btnAdjustStatus.setOnAction(e -> adjustSelectedStudentStatus());
         // 刷新按钮事件：同时刷新学生和申请列表
@@ -245,6 +345,8 @@ public class StudentAdminController implements IClientController {
         });
         btnStudentList.setOnAction(e -> handleShowStudentList());
         btnApplicationList.setOnAction(e -> handleShowApplicationList());
+        addFilterToTeacherDepartmentColumn();
+        addFilterToTeacherTitleColumn();
         loadAllStudent();
     }
 
@@ -459,8 +561,16 @@ public class StudentAdminController implements IClientController {
         TextField gradeField = new TextField(String.valueOf(s.getGrade()));
         TextField birthDateField = new TextField(s.getBirth_date());
         TextField nativePlaceField = new TextField(s.getNative_place());
-        TextField politicsStatusField = new TextField(s.getPolitics_status());
-        TextField studentStatusField = new TextField(s.getStudent_status());
+
+        // 政治面貌下拉选择
+        ChoiceBox<String> politicsStatusChoice = new ChoiceBox<>();
+        politicsStatusChoice.getItems().addAll("群众", "共青团员", "中共党员", "其他");
+        politicsStatusChoice.setValue(s.getPolitics_status() != null ? s.getPolitics_status() : "群众");
+
+        // 学籍状态下拉选择
+        ChoiceBox<String> studentStatusChoice = new ChoiceBox<>();
+        studentStatusChoice.getItems().addAll("在读", "休学", "毕业");
+        studentStatusChoice.setValue(s.getStudent_status() != null ? s.getStudent_status() : "在读");
 
         int row = 0;
         grid.add(new Label("用户ID:"), 0, row); grid.add(userIdField, 1, row++);
@@ -472,8 +582,8 @@ public class StudentAdminController implements IClientController {
         grid.add(new Label("年级:"), 0, row); grid.add(gradeField, 1, row++);
         grid.add(new Label("出生日期:"), 0, row); grid.add(birthDateField, 1, row++);
         grid.add(new Label("籍贯:"), 0, row); grid.add(nativePlaceField, 1, row++);
-        grid.add(new Label("政治面貌:"), 0, row); grid.add(politicsStatusField, 1, row++);
-        grid.add(new Label("学籍状态:"), 0, row); grid.add(studentStatusField, 1, row++);
+        grid.add(new Label("政治面貌:"), 0, row); grid.add(politicsStatusChoice, 1, row++);
+        grid.add(new Label("学籍状态:"), 0, row); grid.add(studentStatusChoice, 1, row++);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -488,8 +598,8 @@ public class StudentAdminController implements IClientController {
                 try { s.setGrade(Integer.parseInt(gradeField.getText())); } catch (NumberFormatException ignored){}
                 s.setBirth_date(birthDateField.getText());
                 s.setNative_place(nativePlaceField.getText());
-                s.setPolitics_status(politicsStatusField.getText());
-                s.setStudent_status(studentStatusField.getText());
+                s.setPolitics_status(politicsStatusChoice.getValue());
+                s.setStudent_status(studentStatusChoice.getValue());
                 return s;
             }
             return null;
@@ -532,9 +642,13 @@ public class StudentAdminController implements IClientController {
     public void handleUpdateStudentResponse(Message message) {
         Platform.runLater(() -> {
             if (message.isSuccess()) {
-                showAlert("更新成功", message.getMessage());
+                if (!isBatchUpdating) { // 仅单个更新时弹窗
+                    showAlert("更新成功", message.getMessage());
+                }
                 loadAllStudent();
-            } else showAlert("更新失败", message.getMessage());
+            } else {
+                showAlert("更新失败", message.getMessage());
+            }
         });
     }
 
@@ -547,7 +661,6 @@ public class StudentAdminController implements IClientController {
     }
 
     private void adjustSelectedStudentStatus() {
-        // 只获取当前筛选显示的学生
         List<Student> selectedStudents = filteredData.stream()
                 .filter(Student::isSelected)
                 .collect(Collectors.toList());
@@ -565,12 +678,24 @@ public class StudentAdminController implements IClientController {
         dialog.showAndWait().ifPresent(status -> {
             for (Student s : selectedStudents) {
                 s.setStudent_status(status);
-                studentAdminService.updateStudent(s);
             }
-            studentTable.refresh();
+
+            // ✅ 一次性批量更新
+            isBatchUpdating = true;
+            studentAdminService.updateStudents(selectedStudents);
+            isBatchUpdating = false;
+
             showAlert("成功", "已将 " + selectedStudents.size() + " 名学生的学籍状态调整为：" + status);
+
+            filteredData.forEach(s -> s.setSelected(false));
+            allSelected = false;
+            btnSelectAll.setText("全选");
+
+            studentTable.refresh();
         });
     }
+
+
 
     private void loadAllApplications() {
         studentAdminService.getAllApplications(); // 假设服务端提供获取申请列表的方法
@@ -610,8 +735,14 @@ public class StudentAdminController implements IClientController {
 
         studentTable.setVisible(true);
         applicationTable.setVisible(false);
+        teacherTable.setVisible(false); // ✅ 隐藏教师表
+
+        btnSelectAll.setVisible(true);
+        btnAdjustStatus.setVisible(true);
+
         loadAllStudent(); // 刷新学生表格
     }
+
 
 
     private void handleShowApplicationList() {
@@ -621,8 +752,14 @@ public class StudentAdminController implements IClientController {
 
         studentTable.setVisible(false);
         applicationTable.setVisible(true);
+        teacherTable.setVisible(false); // ✅ 隐藏教师表
+
+        btnSelectAll.setVisible(false);
+        btnAdjustStatus.setVisible(false);
+
         loadAllApplications(); // 刷新申请表格
     }
+
 
 
 
@@ -659,33 +796,62 @@ public class StudentAdminController implements IClientController {
     }
 
     /** 根据当前表格选择搜索逻辑 */
+    /**
+     * 统一的搜索/筛选入口 — 根据当前显示的表格 (currentTable) 执行相应筛选逻辑
+     */
     private void updateFilterBasedOnCurrentTable() {
         String keyword = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
 
-        if (currentTable == CurrentTable.STUDENT) {
-            filteredData.setPredicate(s -> {
-                boolean matchKeyword = keyword.isEmpty() ||
-                        (s.getStudentId() != null && s.getStudentId().toLowerCase().contains(keyword)) ||
-                        (s.getName() != null && s.getName().toLowerCase().contains(keyword));
+        switch (currentTable) {
+            case STUDENT -> {
+                // 学生表的复合筛选（搜索 + 年级/专业/学籍状态多选筛选）
+                filteredData.setPredicate(s -> {
+                    if (s == null) return false;
+                    boolean matchKeyword = keyword.isEmpty()
+                            || (s.getStudentId() != null && s.getStudentId().toLowerCase().contains(keyword))
+                            || (s.getName() != null && s.getName().toLowerCase().contains(keyword));
 
-                boolean matchGrade = selectedGrades.isEmpty() || selectedGrades.contains(String.valueOf(s.getGrade()));
-                boolean matchMajor = selectedMajors.isEmpty() || (s.getMajor() != null && selectedMajors.contains(s.getMajor()));
-                boolean matchStatus = selectedStatuses.isEmpty() || (s.getStudent_status() != null && selectedStatuses.contains(s.getStudent_status()));
+                    boolean matchGrade = selectedGrades.isEmpty() || selectedGrades.contains(String.valueOf(s.getGrade()));
+                    boolean matchMajor = selectedMajors.isEmpty() || (s.getMajor() != null && selectedMajors.contains(s.getMajor()));
+                    boolean matchStatus = selectedStatuses.isEmpty() || (s.getStudent_status() != null && selectedStatuses.contains(s.getStudent_status()));
 
-                return matchKeyword && matchGrade && matchMajor && matchStatus;
-            });
-        } else if (currentTable == CurrentTable.APPLICATION) {
-            // 搜索申请表
-            String kw = keyword.toLowerCase();
-            FilteredList<StudentLeaveApplication> filteredApps = new FilteredList<>(applicationData, app ->
-                    (kw.isEmpty()) ||
-                            (app.getStudentId() != null && app.getStudentId().toLowerCase().contains(kw)) ||
-                            (app.getStudentName() != null && app.getStudentName().toLowerCase().contains(kw))
-            );
-            applicationTable.setItems(filteredApps);
+                    return matchKeyword && matchGrade && matchMajor && matchStatus;
+                });
+            }
+            case APPLICATION -> {
+                // 申请表仅按学号/姓名搜索（即时构造 FilteredList 并 setItems）
+                String kw = keyword;
+                FilteredList<StudentLeaveApplication> filteredApps =
+                        new FilteredList<>(applicationData, app -> {
+                            if (app == null) return false;
+                            if (kw.isEmpty()) return true;
+                            String sid = app.getStudentId() == null ? "" : app.getStudentId().toLowerCase();
+                            String sname = app.getStudentName() == null ? "" : app.getStudentName().toLowerCase();
+                            return sid.contains(kw) || sname.contains(kw);
+                        });
+                applicationTable.setItems(filteredApps);
+            }
+            case TEACHER -> {
+                // 教师表搜索 + 院系/职称多选筛选
+                // Ensure filteredTeacherData exists and teacherData is populated
+                filteredTeacherData.setPredicate(t -> {
+                    if (t == null) return false;
+                    boolean matchKeyword = keyword.isEmpty()
+                            || (t.getUserId() != null && t.getUserId().toLowerCase().contains(keyword))
+                            || (t.getName() != null && t.getName().toLowerCase().contains(keyword))
+                            || (t.getDepartment() != null && t.getDepartment().toLowerCase().contains(keyword));
+
+                    boolean matchDept = selectedDepartments.isEmpty() || (t.getDepartment() != null && selectedDepartments.contains(t.getDepartment()));
+                    boolean matchTitle = selectedTitles.isEmpty() || (t.getTitle() != null && selectedTitles.contains(t.getTitle()));
+
+                    return matchKeyword && matchDept && matchTitle;
+                });
+            }
+            default -> {
+                // 默认行为：不改变任何过滤
+            }
         }
     }
-
 
 
     private void showAlert(String title, String msg) {
@@ -695,4 +861,119 @@ public class StudentAdminController implements IClientController {
         alert.setContentText(msg);
         alert.showAndWait();
     }
+
+    // 加载教师数据
+    private void loadAllTeachers() {
+        studentAdminService.getAllTeachers();
+    }
+
+
+    // 筛选列（院系/职称）
+    private void addFilterToTeacherDepartmentColumn() {
+        colTeacherDepartment.setText(null);
+        Button filterBtn = new Button("🔍");
+        Popup popup = new Popup(); popup.setAutoHide(true);
+
+        filterBtn.setOnAction(e -> {
+            if (!popup.isShowing()) {
+                VBox box = new VBox(5); box.setStyle("-fx-background-color:white;-fx-padding:10;-fx-border-color:gray");
+                List<String> depts = teacherData.stream().map(Teacher::getDepartment).distinct().sorted().toList();
+                for (String d : depts) {
+                    CheckBox cb = new CheckBox(d);
+                    cb.setSelected(selectedDepartments.contains(d));
+                    cb.selectedProperty().addListener((obs,oldV,newV)->{
+                        if(newV) selectedDepartments.add(d); else selectedDepartments.remove(d);
+                        updateFilterBasedOnCurrentTable();
+                    });
+                    box.getChildren().add(cb);
+                }
+                popup.getContent().clear(); popup.getContent().add(box);
+                popup.show(filterBtn, filterBtn.localToScreen(0,filterBtn.getHeight()).getX(),
+                        filterBtn.localToScreen(0,filterBtn.getHeight()).getY());
+            } else popup.hide();
+        });
+        HBox header = new HBox(3,new Label("院系"),filterBtn); header.setAlignment(Pos.CENTER);
+        colTeacherDepartment.setGraphic(header);
+    }
+
+    private void addFilterToTeacherTitleColumn() {
+        colTeacherTitle.setText(null);
+        Button filterBtn = new Button("🔍");
+        Popup popup = new Popup(); popup.setAutoHide(true);
+
+        filterBtn.setOnAction(e -> {
+            if (!popup.isShowing()) {
+                VBox box = new VBox(5); box.setStyle("-fx-background-color:white;-fx-padding:10;-fx-border-color:gray");
+                List<String> titles = teacherData.stream().map(Teacher::getTitle).distinct().sorted().toList();
+                for (String t : titles) {
+                    CheckBox cb = new CheckBox(t);
+                    cb.setSelected(selectedTitles.contains(t));
+                    cb.selectedProperty().addListener((obs,oldV,newV)->{
+                        if(newV) selectedTitles.add(t); else selectedTitles.remove(t);
+                        updateFilterBasedOnCurrentTable();
+                    });
+                    box.getChildren().add(cb);
+                }
+                popup.getContent().clear(); popup.getContent().add(box);
+                popup.show(filterBtn, filterBtn.localToScreen(0,filterBtn.getHeight()).getX(),
+                        filterBtn.localToScreen(0,filterBtn.getHeight()).getY());
+            } else popup.hide();
+        });
+        HBox header = new HBox(3,new Label("职称"),filterBtn); header.setAlignment(Pos.CENTER);
+        colTeacherTitle.setGraphic(header);
+    }
+
+    /**
+     * 处理获取所有教师的响应
+     */
+    public void handleAllTeachersResponse(Message response) {
+        if (response.isSuccess() && response.getData() instanceof List<?>) {
+            List<Teacher> teachers = (List<Teacher>) response.getData();
+            Platform.runLater(() -> {
+                teacherData.setAll(teachers);
+            });
+        } else {
+            System.err.println("获取所有教师失败: " + response.getMessage());
+        }
+    }
+
+//    /**
+//     * 处理模糊搜索教师的响应
+//     */
+//    public void handleSearchTeachersResponse(Message response) {
+//        if (response.isSuccess() && response.getData() instanceof List<?>) {
+//            List<Teacher> teachers = (List<Teacher>) response.getData();
+//            Platform.runLater(() -> {
+//                teacherData.setAll(teachers);
+//            });
+//        } else {
+//            System.err.println("模糊搜索教师失败: " + response.getMessage());
+//        }
+//    }
+//
+//    /**
+//     * 处理获取单个教师信息的响应
+//     */
+//    public void handleTeacherInfoResponse(Message response) {
+//        if (response.isSuccess() && response.getData() instanceof Teacher teacher) {
+//            Platform.runLater(() -> {
+//                System.out.println("教师详细信息: " + teacher);
+//                // TODO: 如果你有单独的详情面板，可以在这里更新
+//            });
+//        } else {
+//            System.err.println("获取教师信息失败: " + response.getMessage());
+//        }
+//    }
+//
+//    /**
+//     * 处理更新单个教师信息的响应
+//     */
+//    public void handleUpdateTeacherResponse(Message response) {
+//        if (response.isSuccess()) {
+//            System.out.println("教师更新成功");
+//        } else {
+//            System.err.println("教师更新失败: " + response.getMessage());
+//        }
+//    }
+
 }

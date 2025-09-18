@@ -121,4 +121,14 @@ public class StudentAdminService {
             e.printStackTrace();
         }
     }
+
+    public void updateStudents(List<Student> students) {
+        Message message = new Message(ActionType.UPDATE_STUDENTS, students);
+        getGlobalSocketClient().sendMessage(message);
+    }
+
+    public void getAllTeachers() {
+        Message request = new Message(ActionType.ALL_TEACHER, null);
+        socketClient.sendMessage(request);
+    }
 }

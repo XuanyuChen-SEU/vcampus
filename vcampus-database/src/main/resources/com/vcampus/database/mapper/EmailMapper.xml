@@ -53,7 +53,7 @@
 
     <!-- 获取用户的收件箱邮件 -->
     <select id="getInboxEmails" resultMap="EmailResultMap">
-        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
+        SELECT emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE recipientId = #{userId} AND status IN ('SENT', 'READ')
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
@@ -61,7 +61,7 @@
 
     <!-- 获取用户的发件箱邮件 -->
     <select id="getSentEmails" resultMap="EmailResultMap">
-        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
+        SELECT emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE senderId = #{userId} AND status IN ('SENT', 'READ')
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
@@ -69,10 +69,25 @@
 
     <!-- 获取用户的草稿箱邮件 -->
     <select id="getDraftEmails" resultMap="EmailResultMap">
-        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
+        SELECT emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE senderId = #{userId} AND status = 'DRAFT'
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 获取用户收件箱邮件总数 -->
+    <select id="getInboxCount" resultType="int">
+        SELECT COUNT(*) FROM vcampus_db.tb_email WHERE recipientId = #{userId} AND status != 'DRAFT'
+    </select>
+
+    <!-- 获取用户发件箱邮件总数 -->
+    <select id="getSentCount" resultType="int">
+        SELECT COUNT(*) FROM vcampus_db.tb_email WHERE senderId = #{userId} AND status != 'DRAFT'
+    </select>
+
+    <!-- 获取用户草稿箱邮件总数 -->
+    <select id="getDraftCount" resultType="int">
+        SELECT COUNT(*) FROM vcampus_db.tb_email WHERE senderId = #{userId} AND status = 'DRAFT'
     </select>
 
     <!-- 根据状态获取邮件 -->
@@ -85,7 +100,7 @@
 
     <!-- 搜索邮件 -->
     <select id="searchEmails" resultMap="EmailResultMap">
-        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
+        SELECT emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE (senderId = #{userId} OR recipientId = #{userId}) 
         AND subject LIKE CONCAT('%', #{keyword}, '%')
         ORDER BY sendTime DESC 
@@ -113,14 +128,14 @@
 
     <!-- 获取所有邮件（管理员权限） -->
     <select id="getAllEmails" resultMap="EmailResultMap">
-        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
+        SELECT emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
     </select>
 
     <!-- 根据用户ID获取该用户的所有邮件（管理员权限） -->
     <select id="getUserAllEmails" resultMap="EmailResultMap">
-        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
+        SELECT emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE senderId = #{userId} OR recipientId = #{userId}
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
@@ -128,10 +143,27 @@
 
     <!-- 搜索所有邮件（管理员权限） -->
     <select id="searchAllEmails" resultMap="EmailResultMap">
-        SELECT emailId, senderId, recipientId, subject, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
+        SELECT emailId, senderId, recipientId, subject, content, sendTime, status, hasAttachment FROM vcampus_db.tb_email 
         WHERE subject LIKE CONCAT('%', #{keyword}, '%')
         ORDER BY sendTime DESC 
         LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 获取所有邮件总数（管理员权限） -->
+    <select id="getAllEmailsCount" resultType="int">
+        SELECT COUNT(*) FROM vcampus_db.tb_email
+    </select>
+
+    <!-- 获取用户邮件总数（管理员权限） -->
+    <select id="getUserAllEmailsCount" resultType="int">
+        SELECT COUNT(*) FROM vcampus_db.tb_email 
+        WHERE senderId = #{userId} OR recipientId = #{userId}
+    </select>
+
+    <!-- 搜索所有邮件总数（管理员权限） -->
+    <select id="searchAllEmailsCount" resultType="int">
+        SELECT COUNT(*) FROM vcampus_db.tb_email 
+        WHERE subject LIKE CONCAT('%', #{keyword}, '%')
     </select>
 
     <!-- 从CSV文件加载邮件数据 -->

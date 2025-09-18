@@ -6,6 +6,8 @@ import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
 import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.enums.ActionType;
+import com.vcampus.common.dto.Teacher;
+import com.vcampus.common.enums.ActionType;
 
 /**
  * 学生信息服务类
@@ -81,6 +83,12 @@ public class StudentService {
         Message request = new Message(ActionType.REVOKE_APPLICATION, application);
 
         // 发送到服务端，服务端处理更新并返回结果
+        socketClient.sendMessage(request);
+    }
+
+    public void getTeacherById(String userId) {
+        if (socketClient == null) return;
+        Message request = new Message(ActionType.INFO_TEACHER, userId);
         socketClient.sendMessage(request);
     }
 }

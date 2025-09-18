@@ -39,6 +39,10 @@ public enum ActionType {
     UPDATE_APPLICATION_STATUS("更新请假申请状态"),
     INFO_BOOK("获取图书信息"),
     UPDATE_BOOK("更新图书信息"),
+    UPDATE_STUDENTS("批量修改学生学籍状态"),
+    ALL_TEACHER("获取所有教师信息"),
+    // --- 学籍模块 -教师端 ---
+    INFO_TEACHER("获取教师信息"),
 
     // --- 商店模块 - 用户端 ---
     // 商品浏览与搜索
@@ -144,7 +148,7 @@ public enum ActionType {
     LIBRARY_SEARCH_HISTORY   ("搜索借阅历史"),
     LIBRARY_SEARCH_USERS("搜索用户借阅历史"),
 
-    
+
     // --- 邮件系统 - 用户端 ---
     EMAIL_SEND("发送邮件"),                    // 发送邮件
     EMAIL_SAVE_DRAFT("保存草稿"),              // 保存草稿
@@ -156,17 +160,17 @@ public enum ActionType {
     EMAIL_MARK_READ("标记已读"),               // 标记已读
     EMAIL_MARK_UNREAD("标记未读"),             // 标记未读
     EMAIL_SEARCH("搜索邮件"),                  // 搜索邮件
-    EMAIL_GET_UNREAD_COUNT("获取未读数量"),     // 获取未读邮件数量
     EMAIL_BATCH_MARK_READ("批量标记已读"),      // 批量标记已读
     EMAIL_BATCH_DELETE("批量删除邮件"),        // 批量删除邮件
-    
+
     // --- 邮件系统 - 管理员端 ---
     EMAIL_ADMIN_GET_ALL("管理员获取所有邮件"),  // 管理员获取所有邮件
     EMAIL_ADMIN_GET_USER_EMAILS("管理员获取用户邮件"), // 管理员获取指定用户的邮件
     EMAIL_ADMIN_SEARCH_ALL("管理员搜索所有邮件"), // 管理员搜索所有邮件
+    EMAIL_ADMIN_SEARCH_BY_USER("管理员按用户搜索邮件"), // 管理员按用户ID搜索邮件
     EMAIL_ADMIN_DELETE("管理员删除邮件"),       // 管理员删除邮件
     EMAIL_ADMIN_GET_STATISTICS("管理员获取邮件统计"), // 管理员获取邮件统计信息
-    
+
     // === 错误处理 ===
     ERROR("错误"); // 通用错误类型
 

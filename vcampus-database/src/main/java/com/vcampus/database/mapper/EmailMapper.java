@@ -80,6 +80,27 @@ public interface EmailMapper {
                               @Param("limit") int limit);
 
     /**
+     * 获取用户收件箱邮件总数
+     * @param userId 用户ID
+     * @return 收件箱邮件总数
+     */
+    int getInboxCount(@Param("userId") String userId);
+
+    /**
+     * 获取用户发件箱邮件总数
+     * @param userId 用户ID
+     * @return 发件箱邮件总数
+     */
+    int getSentCount(@Param("userId") String userId);
+
+    /**
+     * 获取用户草稿箱邮件总数
+     * @param userId 用户ID
+     * @return 草稿箱邮件总数
+     */
+    int getDraftCount(@Param("userId") String userId);
+
+    /**
      * 根据状态获取邮件
      * @param userId 用户ID
      * @param status 邮件状态
@@ -162,6 +183,26 @@ public interface EmailMapper {
     List<Email> searchAllEmails(@Param("keyword") String keyword, 
                                @Param("offset") int offset, 
                                @Param("limit") int limit);
+
+    /**
+     * 获取所有邮件总数（管理员权限）
+     * @return 邮件总数
+     */
+    int getAllEmailsCount();
+
+    /**
+     * 获取用户邮件总数（管理员权限）
+     * @param userId 用户ID
+     * @return 该用户的邮件总数
+     */
+    int getUserAllEmailsCount(@Param("userId") String userId);
+
+    /**
+     * 搜索所有邮件总数（管理员权限）
+     * @param keyword 搜索关键词
+     * @return 搜索结果总数
+     */
+    int searchAllEmailsCount(@Param("keyword") String keyword);
 
     /**
      * 从CSV文件加载邮件数据

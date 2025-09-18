@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import com.vcampus.client.session.UserSession;
 import com.vcampus.client.service.EmailService;
@@ -31,7 +32,7 @@ import javafx.scene.Parent;
 /**
  * 邮件系统控制器
  * 处理邮件相关的UI交互和网络请求
- * 编写人：AI Assistant
+ * 编写人：谌宣羽
  */
 public class EmailController implements IClientController {
 
@@ -73,15 +74,13 @@ public class EmailController implements IClientController {
     @FXML private Button continueComposeButton;
     @FXML private Button deleteButton;
     @FXML private Button replyButton;
-    
-    // 状态栏
-    @FXML private Label unreadCountLabel;
 
     // ==================== 状态变量 ====================
     
     private String currentTab = "inbox"; // 当前选中的标签页
     private int currentPage = 1;
     private int pageSize = 10;
+    private int totalPages = 1; // 总页数
     private Email selectedEmail = null;
     private ObservableList<Email> emailList = FXCollections.observableArrayList();
     private String currentUserId;
@@ -122,7 +121,6 @@ public class EmailController implements IClientController {
         
         // 加载初始数据
         loadEmails();
-        updateUnreadCount();
     }
 
     /**
@@ -361,7 +359,6 @@ public class EmailController implements IClientController {
     @FXML
     private void handleRefresh(ActionEvent event) {
         loadEmails();
-        updateUnreadCount();
     }
 
     @FXML
@@ -471,13 +468,6 @@ public class EmailController implements IClientController {
      */
     private void deleteEmail(String emailId) {
         emailService.deleteEmail(emailId, currentUserId);
-    }
-
-    /**
-     * 更新未读邮件数量
-     */
-    private void updateUnreadCount() {
-        emailService.getUnreadCount(currentUserId);
     }
 
     // ==================== UI 更新方法 ====================
@@ -590,11 +580,11 @@ public class EmailController implements IClientController {
      * 更新分页信息
      */
     private void updatePageInfo() {
-        pageInfoLabel.setText("第 " + currentPage + " 页");
+        pageInfoLabel.setText(String.format("第 %d 页，共 %d 页", currentPage, totalPages));
         
         // 更新分页按钮状态
         prevPageButton.setDisable(currentPage <= 1);
-        nextPageButton.setDisable(emailList.size() < pageSize);
+        nextPageButton.setDisable(currentPage >= totalPages);
     }
 
     // ==================== 服务端响应处理 ====================
@@ -629,12 +619,23 @@ public class EmailController implements IClientController {
                 case EMAIL_GET_DRAFT:
                 case EMAIL_SEARCH:
                     if (message.isSuccess()) {
-                        List<Email> emails = emailService.handleEmailListResponse(message);
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> responseData = (Map<String, Object>) message.getData();
+                        
+                        @SuppressWarnings("unchecked")
+                        List<Email> emails = (List<Email>) responseData.get("emails");
+                        int totalCount = (Integer) responseData.get("totalCount");
+                        int serverTotalPages = (Integer) responseData.get("totalPages");
+                        
                         if (emails != null) {
                             emailList.clear();
                             emailList.addAll(emails);
                             emailTable.setItems(emailList);
+                            
+                            // 使用服务器返回的总页数
+                            totalPages = serverTotalPages;
                             updatePageInfo();
+                            
                             // 更新表格行样式
                             Platform.runLater(() -> updateTableRowStyles());
                         }
@@ -667,7 +668,6 @@ public class EmailController implements IClientController {
                 case EMAIL_MARK_UNREAD:
                     if (message.isSuccess()) {
                         loadEmails();
-                        updateUnreadCount();
                         // 如果当前有选中的邮件，重新获取其详情以更新按钮状态
                         if (selectedEmail != null) {
                             emailService.readEmail(selectedEmail.getEmailId(), currentUserId);
@@ -677,18 +677,10 @@ public class EmailController implements IClientController {
                     }
                     break;
                     
-                case EMAIL_GET_UNREAD_COUNT:
-                    if (message.isSuccess()) {
-                        String count = (String) message.getData();
-                        unreadCountLabel.setText("未读邮件: " + count);
-                    }
-                    break;
-                    
                 case EMAIL_BATCH_MARK_READ:
                 case EMAIL_BATCH_DELETE:
                     if (message.isSuccess()) {
                         loadEmails();
-                        updateUnreadCount();
                     } else {
                         showAlert("错误", "批量操作失败: " + message.getMessage());
                     }

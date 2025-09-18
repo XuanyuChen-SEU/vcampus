@@ -6,13 +6,7 @@ import java.util.Map;
 
 import com.vcampus.common.dto.User;
 
-public interface   UserMapper {
-
-//    // 创建用户表（示例表）
-//    void createUserTable();
-//    // 删除用户表
-//    void dropUserTable(String dbName);
-//    // 插入用户数据
+public interface UserMapper {
 
     void loadUsersFromCsv(String filePath);
 

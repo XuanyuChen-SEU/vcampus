@@ -30,9 +30,8 @@
     <!-- 学籍状态调整按钮 -->
     <!-- 学籍状态调整按钮 -->
     <HBox spacing="10" alignment="CENTER">
-        <Button fx:id="btnSelectAll" text="全选"/>
-        <Button fx:id="btnAdjustStatus" text="调整学籍状态" styleClass="action-button"/>
         <Button fx:id="btnStudentList" text="学生列表" styleClass="action-button"/>
+        <Button fx:id="btnTeacherList" text="教师列表" styleClass="action-button"/>
         <Button fx:id="btnApplicationList" text="申请列表" styleClass="action-button"/>
         <Button fx:id="btnRefreshList" text="刷新" styleClass="action-button"/>
     </HBox>
@@ -63,6 +62,21 @@
                 </columns>
             </TableView>
 
+            <TableView fx:id="teacherTable" styleClass="data-table" visible="false">
+                <columns>
+                    <TableColumn fx:id="colTeacherUserId" text="工号" prefWidth="100"/>
+                    <TableColumn fx:id="colTeacherName" text="姓名" prefWidth="100"/>
+                    <TableColumn fx:id="colTeacherGender" text="性别" prefWidth="60"/>
+                    <TableColumn fx:id="colTeacherCollege" text="学院" prefWidth="150"/>
+                    <TableColumn fx:id="colTeacherDepartment" text="部门" prefWidth="150"/>
+                    <TableColumn fx:id="colTeacherTitle" text="职称" prefWidth="100"/>
+                    <TableColumn fx:id="colTeacherPhone" text="电话" prefWidth="120"/>
+                    <TableColumn fx:id="colTeacherEmail" text="邮箱" prefWidth="150"/>
+                    <TableColumn fx:id="colTeacherOffice" text="办公室" prefWidth="120"/>
+                    <TableColumn fx:id="colTeacherAction" text="操作" prefWidth="150"/>
+                </columns>
+            </TableView>
+
             <!-- 申请信息表格 -->
             <TableView fx:id="applicationTable" styleClass="data-table" visible="false">
                 <columns>
@@ -75,6 +89,12 @@
             </TableView>
         </children>
     </StackPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Region HBox.hgrow="ALWAYS"/> <!-- 占位，将按钮推到右边 -->
+        <Button fx:id="btnSelectAll" text="全选" styleClass="all-button"/>
+        <Button fx:id="btnAdjustStatus" text="调整学籍状态" styleClass="status-button"/>
+    </HBox>
 
 
 </VBox>

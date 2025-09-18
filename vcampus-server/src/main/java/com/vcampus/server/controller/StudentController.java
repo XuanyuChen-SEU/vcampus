@@ -3,10 +3,13 @@ package com.vcampus.server.controller;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
 import com.vcampus.common.dto.StudentLeaveApplication;
+import com.vcampus.common.dto.Teacher;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.dao.impl.StudentLeaveApplicationDao;
 import com.vcampus.server.service.StudentAdminService;
 import com.vcampus.server.service.StudentService;
+
+import java.util.List;
 
 /**
  * 服务端 学生控制器
@@ -137,6 +140,23 @@ public class StudentController {
                     null,
                     false,
                     "服务器处理异常: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 教师信息查询
+     */
+    public Message handleInfoTeacher(Message request) {
+        Object data = request.getData();
+        if (!(data instanceof String teacherId) || teacherId.isBlank()) {
+            return Message.failure(ActionType.INFO_TEACHER, "参数错误，应为非空 teacherId(String)");
+        }
+
+        Teacher teacher = studentService.getTeacherById(teacherId);
+        if (teacher != null) {
+            return Message.success(ActionType.INFO_TEACHER, teacher, "教师信息查询成功");
+        } else {
+            return Message.failure(ActionType.INFO_TEACHER, "未找到教师信息");
         }
     }
 

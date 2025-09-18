@@ -112,6 +112,33 @@ public class EmailService {
     }
 
     /**
+     * 获取用户收件箱总数
+     * @param userId 用户ID
+     * @return 收件箱邮件总数
+     */
+    public int getInboxCount(String userId) {
+        return emailDao.getInboxCount(userId);
+    }
+
+    /**
+     * 获取用户发件箱总数
+     * @param userId 用户ID
+     * @return 发件箱邮件总数
+     */
+    public int getSentCount(String userId) {
+        return emailDao.getSentCount(userId);
+    }
+
+    /**
+     * 获取用户草稿箱总数
+     * @param userId 用户ID
+     * @return 草稿箱邮件总数
+     */
+    public int getDraftCount(String userId) {
+        return emailDao.getDraftCount(userId);
+    }
+
+    /**
      * 阅读邮件（不自动标记为已读）
      * @param emailId 邮件ID
      * @param userId 用户ID
@@ -151,15 +178,6 @@ public class EmailService {
      */
     public List<Email> searchEmails(String userId, String keyword, int page, int pageSize) {
         return emailDao.searchEmails(userId, keyword, page, pageSize);
-    }
-
-    /**
-     * 获取未读邮件数量
-     * @param userId 用户ID
-     * @return 未读邮件数量
-     */
-    public int getUnreadCount(String userId) {
-        return emailDao.getUnreadEmailCount(userId);
     }
 
     /**
@@ -254,6 +272,32 @@ public class EmailService {
      */
     public List<Email> searchAllEmails(String keyword, int page, int pageSize) {
         return emailDao.searchAllEmails(keyword, page, pageSize);
+    }
+
+    /**
+     * 获取所有邮件总数（管理员权限）
+     * @return 邮件总数
+     */
+    public int getAllEmailsCount() {
+        return emailDao.getAllEmailsCount();
+    }
+
+    /**
+     * 获取用户邮件总数（管理员权限）
+     * @param userId 用户ID
+     * @return 该用户的邮件总数
+     */
+    public int getUserAllEmailsCount(String userId) {
+        return emailDao.getUserAllEmailsCount(userId);
+    }
+
+    /**
+     * 搜索所有邮件总数（管理员权限）
+     * @param keyword 搜索关键词
+     * @return 搜索结果总数
+     */
+    public int searchAllEmailsCount(String keyword) {
+        return emailDao.searchAllEmailsCount(keyword);
     }
 
     /**
