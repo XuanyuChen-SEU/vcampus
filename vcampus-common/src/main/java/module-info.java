@@ -8,7 +8,8 @@ module vcampus.common {
     requires com.google.gson;
     requires java.sql;
     requires javafx.base;
-    
+    requires org.mybatis;
+
     // 为Gson反射访问开放包
     opens com.vcampus.common.dto to com.google.gson;
 }

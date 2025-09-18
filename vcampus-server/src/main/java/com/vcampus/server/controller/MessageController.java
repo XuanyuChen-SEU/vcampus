@@ -86,10 +86,18 @@ public class MessageController {
                     return studentadminController.getStudentById(request);
                 case UPDATE_STUDENT_ADMIN:
                     return studentadminController.updateStudent(request);
+                case UPDATE_STUDENTS:
+                    return studentadminController.updateStudents(request);
                 case GET_ALL_APPLICATIONS:
                     return studentadminController.getAllApplications(request);
                 case UPDATE_APPLICATION_STATUS:
                     return studentadminController.updateApplicationStatus(request);
+                case ALL_TEACHER:
+                    return studentadminController.getAllTeachers(request);
+
+                // --- 教师相关 ---
+                case INFO_TEACHER:
+                    return studentController.handleInfoTeacher(request);
                 // --- 课程相关 ---
 
                 // --- 课程相关 ---调用服务端的controller层相关逻辑部分

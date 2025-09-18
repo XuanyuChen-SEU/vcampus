@@ -9,18 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.vcampus.database.mapper.*;
 import org.apache.ibatis.session.SqlSession;
 
-import com.vcampus.database.mapper.ClassSessionMapper;
-import com.vcampus.database.mapper.CourseMapper;
-import com.vcampus.database.mapper.CourseSelectionMapper;
-import com.vcampus.database.mapper.LibraryMapper;
-import com.vcampus.database.mapper.Mapper;
-import com.vcampus.database.mapper.PasswordResetApplicationMapper;
-import com.vcampus.database.mapper.ShopMapper;
-import com.vcampus.database.mapper.StudentMapper;
-import com.vcampus.database.mapper.StudentLeaveApplicationMapper;
-import com.vcampus.database.mapper.UserMapper;
 import com.vcampus.database.utils.MyBatisUtil;
 
 public class DBService {
@@ -38,6 +29,7 @@ public class DBService {
         File userCsvTempFile = null;
         File studentCsvTempFile = null;
         File studentLeaveApplicationCsvTempFile = null;
+        File teacherCsvTempFile = null;
         File bookCsvTempFile = null;
         File borrowLogCsvTempFile = null;
         File passwordResetApplicationCsvTempFile = null;
@@ -60,10 +52,12 @@ public class DBService {
             System.out.println("成功删除数据库: " + dbName);
             mapper.createDatabase(dbName);
             System.out.println("成功创建数据库: " + dbName);
+            mapper.useDatabase(dbName);
 
             mapper.createUserTable();
             mapper.createStudentTable();
             mapper.createStudentLeaveApplicationTable();
+            mapper.createTeacherTable();
             mapper.createPasswordResetApplicationTable();
             mapper.createProductTable();
             mapper.createOrderTable();
@@ -80,6 +74,7 @@ public class DBService {
 
             String userCSVPath = "db/tb_user.csv";
             String studentCSVPath = "db/tb_student.csv";
+            String teacherCSVPath = "db/tb_teacher.csv";
             String studentLeaveApplicationCSVPath = "db/tb_student_leave_application.csv";
             String BookCSVPath = "db/tb_book.csv";
             String BorrowLogCSVPath = "db/tb_borrow_log.csv";
@@ -101,6 +96,7 @@ public class DBService {
             userCsvTempFile = createTempFileFromResource(userCSVPath, tempDirectory.toFile());
             studentCsvTempFile = createTempFileFromResource(studentCSVPath, tempDirectory.toFile());
             studentLeaveApplicationCsvTempFile = createTempFileFromResource(studentLeaveApplicationCSVPath, tempDirectory.toFile());
+            teacherCsvTempFile = createTempFileFromResource(teacherCSVPath, tempDirectory.toFile());
             bookCsvTempFile = createTempFileFromResource(BookCSVPath, tempDirectory.toFile());
             borrowLogCsvTempFile = createTempFileFromResource(BorrowLogCSVPath, tempDirectory.toFile());
             passwordResetApplicationCsvTempFile = createTempFileFromResource(passwordResetApplicationCSVPath,tempDirectory.toFile());
@@ -116,6 +112,7 @@ public class DBService {
             String userPath = userCsvTempFile.getCanonicalPath().replace('\\', '/');
             String studentPath = studentCsvTempFile.getCanonicalPath().replace('\\', '/');
             String studentLeaveApplicationPath = studentLeaveApplicationCsvTempFile.getAbsolutePath();
+            String teacherPath = teacherCsvTempFile.getCanonicalPath().replace('\\', '/');
             String bookPath = bookCsvTempFile.getCanonicalPath().replace('\\', '/');
             String borrowLogPath = borrowLogCsvTempFile.getCanonicalPath().replace('\\', '/');
             String passwordResetApplicationPath = passwordResetApplicationCsvTempFile.getAbsolutePath();
@@ -130,6 +127,7 @@ public class DBService {
             System.out.println("正在从临时文件加载: " + userPath);
             System.out.println("正在从临时文件加载: " + studentPath);
             System.out.println("正在从临时文件加载: " + studentLeaveApplicationPath);
+            System.out.println("正在从临时文件加载教师数据: " + teacherPath);
             System.out.println("正在从临时文件加载: " + passwordResetApplicationPath);
             System.out.println("正在从临时文件加载: " + productPath);
             System.out.println("正在从临时文件加载: " + orderPath);
@@ -144,6 +142,7 @@ public class DBService {
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
             StudentLeaveApplicationMapper studentLeaveApplicationMapper = sqlSession.getMapper(StudentLeaveApplicationMapper.class);
+            TeacherMapper teacherMapper = sqlSession.getMapper(TeacherMapper.class);
             LibraryMapper libraryMapper = sqlSession.getMapper(LibraryMapper.class);
             PasswordResetApplicationMapper passwordResetApplicationMapper = sqlSession.getMapper(PasswordResetApplicationMapper.class);
             ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
@@ -154,6 +153,7 @@ public class DBService {
             userMapper.loadUsersFromCsv(userPath);
             studentMapper.loadStudentsFromCsv(studentPath);
             studentLeaveApplicationMapper.loadStudentLeaveApplicationsFromCsv(studentLeaveApplicationPath);
+            teacherMapper.loadTeachersFromCsv(teacherPath);
             libraryMapper.loadBooksFromCsv(bookPath);
             libraryMapper.loadBorrowLogsFromCsv(borrowLogPath);
             passwordResetApplicationMapper.loadPasswordResetApplicationsFromCsv(passwordResetApplicationPath);
@@ -243,7 +243,6 @@ public class DBService {
      * @throws IOException 如果资源找不到或文件写入失败
      */
     private File createTempFileFromResource(String resourcePath, File directory) throws IOException {
-        // ★ 修改点 2: 确保目标目录存在
         if (!directory.exists()) {
             if (!directory.mkdirs()) {
                 throw new IOException("无法创建临时目录: " + directory.getAbsolutePath());
@@ -255,7 +254,6 @@ public class DBService {
             throw new IOException("在 classpath 中找不到资源文件: " + resourcePath);
         }
 
-        // ★ 修改点 3: 使用指定目录的 createTempFile 方法
         // 从资源路径中提取文件名作为参考
         String fileName = new File(resourcePath).getName();
         String prefix = fileName.substring(0, fileName.lastIndexOf('.'));

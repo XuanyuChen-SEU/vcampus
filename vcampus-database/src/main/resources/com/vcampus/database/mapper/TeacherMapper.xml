@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vcampus.database.mapper.TeacherMapper">
+
+    <!-- 获取所有教师信息 -->
+    <select id="getAllTeachers" resultType="com.vcampus.common.dto.Teacher">
+        SELECT userId,
+        name,
+        gender,
+        college,
+        department,
+        title,
+        phone,
+        email,
+        office
+        FROM teacher
+    </select>
+
+    <!-- 通过 userId 获取教师信息 -->
+    <select id="getTeacherByUserId" parameterType="string" resultType="com.vcampus.common.dto.Teacher">
+        SELECT userId,
+        name,
+        gender,
+        college,
+        department,
+        title,
+        phone,
+        email,
+        office
+        FROM teacher
+        WHERE userId = #{userId}
+    </select>
+
+    <!-- 修改教师信息 -->
+    <update id="updateTeacher" parameterType="com.vcampus.common.dto.Teacher">
+        UPDATE teacher
+        SET name = #{name},
+        gender = #{gender},
+        college=#{college},
+        department = #{department},
+        title = #{title},
+        phone = #{phone},
+        email = #{email},
+        office = #{office}
+        WHERE userId = #{userId}
+    </update>
+
+    <!-- 通过院系、职称筛选教师 -->
+    <select id="getTeachersByDeptAndTitle" resultType="com.vcampus.common.dto.Teacher">
+        SELECT userId,
+        name,
+        gender,
+        college,
+        department,
+        title,
+        phone,
+        email,
+        office
+        FROM teacher
+        WHERE 1=1
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        <if test="title != null and title != ''">
+            AND title = #{title}
+        </if>
+    </select>
+
+    <!-- 直接从 CSV 文件加载教师数据 -->
+    <update id="loadTeachersFromCsv">
+        LOAD DATA LOCAL INFILE '${filePath}'
+        INTO TABLE teacher
+        FIELDS TERMINATED BY ','
+        OPTIONALLY ENCLOSED BY '"'
+        LINES TERMINATED BY '\n'
+        IGNORE 1 LINES
+        (userId, name,gender,college, department, title, phone, email, office)
+    </update>
+
+</mapper>

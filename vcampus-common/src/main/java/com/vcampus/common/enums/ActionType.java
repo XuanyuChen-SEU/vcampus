@@ -29,6 +29,10 @@ public enum ActionType {
     UPDATE_BOOK("更新图书信息"),
     GET_ALL_APPLICATIONS("获取所有的申请"),
     UPDATE_APPLICATION_STATUS("更新申请状态"),
+    UPDATE_STUDENTS("批量修改学生学籍状态"),
+    ALL_TEACHER("获取所有教师信息"),
+    // --- 学籍模块 -教师端 ---
+    INFO_TEACHER("获取教师信息"),
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
     DELETE_USER("删除用户"),                   // 删除用户

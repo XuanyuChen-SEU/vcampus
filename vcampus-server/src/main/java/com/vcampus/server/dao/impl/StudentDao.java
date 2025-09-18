@@ -94,4 +94,12 @@ public class StudentDao implements IStudentDao{
         }
     }
 
+    @Override
+    public void updateStudents(List<Student> students) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            StudentMapper mapper = sqlSession.getMapper(StudentMapper.class);
+            mapper.updateStudents(students);
+            sqlSession.commit();
+        }
+    }
 }
