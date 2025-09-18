@@ -100,7 +100,7 @@
               author LIKE CONCAT('%', #{keyword}, '%') OR
               isbn LIKE CONCAT('%', #{keyword}, '%') OR
               publisher LIKE CONCAT('%', #{keyword}, '%') OR
-              description LIKE CONCAT('%', #{keyword}, '%');
+              description LIKE CONCAT('%', #{keyword}, '%') OR
               borrow_status LIKE CONCAT('%', #{keyword}, '%');
     </select>
 

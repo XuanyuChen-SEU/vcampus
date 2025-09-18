@@ -206,6 +206,7 @@ public class MessageController {
                 case LIBRARY_RETURN_BOOK:
                 case LIBRARY_GET_BOOK_PDF:
                 case LIBRARY_CREATE_BORROW_LOG:
+                case LIBRARY_UPDATE_BORROW_LOG:
                     return libraryController.dispatch(request);
 
                 case SHOP_CREATE_ORDER:
