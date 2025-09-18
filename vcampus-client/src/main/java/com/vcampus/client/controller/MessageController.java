@@ -1,5 +1,6 @@
 package com.vcampus.client.controller;
 
+import com.vcampus.client.controller.courseAdmin.CourseAdminController;
 import com.vcampus.client.controller.libraryAdmin.BookCreateViewController;
 import com.vcampus.client.controller.libraryAdmin.BookListViewController;
 import com.vcampus.client.controller.libraryAdmin.BorrowLogCreateController;
@@ -13,8 +14,7 @@ import com.vcampus.client.controller.userAdmin.ForgetPasswordTableViewController
 import com.vcampus.client.controller.userAdmin.UserCreateViewController;
 import com.vcampus.client.controller.userAdmin.UserListViewController;
 import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
-import com.vcampus.common.dto.Message;
-import com.vcampus.client.controller.courseAdmin.CourseAdminController; // 确保导入
+import com.vcampus.common.dto.Message; // 确保导入
 
 /**
  * 客户端消息控制器
@@ -41,10 +41,19 @@ public class MessageController {
     private FavoriteManagementViewController favoriteManagementViewController;
     private MyTimetableController myTimetableController; // ⭐ 新增
     private CourseAdminController courseAdminController;
+
     private BookListViewController bookListViewController;
     private BookCreateViewController bookCreateViewController;
     private BorrowLogListViewController borrowLogListViewController;
     private BorrowLogCreateController borrowLogCreateController; // 【新增】引用
+    
+    // 邮件系统控制器
+    private EmailController emailController;
+    private ComposeEmailController composeEmailController;
+    private EmailAdminViewController emailAdminViewController;
+    
+    // 教师端标识
+    private boolean isTeacherMode = false;
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -136,6 +145,21 @@ public class MessageController {
     // 【新增】注册 BorrowLogCreateController 的方法
     public void setBorrowLogCreateController(BorrowLogCreateController controller) {
         this.borrowLogCreateController = controller;
+    }
+    
+    // 【新增】注册 EmailController 的方法
+    public void setEmailController(EmailController controller) {
+        this.emailController = controller;
+    }
+    
+    // 【新增】注册 EmailAdminViewController 的方法
+    public void setEmailAdminViewController(EmailAdminViewController controller) {
+        this.emailAdminViewController = controller;
+    }
+    
+    // 【新增】注册 ComposeEmailController 的方法
+    public void setComposeEmailController(ComposeEmailController controller) {
+        this.composeEmailController = controller;
     }
 
 
@@ -389,6 +413,31 @@ public class MessageController {
                         System.err.println("路由警告：收到取消收藏响应，但ShopController未注册。");
                     }
                     break;
+                case SHOP_GET_BALANCE:
+                    if (shopController != null) {
+                        // 当收到获取余额的响应时，调用 ShopController 中对应的处理方法
+                        shopController.handleGetBalanceResponse(message);
+                    } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
+                        System.err.println("路由警告：收到获取余额响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_RECHARGE:
+                    if (shopController != null) {
+                        // 当收到充值的响应时，调用 ShopController 中对应的处理方法
+                        shopController.handleRechargeResponse(message);
+                    } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
+                        System.err.println("路由警告：收到充值响应，但ShopController未注册。");
+                    }
+                    break;
+                case SHOP_PAY_FOR_ORDER:
+                    if(shopController!=null){
+                        shopController.handleGetBalanceResponse(message);
+                    }else{
+                        System.err.println("路由警告：收到余额更新响应，但ShopController未注册.");
+                    }
 
 
                 // 商店管理员相关响应处理
@@ -581,8 +630,6 @@ public class MessageController {
 
 
 
-                default:
-                    System.out.println("未处理的消息类型: " + message.getAction());
                 case LIBRARY_ADD_BOOK:
                     // 【修改】将 ADD_BOOK 的响应路由给 BookCreateViewController
                     if (bookCreateViewController != null) {
@@ -623,6 +670,76 @@ public class MessageController {
                         System.err.println("路由警告：收到创建借阅记录响应，但BorrowLogCreateController未注册。");
                     }
                     break;
+                
+                // --- 邮件系统模块 ---
+                case EMAIL_SEND:
+                case EMAIL_SAVE_DRAFT:
+                    // 发送和保存草稿的响应由ComposeEmailController处理
+                    if (composeEmailController != null) {
+                        composeEmailController.handleEmailResponse(message);
+                    } else if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("ComposeEmailController和EmailController都未设置，无法处理邮件响应");
+                    }
+                    break;
+                    
+                case EMAIL_GET_INBOX:
+                case EMAIL_GET_SENT:
+                case EMAIL_GET_DRAFT:
+                case EMAIL_READ:
+                case EMAIL_DELETE:
+                case EMAIL_MARK_READ:
+                case EMAIL_MARK_UNREAD:
+                case EMAIL_SEARCH:
+                case EMAIL_BATCH_MARK_READ:
+                case EMAIL_BATCH_DELETE:
+                    if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("EmailController未设置，无法处理邮件响应");
+                    }
+                    break;
+                    
+                // 邮件管理员相关响应
+                case EMAIL_ADMIN_GET_ALL:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleGetAllEmailsResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理获取所有邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_SEARCH_ALL:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleSearchEmailsResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理搜索邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_SEARCH_BY_USER:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleSearchEmailsByUserResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理用户搜索邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_GET_USER_EMAILS:
+                    if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("EmailController未设置，无法处理邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_DELETE:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleDeleteEmailResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理删除邮件响应");
+                    }
+                    break;
+                    
+                default:
+                    System.out.println("未处理的消息类型: " + message.getAction());
             }
             
         } catch (Exception e) {

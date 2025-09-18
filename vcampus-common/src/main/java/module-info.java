@@ -3,6 +3,7 @@ module vcampus.common {
     exports com.vcampus.common.dto;
     exports com.vcampus.common.enums;
     exports com.vcampus.common.dao;
+    exports com.vcampus.common.entity;
     
     // 声明依赖
     requires com.google.gson;

@@ -27,4 +27,6 @@ public interface Mapper {
     void createCourseSelectionsTable();
 
     void useDatabase(String dbName);
+    //邮件模块
+    void createEmailTable();
 }

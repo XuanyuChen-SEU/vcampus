@@ -164,4 +164,20 @@ public interface ShopMapper {
      * @return 如果更新成功，返回 true；否则返回 false
      */
     boolean updateBalance(Balance balance);
+    
+    /*
+     * 创建余额记录
+     * @param balance 包含用户ID和初始余额的余额对象
+     * @return 如果创建成功，返回 true；否则返回 false
+     */
+    boolean createBalance(Balance balance);
+    
+    /*
+     * 根据用户ID删除余额记录
+     * @param userId 用户ID
+     * @return 如果删除成功，返回 true；否则返回 false
+     */
+    boolean deleteBalanceByUserId(String userId);
+    
+    boolean updateOrder(ShopTransaction order);
 }

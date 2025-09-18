@@ -233,4 +233,16 @@ public class ShopDao implements IShopDao {
             return false;
         }
     }
+    @Override
+    public boolean updateOrder(ShopTransaction order) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
+            boolean result = shopMapper.updateOrder(order);
+            sqlSession.commit();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

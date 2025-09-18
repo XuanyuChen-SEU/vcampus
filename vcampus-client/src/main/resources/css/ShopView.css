@@ -1,0 +1,128 @@
+/* 基础背景样式 (保持不变) */
+.background {
+    -fx-background-color: #E3F2FD;
+}
+
+/* 【已修改】顶部工具栏的样式，改为直角矩形 */
+.glass-panel {
+    -fx-background-color: #bbd7ff; /* 应用您指定的颜色 */
+    -fx-background-radius: 0;      /* 关键：移除圆角 */
+    -fx-effect: null;              /* 关键：移除阴影效果 */
+    /* 新增一个底部边框来模仿示例中的分隔线 */
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: #a0c0e0; /* 一个比背景稍暗的边框色，用于分割 */
+}
+
+/* 搜索框样式 (保持不变) */
+.search-box {
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-color: #CCCCCC;
+    -fx-padding: 5px 15px;
+    -fx-font-size: 14px;
+}
+
+/* 中间内容区域透明化处理 */
+.scroll-pane, .scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
+
+/* 核心按钮样式 */
+.action-button {
+    -fx-background-color: #4FC3F7;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 15px;
+    -fx-cursor: hand;
+    -fx-transition: -fx-background-color 0.3s;
+}
+
+.action-button:hover {
+    -fx-background-color: #29B6F6;
+}
+
+.icon {
+    -fx-fill: white;
+}
+
+.recharge-button {
+    -fx-background-color: #FFB74D;
+}
+.recharge-button:hover {
+    -fx-background-color: #FFA726;
+}
+
+
+/* ======================================================= */
+/* ===== 【最终颜色版】订单表格 (Order Table) 的所有样式 ===== */
+/* ======================================================= */
+
+.order-table {
+   -fx-background-color: transparent;
+   -fx-padding: 0;
+   -fx-fixed-cell-size: 60;
+}
+
+/* 【已修改】将表头背景色改为更深的蓝色 */
+.order-table .column-header-background {
+    -fx-background-color: #8cb8ff;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-background-insets: 0 0 0 0;
+}
+
+.order-table .column-header {
+    -fx-pref-height: 60px;
+}
+
+/* 【已修改】将表头文字改为白色，以适配新的深蓝背景 */
+.order-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+    -fx-font-size: 16px;
+}
+
+/* 单元格的基础样式 (保持不变) */
+.order-table .table-cell {
+    -fx-border-color: transparent;
+    -fx-alignment: CENTER;
+    -fx-font-size: 16px;
+}
+
+/* --- 基于状态的整行背景颜色 (保持不变) --- */
+.row-paid .table-cell {
+    -fx-background-color: #E8F5E9;
+}
+.row-unpaid .table-cell {
+    -fx-background-color: #FFF3E0;
+}
+.row-cancelled .table-cell {
+    -fx-background-color: #FFEBEE;
+}
+
+/* --- 鼠标悬停在不同状态行上的效果 (保持不变) --- */
+.row-paid:hover .table-cell {
+    -fx-background-color: #C8E6C9;
+}
+.row-unpaid:hover .table-cell {
+    -fx-background-color: #FFE0B2;
+}
+.row-cancelled:hover .table-cell {
+    -fx-background-color: #FFCDD2;
+}
+
+
+/* --- 订单状态文字样式 (保持不变) --- */
+.status-paid {
+    -fx-font-weight: bold;
+    -fx-fill: #2E7D32;
+}
+.status-unpaid {
+    -fx-font-weight: bold;
+    -fx-fill: #E65100;
+}
+.status-cancelled {
+    -fx-font-weight: bold;
+    -fx-fill: #C62828;
+}

@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 /**
  * 客户端主应用程序类
  * JavaFX应用程序的入口点
- * 编写人：cursorcursor
  */
 public class MainApp extends Application {//继承自Application类
 

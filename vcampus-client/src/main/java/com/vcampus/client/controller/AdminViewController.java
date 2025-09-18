@@ -100,6 +100,9 @@ public class AdminViewController {
                 case "7": // 商店管理员
                     contentPath = "/fxml/admin/ShopAdminView.fxml";
                     break;
+                case "8": // 邮件管理员
+                    contentPath = "/fxml/admin/EmailAdminView.fxml";
+                    break;
                 default: // 默认管理员
                     contentPath = "/fxml/admin/UserAdminView.fxml";
                     break;

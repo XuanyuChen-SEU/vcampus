@@ -12,6 +12,17 @@ import java.nio.file.Paths;
 import com.vcampus.database.mapper.*;
 import org.apache.ibatis.session.SqlSession;
 
+import com.vcampus.database.mapper.ClassSessionMapper;
+import com.vcampus.database.mapper.CourseMapper;
+import com.vcampus.database.mapper.CourseSelectionMapper;
+import com.vcampus.database.mapper.EmailMapper;
+import com.vcampus.database.mapper.LibraryMapper;
+import com.vcampus.database.mapper.Mapper;
+import com.vcampus.database.mapper.PasswordResetApplicationMapper;
+import com.vcampus.database.mapper.ShopMapper;
+import com.vcampus.database.mapper.StudentLeaveApplicationMapper;
+import com.vcampus.database.mapper.StudentMapper;
+import com.vcampus.database.mapper.UserMapper;
 import com.vcampus.database.utils.MyBatisUtil;
 
 public class DBService {
@@ -40,6 +51,7 @@ public class DBService {
         File courseCsvTempFile = null;
         File courseSelectionCsvTempFile = null;
         File classSessionCsvTempFile = null;
+        File emailCsvTempFile = null;
 
         try {
             MyBatisUtil myBatisUtil = new MyBatisUtil();
@@ -68,6 +80,7 @@ public class DBService {
             mapper.createCourseSelectionsTable();
             mapper.createBookTable();
             mapper.createBorrowLogTable();
+            mapper.createEmailTable();
 
             System.out.println("成功在数据库 " + dbName + " 中创建表结构。");
             System.out.println("准备从CSV文件加载数据...");
@@ -86,6 +99,7 @@ public class DBService {
             String CourseCSVPath = "db/tb_courses.csv";
             String ClassSessionCSVPath = "db/tb_class_sessions.csv";
             String CourseSelectionCSVPath = "db/tb_course_selections.csv";
+            String EmailCSVPath = "db/tb_email.csv";
 
             // ★ 修改点 1: 指定临时文件存放的目录
             // 在当前程序运行目录下创建一个名为 "temp_csv" 的子目录
@@ -107,6 +121,7 @@ public class DBService {
             courseCsvTempFile = createTempFileFromResource(CourseCSVPath,tempDirectory.toFile());
             classSessionCsvTempFile = createTempFileFromResource(ClassSessionCSVPath,tempDirectory.toFile());
             courseSelectionCsvTempFile = createTempFileFromResource(CourseSelectionCSVPath,tempDirectory.toFile());
+            emailCsvTempFile = createTempFileFromResource(EmailCSVPath,tempDirectory.toFile());
 
             // getAbsolutePath() 在某些系统上可能包含'..'，改用 getCanonicalPath() 获取更规范的路径
             String userPath = userCsvTempFile.getCanonicalPath().replace('\\', '/');
@@ -123,6 +138,7 @@ public class DBService {
             String coursePath = courseCsvTempFile.getAbsolutePath();
             String classSessionPath = classSessionCsvTempFile.getAbsolutePath();
             String courseSelectionPath = courseSelectionCsvTempFile.getAbsolutePath();
+            String emailPath = emailCsvTempFile.getCanonicalPath().replace('\\', '/');
 
             System.out.println("正在从临时文件加载: " + userPath);
             System.out.println("正在从临时文件加载: " + studentPath);
@@ -138,6 +154,7 @@ public class DBService {
             System.out.println("正在从临时文件加载: " + classSessionPath);
             System.out.println("正在从临时文件加载: " + bookPath);
             System.out.println("正在从临时文件加载: " + borrowLogPath);
+            System.out.println("正在从临时文件加载: " + emailPath);
 
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
@@ -149,6 +166,7 @@ public class DBService {
             CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
             ClassSessionMapper classSessionMapper = sqlSession.getMapper(ClassSessionMapper.class);
             CourseSelectionMapper courseSelectionMapper = sqlSession.getMapper(CourseSelectionMapper.class);
+            EmailMapper emailMapper = sqlSession.getMapper(EmailMapper.class);
 
             userMapper.loadUsersFromCsv(userPath);
             studentMapper.loadStudentsFromCsv(studentPath);
@@ -164,6 +182,7 @@ public class DBService {
             courseMapper.loadCoursesFromCsv(coursePath);
             classSessionMapper.loadClassSessionsFromCsv(classSessionPath);
             courseSelectionMapper.loadCourseSelectionsFromCsv(courseSelectionPath);
+            emailMapper.loadEmailsFromCsv(emailPath);
             sqlSession.commit(); // 提交事务
 
             System.out.println("CSV数据批量加载成功！");
@@ -227,7 +246,10 @@ public class DBService {
             }
             if (classSessionCsvTempFile != null && classSessionCsvTempFile.exists()) {
                 classSessionCsvTempFile.delete();
-                }
+            }
+            if (emailCsvTempFile != null && emailCsvTempFile.exists()) {
+                emailCsvTempFile.delete();
+            }
             if (sqlSession != null) {
                 sqlSession.close();
             }
@@ -243,6 +265,7 @@ public class DBService {
      * @throws IOException 如果资源找不到或文件写入失败
      */
     private File createTempFileFromResource(String resourcePath, File directory) throws IOException {
+        // ★ 修改点 2: 确保目标目录存在
         if (!directory.exists()) {
             if (!directory.mkdirs()) {
                 throw new IOException("无法创建临时目录: " + directory.getAbsolutePath());
@@ -254,6 +277,7 @@ public class DBService {
             throw new IOException("在 classpath 中找不到资源文件: " + resourcePath);
         }
 
+        // ★ 修改点 3: 使用指定目录的 createTempFile 方法
         // 从资源路径中提取文件名作为参考
         String fileName = new File(resourcePath).getName();
         String prefix = fileName.substring(0, fileName.lastIndexOf('.'));

@@ -13,6 +13,7 @@ public class MessageController {
     private final CourseController courseController; // 来自远程的修改
     private final ShopController shopController;     // 来自您的修改
     private final LibraryController libraryController; // 【新增】图书馆控制器实例
+    private final EmailController emailController;   // 【新增】邮件控制器实例
     // --- 2. 合并构造函数 ---
     // 在构造函数中，我们需要实例化所有的控制器
 
@@ -25,6 +26,7 @@ public class MessageController {
         this.courseController = new CourseController(); // 保留
         this.shopController = new ShopController();     // 保留
         this.libraryController = new LibraryController(); // 【新增】在构造时实例化
+        this.emailController = new EmailController();   // 【新增】在构造时实例化邮件控制器
     }
 
     /**
@@ -145,6 +147,13 @@ public class MessageController {
                     return shopController.handleGetMyFavorites(request);
                 case SHOP_GET_PRODUCT_DETAIL:
                     return shopController.handleGetProductDetail(request);
+                case SHOP_GET_BALANCE:
+                    return shopController.handleGetBalance(request);
+                case SHOP_PAY_FOR_ORDER:
+                    return shopController.handlePayForOrder(request); // <-- 确保 (message) 在这里
+
+                case SHOP_RECHARGE:
+                    return shopController.handleRecharge(request);
 
                 // --- 商店管理员相关 ---
                 case SHOP_ADMIN_ADD_PRODUCT:
@@ -189,6 +198,26 @@ public class MessageController {
                 case SHOP_REMOVE_FAVORITE:
                     return shopController.handleRemoveFavorite(request);
 
+                // --- 邮件系统相关 ---
+                case EMAIL_SEND:
+                case EMAIL_SAVE_DRAFT:
+                case EMAIL_GET_INBOX:
+                case EMAIL_GET_SENT:
+                case EMAIL_GET_DRAFT:
+                case EMAIL_READ:
+                case EMAIL_DELETE:
+                case EMAIL_MARK_READ:
+                case EMAIL_MARK_UNREAD:
+                case EMAIL_SEARCH:
+                case EMAIL_BATCH_MARK_READ:
+                case EMAIL_BATCH_DELETE:
+                case EMAIL_ADMIN_GET_ALL:
+                case EMAIL_ADMIN_SEARCH_ALL:
+                case EMAIL_ADMIN_SEARCH_BY_USER:
+                case EMAIL_ADMIN_GET_USER_EMAILS:
+                case EMAIL_ADMIN_DELETE:
+                case EMAIL_ADMIN_GET_STATISTICS:
+                    return emailController.handleRequest(request);
 
                 // --- 添加结束 ---
 

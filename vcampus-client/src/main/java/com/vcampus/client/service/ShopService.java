@@ -5,6 +5,8 @@ import com.vcampus.client.net.SocketClient;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.enums.ActionType;
+import com.vcampus.common.entity.Balance;
+import java.math.BigDecimal; // 使用 BigDecimal 处理金额，更精确
 
 /**
  * 商店模块的服务层 (ShopService) - 客户端
@@ -72,12 +74,33 @@ public class ShopService {
         System.out.println("客户端 ShopService：异步发送取消收藏请求 (ID: " + favoriteId + ")...");
         socketClient.sendMessage(new Message(ActionType.SHOP_REMOVE_FAVORITE, favoriteId));
     }
+
     /**
-     * 【新增】异步发送“获取余额”的请求
+     * 【异步】发送“获取余额”的请求。
+     * @param userId 用户ID
      */
     public void getBalance(String userId) {
+        System.out.println("客户端 ShopService：异步发送获取余额请求...");
         socketClient.sendMessage(new Message(ActionType.SHOP_GET_BALANCE, userId));
     }
 
+    /**
+     * 【异步】发送“充值”的请求。
+     * @param userId 用户ID
+     * @param amount 充值金额
+     */
+    public void recharge(String userId, BigDecimal amount) {
+        System.out.println("客户端 ShopService：异步发送充值请求...");
+        Balance rechargeData = new Balance();
+        rechargeData.setUserId(userId);
+        rechargeData.setBalance(amount);
+        socketClient.sendMessage(new Message(ActionType.SHOP_RECHARGE, rechargeData));
+    }
 
+    // 在 ShopService.java (客户端) 中添加
+    public void payForOrder(ShopTransaction order) {
+        System.out.println("客户端 ShopService：异步发送支付请求...");
+        // 假设你已经在 ActionType 枚举中添加了 SHOP_PAY_FOR_ORDER
+        socketClient.sendMessage(new Message(ActionType.SHOP_PAY_FOR_ORDER, order));
+    }
 }
