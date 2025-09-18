@@ -6,16 +6,19 @@ module vcampus.client {
     requires java.desktop;
     requires java.logging;
     requires java.net.http;
-    requires org.apache.pdfbox;
 
-    // 项目模块依赖
+    requires org.apache.pdfbox;
+    requires com.google.gson;
+    requires org.apache.poi.ooxml;
+    requires org.apache.poi.ooxml.schemas;
+    requires org.apache.poi.poi;
+    requires org.apache.xmlbeans;
+
+    requires javafx.graphics;
     requires vcampus.common;
 
-    // 第三方依赖（自动模块）
-    requires com.google.gson;
-
-    // 导出主类包
     exports com.vcampus.client;
+    exports com.vcampus.client.controller;
 
     // 打开包给JavaFX FXML使用
     opens com.vcampus.client.controller to javafx.fxml;

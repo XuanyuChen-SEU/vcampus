@@ -91,9 +91,12 @@ public class StudentAdminController implements IClientController {
 
     @FXML
     public void initialize() {
+        // 注册消息控制器
         registerToMessageController();
 
-        // 列绑定
+        // ========================
+        // 1. 学生表列绑定
+        // ========================
         colUserId.setCellValueFactory(new PropertyValueFactory<>("userId"));
         colStudentId.setCellValueFactory(new PropertyValueFactory<>("studentId"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -107,6 +110,9 @@ public class StudentAdminController implements IClientController {
         colAppReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
         colAppStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
+        // ========================
+        // 2. 学生表列宽绑定
+        // ========================
         colSelect.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.05));
         colUserId.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.07));
         colStudentId.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.10));
@@ -118,7 +124,9 @@ public class StudentAdminController implements IClientController {
         colStudentStatus.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.10));
         colAction.prefWidthProperty().bind(studentTable.widthProperty().multiply(0.25));
 
-        // 绑定教师表列
+        // ========================
+        // 3. 教师表列绑定
+        // ========================
         colTeacherUserId.setCellValueFactory(new PropertyValueFactory<>("userId"));
         colTeacherName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colTeacherGender.setCellValueFactory(new PropertyValueFactory<>("gender"));
@@ -129,9 +137,12 @@ public class StudentAdminController implements IClientController {
         colTeacherEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colTeacherOffice.setCellValueFactory(new PropertyValueFactory<>("office"));
 
+        // ========================
+        // 4. 教师表列宽绑定
+        // ========================
         colTeacherUserId.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.08));
         colTeacherName.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.12));
-        colTeacherCollege.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.12)); // 新增
+        colTeacherCollege.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.12));
         colTeacherGender.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.06));
         colTeacherDepartment.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.12));
         colTeacherTitle.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.10));
@@ -140,28 +151,31 @@ public class StudentAdminController implements IClientController {
         colTeacherOffice.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.10));
         colTeacherAction.prefWidthProperty().bind(teacherTable.widthProperty().multiply(0.10));
 
-        teacherTable.setItems(filteredTeacherData);
-        teacherTable.setPlaceholder(new Label("暂无教师数据"));
-
-        // 动态列宽绑定 - 申请表
+        // ========================
+        // 5. 申请表列宽绑定
+        // ========================
         colAppStudentId.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.15));
         colAppName.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.15));
         colAppReason.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.30));
         colAppStatus.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.15));
         colAppAction.prefWidthProperty().bind(applicationTable.widthProperty().multiply(0.25));
 
-        // 添加多选筛选按钮
-        addFilterToGradeColumn();
-        addFilterToMajorColumn();
-        addFilterToStudentStatusColumn();
+        // ========================
+        // 6. 添加表格数据
+        // ========================
+        studentTable.setItems(filteredData);
+        teacherTable.setItems(filteredTeacherData);
+        applicationTable.setItems(applicationData);
 
         studentTable.setPlaceholder(new Label("暂无学生数据"));
-
-        applicationTable.setItems(applicationData);
+        teacherTable.setPlaceholder(new Label("暂无教师数据"));
         applicationTable.setPlaceholder(new Label("暂无申请数据"));
+
         applicationTable.setVisible(false); // 默认隐藏
 
-        // 自定义单元格渲染
+        // ========================
+        // 7. 学生表单元格自定义渲染
+        // ========================
         colStudentStatus.setCellFactory(column -> new TableCell<Student, String>() {
             @Override
             protected void updateItem(String status, boolean empty) {
@@ -180,7 +194,10 @@ public class StudentAdminController implements IClientController {
                 }
             }
         });
-        // 操作列
+
+        // ========================
+        // 8. 学生表操作列
+        // ========================
         colAction.setCellFactory(param -> new TableCell<Student, Void>() {
             private final Button btnDetail = new Button("查看详细");
             private final Button btnEdit = new Button("修改");
@@ -189,15 +206,13 @@ public class StudentAdminController implements IClientController {
             {
                 btnDetail.getStyleClass().add("clear-button");
                 btnEdit.getStyleClass().add("create-button");
-
                 btnDetail.setMaxWidth(Double.MAX_VALUE);
                 btnEdit.setMaxWidth(Double.MAX_VALUE);
                 HBox.setHgrow(btnDetail, Priority.ALWAYS);
                 HBox.setHgrow(btnEdit, Priority.ALWAYS);
 
-                // 将按钮宽度绑定到列宽的比例
                 box.widthProperty().addListener((obs, oldW, newW) -> {
-                    btnDetail.setPrefWidth(newW.doubleValue() * 0.5 - 3); // 留出间距
+                    btnDetail.setPrefWidth(newW.doubleValue() * 0.5 - 3);
                     btnEdit.setPrefWidth(newW.doubleValue() * 0.5 - 3);
                 });
 
@@ -216,16 +231,16 @@ public class StudentAdminController implements IClientController {
                 });
             }
 
-
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : box);
             }
-
         });
 
-        // 教师表操作列
+        // ========================
+        // 9. 教师表操作列
+        // ========================
         colTeacherAction.setCellFactory(param -> new TableCell<Teacher, Void>() {
             private final Button btnEdit = new Button("修改");
 
@@ -244,17 +259,13 @@ public class StudentAdminController implements IClientController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(btnEdit);
-                }
+                setGraphic(empty ? null : btnEdit);
             }
         });
 
-
-
-        // 申请表操作列
+        // ========================
+        // 10. 申请表操作列
+        // ========================
         colAppAction.setCellFactory(col -> new TableCell<StudentLeaveApplication, Void>() {
             private final Button approveBtn = new Button("√通过");
             private final Button rejectBtn = new Button("×不通过");
@@ -262,7 +273,6 @@ public class StudentAdminController implements IClientController {
 
             {
                 buttonBox.setAlignment(Pos.CENTER);
-
                 approveBtn.setMaxWidth(Double.MAX_VALUE);
                 rejectBtn.setMaxWidth(Double.MAX_VALUE);
                 HBox.setHgrow(approveBtn, Priority.ALWAYS);
@@ -276,15 +286,8 @@ public class StudentAdminController implements IClientController {
                 approveBtn.getStyleClass().add("approve-button");
                 rejectBtn.getStyleClass().add("reject-button");
 
-                approveBtn.setOnAction(e -> {
-                    StudentLeaveApplication app = getTableView().getItems().get(getIndex());
-                    handleApprove(app);
-                });
-
-                rejectBtn.setOnAction(e -> {
-                    StudentLeaveApplication app = getTableView().getItems().get(getIndex());
-                    handleReject(app);
-                });
+                approveBtn.setOnAction(e -> handleApprove(getTableView().getItems().get(getIndex())));
+                rejectBtn.setOnAction(e -> handleReject(getTableView().getItems().get(getIndex())));
             }
 
             @Override
@@ -305,8 +308,9 @@ public class StudentAdminController implements IClientController {
             }
         });
 
-
-        // 申请状态列颜色显示
+        // ========================
+        // 11. 申请状态列颜色显示
+        // ========================
         colAppStatus.setCellFactory(column -> new TableCell<StudentLeaveApplication, String>() {
             @Override
             protected void updateItem(String status, boolean empty) {
@@ -324,7 +328,55 @@ public class StudentAdminController implements IClientController {
                 }
             }
         });
-        // 切换显示
+
+        // ========================
+        // 12. 搜索框 & 按钮事件
+        // ========================
+        searchButton.setOnAction(e -> updateFilterBasedOnCurrentTable());
+        searchField.setOnAction(e -> updateFilterBasedOnCurrentTable());
+
+        // ========================
+        // 13. 按钮样式设置
+        // ========================
+        btnSelectAll.getStyleClass().add("all-button");
+        btnAdjustStatus.getStyleClass().add("status-button");
+        btnStudentList.getStyleClass().add("studentlist-button");
+        btnApplicationList.getStyleClass().add("applicationlist-button");
+        btnRefreshList.getStyleClass().add("refresh-button");
+        btnTeacherList.getStyleClass().add("teacherlist-button");
+
+        // ========================
+        // 14. 批量学籍状态调整
+        // ========================
+        btnAdjustStatus.setOnAction(e -> adjustSelectedStudentStatus());
+
+        // ========================
+        // 15. 刷新按钮事件
+        // ========================
+        btnRefreshList.setOnAction(e -> refreshAllData());
+
+        // ========================
+        // 16. 学生选择列设置
+        // ========================
+        colSelect.setCellValueFactory(cellData -> cellData.getValue().selectedProperty());
+        colSelect.setCellFactory(CheckBoxTableCell.forTableColumn(colSelect));
+        colSelect.setEditable(true);
+        studentTable.setEditable(true);
+
+        // ========================
+        // 17. 全选/全不选按钮逻辑
+        // ========================
+        btnSelectAll.setText("全选");
+        btnSelectAll.setOnAction(e -> {
+            allSelected = !allSelected;
+            filteredData.forEach(s -> s.setSelected(allSelected));
+            btnSelectAll.setText(allSelected ? "全不选" : "全选");
+            studentTable.refresh();
+        });
+
+        // ========================
+        // 18. 切换显示表格按钮事件
+        // ========================
         btnTeacherList.setOnAction(e -> {
             currentTable = CurrentTable.TEACHER;
             searchField.setPromptText("按工号/姓名搜索教师");
@@ -332,52 +384,35 @@ public class StudentAdminController implements IClientController {
             studentTable.setVisible(false);
             applicationTable.setVisible(false);
             teacherTable.setVisible(true);
+            btnSelectAll.setVisible(false);
+            btnAdjustStatus.setVisible(false);
             loadAllTeachers();
         });
 
-
-
-        studentTable.setItems(filteredData);
-        studentTable.getSelectionModel().setCellSelectionEnabled(false);
-        studentTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        // 搜索按钮 & 回车
-        searchButton.setOnAction(event -> updateFilterBasedOnCurrentTable());
-        searchField.setOnAction(event -> updateFilterBasedOnCurrentTable());
-        searchButton.setOnAction(e -> updateFilterBasedOnCurrentTable());
-        searchField.setOnAction(e -> updateFilterBasedOnCurrentTable());
-
-        btnSelectAll.getStyleClass().add("all-button");
-        btnAdjustStatus.getStyleClass().add("status-button");
-        btnStudentList.getStyleClass().add("studentlist-button");
-        btnApplicationList.getStyleClass().add("applicationlist-button");
-        btnRefreshList.getStyleClass().add("refresh-button");
-        btnTeacherList.getStyleClass().add("teacherlist-button");
-        // 批量学籍状态调整
-        btnAdjustStatus.setOnAction(e -> adjustSelectedStudentStatus());
-        // 刷新按钮事件：同时刷新学生和申请列表
-        btnRefreshList.setOnAction(e -> refreshAllData());
-
-        // 添加选择列
-        colSelect.setCellValueFactory(cellData -> cellData.getValue().selectedProperty());
-        colSelect.setCellFactory(CheckBoxTableCell.forTableColumn(colSelect));
-        colSelect.setEditable(true);
-        studentTable.setEditable(true);
-
-        // 全选/全不选按钮逻辑
-        btnSelectAll.setText("全选");
-        btnSelectAll.setOnAction(e -> {
-            allSelected = !allSelected;
-            // 当前显示的数据行才操作
-            filteredData.forEach(s -> s.setSelected(allSelected));
-            btnSelectAll.setText(allSelected ? "全不选" : "全选");
-            studentTable.refresh();
-        });
         btnStudentList.setOnAction(e -> handleShowStudentList());
         btnApplicationList.setOnAction(e -> handleShowApplicationList());
+
+        // ========================
+        // 19. 学生表多选 & 搜索
+        // ========================
+        studentTable.getSelectionModel().setCellSelectionEnabled(false);
+        studentTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        // ========================
+        // 20. 添加筛选功能
+        // ========================
+        addFilterToGradeColumn();
+        addFilterToMajorColumn();
+        addFilterToStudentStatusColumn();
         addFilterToTeacherDepartmentColumn();
         addFilterToTeacherTitleColumn();
+
+        // ========================
+        // 21. 加载学生数据
+        // ========================
         loadAllStudent();
     }
+
 
     private void loadAllStudent() {
         studentAdminService.getAllStudents();
