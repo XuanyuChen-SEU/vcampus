@@ -548,6 +548,7 @@ public class EmailController implements IClientController {
                             getStyleClass().add("read");
                         } else {
                             getStyleClass().add("unread");
+                            System.out.println("添加未读样式到邮件: " + email.getSubject());
                         }
                     }
                 }
