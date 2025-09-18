@@ -59,7 +59,7 @@
             
             <!-- 左侧：邮件列表区域 -->
             <items>
-                <VBox fx:id="emailListContainer" minWidth="250.0" maxWidth="500.0" styleClass="email-list-container" VBox.vgrow="ALWAYS">
+                <VBox fx:id="emailListContainer" minWidth="250.0" styleClass="email-list-container" VBox.vgrow="ALWAYS">
                     
                     <!-- 邮件分类标签页 -->
                     <HBox alignment="CENTER_LEFT" spacing="0.0" styleClass="email-tabs">

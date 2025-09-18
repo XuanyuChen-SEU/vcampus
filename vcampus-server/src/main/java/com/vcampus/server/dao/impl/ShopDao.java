@@ -61,10 +61,23 @@ public class ShopDao implements IShopDao {
     public boolean updateProductById(Product product) {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
+            System.out.println("开始更新商品: ID=" + product.getId() + ", 名称=" + product.getName());
+            System.out.println("图片路径: " + product.getImagePath());
+            System.out.println("图片数据大小: " + (product.getImageData() != null ? product.getImageData().length : 0) + " bytes");
+            
             boolean result = shopMapper.updateProductById(product);
             sqlSession.commit();
+            
+            System.out.println("数据库更新结果: " + result);
+            if (result) {
+                System.out.println("商品更新成功: " + product.getName());
+            } else {
+                System.err.println("商品更新失败: " + product.getName());
+            }
+            
             return result;
         } catch (Exception e) {
+            System.err.println("更新商品时发生异常: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

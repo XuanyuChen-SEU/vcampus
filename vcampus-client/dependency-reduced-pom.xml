@@ -23,10 +23,24 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
+        <version>0.0.8</version>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <mainClass>com.vcampus.client.MainApp</mainClass>
+            </configuration>
+          </execution>
+        </executions>
         <configuration>
           <mainClass>com.vcampus.client.MainApp</mainClass>
           <commandlineArgs />
@@ -35,29 +49,9 @@
           <launcher>vcampus-client</launcher>
           <noManPages>true</noManPages>
           <noHeaderFiles>true</noHeaderFiles>
+          <stripDebug>true</stripDebug>
+          <compress>2</compress>
         </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.6.0</version>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/lib</outputDirectory>
-              <includeScope>runtime</includeScope>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-              <overWriteIfNewer>true</overWriteIfNewer>
-              <excludeTransitive>false</excludeTransitive>
-              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -74,7 +68,6 @@
                   <mainClass>com.vcampus.client.MainApp</mainClass>
                 </transformer>
               </transformers>
-              <finalName>vcampus-client-${project.version}</finalName>
             </configuration>
           </execution>
         </executions>
@@ -103,4 +96,8 @@
       </exclusions>
     </dependency>
   </dependencies>
+  <properties>
+    <java.version>17</java.version>
+    <javafx.version>20.0.1</javafx.version>
+  </properties>
 </project>
