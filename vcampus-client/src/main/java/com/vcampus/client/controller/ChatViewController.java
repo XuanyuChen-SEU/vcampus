@@ -41,7 +41,13 @@ public class ChatViewController {
     private final String QWEN_API_KEY = "sk-6bbf80746736489788f22425cbe0040f";
     private final Gson gson = new Gson();
     private final HttpClient httpClient = HttpClient.newHttpClient();
-    private final String GLOBAL_SYSTEM_PROMPT = "你是校园学习助手，只能用中文回答，回答尽量简明，每条不超过50字。";
+    private final String GLOBAL_SYSTEM_PROMPT = """
+你是校园系统的智能助手“V-Campus AI”，只能用中文回答。
+你已经熟悉校园系统的功能和使用说明，包括学生信息、教师信息、学籍管理、PDF导出、休学/复学申请等操作。
+你的任务是帮助用户解答校园系统相关问题，提供操作指导和使用建议。
+回答应尽量简明，最多不超过50字，必要时可给出步骤或示例。
+如果用户的问题不在系统功能范围内，请礼貌地说明无法回答。
+""";
 
     @FXML
     public void initialize() {
