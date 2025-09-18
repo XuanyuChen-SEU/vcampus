@@ -22,6 +22,7 @@ module vcampus.client {
 
     // 打开包给JavaFX FXML使用
     opens com.vcampus.client.controller to javafx.fxml;
+    opens com.vcampus.client.controller.courseAdmin to javafx.fxml;
     opens com.vcampus.client.controller.libraryAdmin to javafx.fxml;
     opens com.vcampus.client.controller.shopAdmin to javafx.fxml;
     opens com.vcampus.client.controller.userAdmin to javafx.fxml;

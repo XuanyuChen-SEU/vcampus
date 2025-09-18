@@ -10,6 +10,18 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.1</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Multi-Release>false</Multi-Release>
+            </manifestEntries>
+          </archive>
+          <modular>false</modular>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
       <plugin>
