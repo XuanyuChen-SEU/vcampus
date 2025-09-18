@@ -17,11 +17,15 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
 /**
  * ChatViewController（修改版）
@@ -38,7 +42,6 @@ public class ChatViewController {
     private final String QWEN_API_KEY = "sk-6bbf80746736489788f22425cbe0040f";
     private final Gson gson = new Gson();
     private final HttpClient httpClient = HttpClient.newHttpClient();
-
     private final String GLOBAL_SYSTEM_PROMPT = "你是校园学习助手，只能用中文回答，回答尽量简明，每条不超过50字。";
 
     @FXML
@@ -76,9 +79,13 @@ public class ChatViewController {
             @Override
             protected String call() throws Exception {
 
+                // 读取 Word 文件内容
+                String wordContent = readWordFile("D:/IdeaProjects/untitled/vcampus/vcampus-client/src/main/resources/ai_prompt/系统使用说明.docx");
+
                 JsonObject systemMessage = new JsonObject();
                 systemMessage.addProperty("role", "system");
-                systemMessage.addProperty("content", GLOBAL_SYSTEM_PROMPT);
+                systemMessage.addProperty("content",
+                        GLOBAL_SYSTEM_PROMPT + "\n以下是额外背景信息:\n" + wordContent);
 
                 JsonObject userMessage = new JsonObject();
                 userMessage.addProperty("role", "user");
@@ -126,6 +133,7 @@ public class ChatViewController {
         new Thread(task).start();
     }
 
+
     // ==========================================================
     // UI 更新方法
     // ==========================================================
@@ -155,5 +163,17 @@ public class ChatViewController {
 
     private void addAIMessage(String message) {
         addAIMessageLabel(new Label(message));
+    }
+
+    public String readWordFile(String filePath) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        try (FileInputStream fis = new FileInputStream(filePath);
+             XWPFDocument document = new XWPFDocument(fis)) {
+
+            for (XWPFParagraph para : document.getParagraphs()) {
+                sb.append(para.getText()).append("\n");
+            }
+        }
+        return sb.toString();
     }
 }

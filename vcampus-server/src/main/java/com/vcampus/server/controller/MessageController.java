@@ -10,6 +10,7 @@ public class MessageController {
     private final UserController userController;
     private final StudentController studentController;
     private final StudentAdminController studentadminController;
+    private final TeacherController teacherController;
     private final CourseController courseController; // 来自远程的修改
     private final ShopController shopController;     // 来自您的修改
     private final LibraryController libraryController; // 【新增】图书馆控制器实例
@@ -23,6 +24,7 @@ public class MessageController {
         this.userController = new UserController();
         this.studentController = new StudentController();
         this.studentadminController=new StudentAdminController();
+        this.teacherController=new TeacherController();
         this.courseController = new CourseController(); // 保留
         this.shopController = new ShopController();     // 保留
         this.libraryController = new LibraryController(); // 【新增】在构造时实例化
@@ -96,10 +98,13 @@ public class MessageController {
                     return studentadminController.updateApplicationStatus(request);
                 case ALL_TEACHER:
                     return studentadminController.getAllTeachers(request);
-
+                case UPDATE_TEACHER:
+                    return studentadminController.updateTeacher(request);
                 // --- 教师相关 ---
                 case INFO_TEACHER:
-                    return studentController.handleInfoTeacher(request);
+                    return teacherController.handleInfoTeacher(request);
+                case UPDATE_TEACHER_INFO:
+                    return teacherController.updateTeacher(request);
                 // --- 课程相关 ---
 
                 // --- 课程相关 ---调用服务端的controller层相关逻辑部分
@@ -112,7 +117,6 @@ public class MessageController {
                     return courseController.handleDropCourse(request);
                 case GET_MY_COURSES:
                     return courseController.handleGetMyCourses(request);
-// 在服务端的 MessageController.java 的 switch 语句中添加:
                 case SEARCH_COURSES:
                     return courseController.handleSearchCourses(request);
 

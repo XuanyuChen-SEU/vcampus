@@ -41,8 +41,10 @@ public enum ActionType {
     UPDATE_BOOK("更新图书信息"),
     UPDATE_STUDENTS("批量修改学生学籍状态"),
     ALL_TEACHER("获取所有教师信息"),
+    UPDATE_TEACHER("修改教师信息"),
     // --- 学籍模块 -教师端 ---
     INFO_TEACHER("获取教师信息"),
+    UPDATE_TEACHER_INFO("修改教师信息"),
 
     // --- 商店模块 - 用户端 ---
     // 商品浏览与搜索

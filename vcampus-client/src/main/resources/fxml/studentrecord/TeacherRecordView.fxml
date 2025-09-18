@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<AnchorPane prefHeight="500.0" prefWidth="700.0"
+            xmlns="http://javafx.com/javafx/19"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.TeacherController"
+            stylesheets="@../../css/student.css"
+            styleClass="student-record-background">
+
+    <children>
+        <!-- 顶部标题栏 -->
+        <HBox spacing="10" alignment="CENTER_LEFT" prefHeight="70.0"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+              styleClass="student-record-header">
+            <padding>
+                <Insets top="10" left="20" right="20" bottom="10"/>
+            </padding>
+            <Label text="教师信息管理模块" styleClass="student-record-title">
+                <font>
+                    <Font name="Microsoft YaHei Bold" size="22.0"/>
+                </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <!-- 主内容 -->
+        <ScrollPane fx:id="mainScrollPane" fitToWidth="true"
+                    AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="60.0"
+                    AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
+                    styleClass="student-record-scroll-pane">
+            <content>
+                <VBox spacing="18" styleClass="student-record-content">
+                    <padding>
+                        <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
+                    </padding>
+
+                    <!-- 基本信息 -->
+                    <TitledPane text="基本信息" expanded="true" collapsible="false" styleClass="student-record-titled-pane">
+                        <content>
+                            <HBox spacing="20">
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <GridPane fx:id="teacherGridPane" hgap="12" vgap="10" styleClass="student-record-grid">
+                                        <columnConstraints>
+                                            <ColumnConstraints prefWidth="110" halignment="LEFT"/>
+                                            <ColumnConstraints hgrow="ALWAYS" halignment="LEFT"/>
+                                            <ColumnConstraints prefWidth="110" halignment="LEFT"/>
+                                            <ColumnConstraints hgrow="ALWAYS" halignment="LEFT"/>
+                                        </columnConstraints>
+                                        <rowConstraints>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                        </rowConstraints>
+
+                                        <!-- 第一行 -->
+                                        <Label text="工号" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="userIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="姓名" GridPane.rowIndex="0" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="nameLabel" GridPane.rowIndex="0" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
+
+                                        <!-- 第二行 -->
+                                        <Label text="性别" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="genderLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="职称" GridPane.rowIndex="1" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="titleLabel" GridPane.rowIndex="1" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
+
+                                        <!-- 第三行 -->
+                                        <Label text="学院" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="collegeLabel" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="部门" GridPane.rowIndex="2" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="departmentLabel" GridPane.rowIndex="2" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
+
+                                        <!-- 第四行 -->
+                                        <Label text="电话" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="phoneLabel" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="邮箱" GridPane.rowIndex="3" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="emailLabel" GridPane.rowIndex="3" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
+
+                                        <!-- 第五行 -->
+                                        <Label text="办公地点" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="officeLabel" GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                    </GridPane>
+                                </VBox>
+
+                                <!-- 教师头像 -->
+                                <ImageView fx:id="teacherImageView" fitWidth="120" fitHeight="150" preserveRatio="true" translateX="-10"/>
+                            </HBox>
+                        </content>
+                    </TitledPane>
+                </VBox>
+            </content>
+        </ScrollPane>
+
+        <!-- 按钮区 -->
+        <HBox spacing="12" alignment="CENTER_RIGHT"
+              AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="24.0">
+            <Button fx:id="editOrSaveButton" text="修改" styleClass="student-record-button-edit" prefWidth="90" prefHeight="34">
+                <graphic>
+                    <ImageView fitWidth="16" fitHeight="16" preserveRatio="true" styleClass="white-icon">
+                        <image>
+                            <Image url="@../../images/StudentIcons/edit_icon.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+
+    </children>
+</AnchorPane>

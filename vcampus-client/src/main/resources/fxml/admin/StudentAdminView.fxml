@@ -47,7 +47,8 @@
     <StackPane VBox.vgrow="ALWAYS">
         <children>
             <!-- 学生信息表格 -->
-            <TableView fx:id="studentTable" styleClass="data-table">
+            <TableView fx:id="studentTable" styleClass="data-table"
+                       fixedCellSize="35.0">
                 <columns>
                     <TableColumn fx:id="colSelect" text="" prefWidth="40"/>
                     <TableColumn fx:id="colUserId" text="用户ID" prefWidth="100"/>
@@ -62,7 +63,8 @@
                 </columns>
             </TableView>
 
-            <TableView fx:id="teacherTable" styleClass="data-table" visible="false">
+            <TableView fx:id="teacherTable" styleClass="data-table" visible="false"
+                       fixedCellSize="35.0">
                 <columns>
                     <TableColumn fx:id="colTeacherUserId" text="工号" prefWidth="100"/>
                     <TableColumn fx:id="colTeacherName" text="姓名" prefWidth="100"/>
@@ -78,7 +80,8 @@
             </TableView>
 
             <!-- 申请信息表格 -->
-            <TableView fx:id="applicationTable" styleClass="data-table" visible="false">
+            <TableView fx:id="applicationTable" styleClass="data-table" visible="false"
+                       fixedCellSize="35.0">
                 <columns>
                     <TableColumn fx:id="colAppStudentId" text="学号" prefWidth="100"/>
                     <TableColumn fx:id="colAppName" text="姓名" prefWidth="100"/>
@@ -96,6 +99,4 @@
         <Button fx:id="btnAdjustStatus" text="调整学籍状态" styleClass="status-button"/>
     </HBox>
 
-
 </VBox>
-
