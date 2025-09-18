@@ -495,20 +495,32 @@ public class ShopController implements IClientController{
         ));
 
         // ==========================================================
-        // 2. 图片加载逻辑 (保持不变)
+        // 2. 图片加载逻辑 (改进版本)
         // ==========================================================
         try {
             Image image;
+            // 优先使用imageData（从服务器传输的图片数据）
             if (product.getImageData() != null && product.getImageData().length > 0) {
+                System.out.println("使用imageData加载图片: " + product.getName() + " (" + product.getImageData().length + " bytes)");
                 image = new Image(new ByteArrayInputStream(product.getImageData()));
             } else if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
-                image = new Image(new FileInputStream(product.getImagePath()));
+                System.out.println("使用imagePath加载图片: " + product.getName() + " - " + product.getImagePath());
+                // 尝试从文件系统加载图片
+                try {
+                    image = new Image(new FileInputStream(product.getImagePath()));
+                } catch (Exception e) {
+                    System.err.println("从文件系统加载图片失败，尝试从资源路径加载: " + e.getMessage());
+                    // 如果文件系统加载失败，尝试从资源路径加载
+                    image = new Image(getClass().getResourceAsStream(product.getImagePath()));
+                }
             } else {
+                System.out.println("使用默认图片: " + product.getName());
                 image = new Image("https://via.placeholder.com/220x220.png?text=No+Image");
             }
             imageView.setImage(image);
         } catch (Exception e) {
             System.err.println("加载图片失败: " + product.getName() + " | " + e.getMessage());
+            e.printStackTrace();
             imageView.setImage(new Image("https://via.placeholder.com/220x220.png?text=Error"));
         }
 
