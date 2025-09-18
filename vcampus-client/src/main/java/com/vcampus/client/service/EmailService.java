@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * 邮件服务类
  * 负责向服务端请求邮件数据，并向 Controller 提供接口
- * 编写人：AI Assistant
+ * 编写人：谌宣羽
  */
 public class EmailService {
 

@@ -32,7 +32,7 @@ import javafx.scene.Parent;
 /**
  * 邮件系统控制器
  * 处理邮件相关的UI交互和网络请求
- * 编写人：AI Assistant
+ * 编写人：谌宣羽
  */
 public class EmailController implements IClientController {
 
