@@ -4,6 +4,9 @@ import java.util.List;
 
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
+import com.vcampus.common.entity.Balance;
+import java.math.BigDecimal;
+
 
 /**
  * 商店数据访问对象接口 (IShopDao)
@@ -98,4 +101,27 @@ public interface IShopDao {
      * @return 如果移除成功，返回 true；否则返回 false。
      */
     boolean removeFavorite(String favoriteId);
+
+    // ==========================================================
+    // 余额 (Balance) 相关操作
+    // ==========================================================
+
+    /*
+     * 根据用户id获取余额
+     */
+    Balance getBalanceByUserId(String userId);
+
+    /*
+     * 更新余额
+     */
+    boolean updateBalance(Balance balance);
+
+    /**
+     * 【新增】更新一个已存在的订单。
+     * @param order 包含更新信息的 ShopTransaction 对象
+     * @return 如果更新成功，返回 true；否则返回 false。
+     */
+    boolean updateOrder(ShopTransaction order);
+    boolean deleteOrderById(String orderId);
+
 }

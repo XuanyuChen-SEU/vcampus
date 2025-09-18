@@ -881,42 +881,43 @@
 
 /* === 学籍管理背景样式 === */
 .student-record-background {
-    -fx-background-color: linear-gradient(to bottom right, #e3f2fd 0%, #bbdefb 100%);
+    -fx-background-color: linear-gradient(to bottom right, #f0f8ff 0%, #d0e8ff 100%);
 }
 
 /* === 学籍管理标题栏样式 === */
 .student-record-header {
-    -fx-background-color: rgba(74, 144, 226, 0.2);
+    -fx-background-color: rgba(41, 98, 255, 0.15);
     -fx-padding: 0 20;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0.0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 4, 0.0, 0, 1);
 }
 
 .student-record-title {
-    -fx-text-fill: #2c5aa0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0.0, 0, 1);
+    -fx-text-fill: #1a4fa3;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 2, 0.0, 0, 1);
 }
 
 /* === 学籍管理折叠面板样式 === */
 .student-record-titled-pane {
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 10;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0.0, 0, 2);
-    -fx-border-color: rgba(255, 255, 255, 0.3);
-    -fx-border-radius: 10;
+    -fx-background-color: rgba(255, 255, 255, 0.97);
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0.0, 0, 2);
+    -fx-border-color: rgba(235, 245, 255, 0.8);
+    -fx-border-radius: 12;
     -fx-border-width: 1;
 }
 
 .student-record-titled-pane .title {
-    -fx-background-color: linear-gradient(to right, #4a90e2, #357abd);
+    -fx-background-color: linear-gradient(to right, #3273dc, #1a56c4);
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-padding: 8 15;
-    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 15;
+    -fx-background-radius: 12 12 0 0;
 }
 
 .student-record-titled-pane .title:hover {
-    -fx-background-color: linear-gradient(to right, #357abd, #2c5aa0);
+    -fx-background-color: linear-gradient(to right, #2764c9, #0d47a1);
 }
 
 /* === 学籍管理滚动面板样式 === */
@@ -926,17 +927,17 @@
 }
 
 .student-record-scroll-pane .scroll-bar:vertical {
-    -fx-background-color: rgba(255, 255, 255, 0.2);
-    -fx-background-radius: 5;
+    -fx-background-color: rgba(230, 240, 255, 0.3);
+    -fx-background-radius: 6;
 }
 
 .student-record-scroll-pane .scroll-bar:vertical .thumb {
-    -fx-background-color: rgba(255, 255, 255, 0.5);
-    -fx-background-radius: 5;
+    -fx-background-color: rgba(100, 150, 235, 0.5);
+    -fx-background-radius: 6;
 }
 
 .student-record-scroll-pane .scroll-bar:vertical .thumb:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.7);
+    -fx-background-color: rgba(80, 130, 215, 0.7);
 }
 
 .student-record-content {

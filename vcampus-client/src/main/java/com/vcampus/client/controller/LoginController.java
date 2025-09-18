@@ -419,7 +419,7 @@ public class LoginController implements IClientController {
                     windowTitle = "VCampus 虚拟校园系统 - 学生端";
                     break;
                 case "2": // 教师
-                    fxmlPath = "/fxml/MainView.fxml";
+                    fxmlPath = "/fxml/MainTeacherView.fxml";
                     windowTitle = "VCampus 虚拟校园系统 - 教师端";
                     break;
                 default: // 其他角色为管理员

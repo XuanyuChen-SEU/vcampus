@@ -1,83 +1,124 @@
 package com.vcampus.client.service;
 
-import com.vcampus.client.MainApp; // 假设您的主应用类在这个包下
+import com.vcampus.client.MainApp;
 import com.vcampus.client.net.SocketClient;
 import com.vcampus.common.dto.Message;
+import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.enums.ActionType;
+import com.vcampus.common.entity.Balance;
+import java.math.BigDecimal; // 使用 BigDecimal 处理金额，更精确
 
 /**
- * 商店模块的服务层 (ShopService)
- * 精准匹配 ShopController 的当前功能需求，提供后台网络通信支持。
+ * 商店模块的服务层 (ShopService) - 客户端
+ * 【异步非阻塞模型版本】
+ * 负责将 ShopController 的请求异步发送给服务器，不等待响应。
+ * 所有方法都返回 void。
  */
 public class ShopService {
 
-    private final SocketClient socketClient;
-
-    /**
-     * 构造函数，通过 MainApp 获取全局唯一的 SocketClient 实例。
-     */
-    public ShopService() {
-        this.socketClient = MainApp.getGlobalSocketClient();
-    }
-
-    /**
-     * 【为 initialize() 服务】
-     * 获取初始显示的商品列表。
-     * @return 包含商品列表的响应 Message 对象。
-     */
-    public Message getAllProducts() {
-        // 创建一个不带数据的请求消息，因为服务器知道这个指令是获取所有商品
-        Message request = new Message(ActionType.SHOP_GET_ALL_PRODUCTS, null);
-
-        // 发送请求并同步等待服务器的响应
-        return socketClient.sendMessage(request);
-    }
-
-    /**
-     * 【为 handleSearch() 服务】
-     * 根据用户输入的关键词搜索商品。
-     * @param keyword 搜索关键词 (String)。
-     * @return 包含搜索结果商品列表的响应 Message 对象。
-     */
-    public Message searchProducts(String keyword) {
-        // 将关键词作为数据发送给服务器
-        Message request = new Message(ActionType.SHOP_SEARCH_PRODUCTS, keyword);
-        return socketClient.sendMessage(request);
-    }
-
-    /**
-     * 【为 handleShowMyOrders() 服务】
-     * 获取当前登录用户的所有订单。
-     * @param userId 当前登录用户的ID (String)。
-     * @return 包含该用户订单列表的响应 Message 对象。
-     */
-    public Message getMyOrders(String userId) {
-        // 将用户ID作为数据发送，告诉服务器要查询谁的订单
-        Message request = new Message(ActionType.SHOP_GET_MY_ORDERS, userId);
-        return socketClient.sendMessage(request);
-    }
-
-    /**
-     * 【为 handleShowMyFavorites() 服务】
-     * 获取当前登录用户的所有收藏。
-     * @param userId 当前登录用户的ID (String)。
-     * @return 包含该用户收藏列表的响应 Message 对象。
-     */
-    public Message getMyFavorites(String userId) {
-        // 将用户ID作为数据发送，告诉服务器要查询谁的收藏
-        Message request = new Message(ActionType.SHOP_GET_MY_FAVORITES, userId);
-        return socketClient.sendMessage(request);
-    }
+    private final SocketClient socketClient = MainApp.getGlobalSocketClient();
 
     public SocketClient getGlobalSocketClient() {
         return socketClient;
     }
 
+    // --- 商品浏览相关 ---
+
+    public void getAllProducts() {
+        socketClient.sendMessage(new Message(ActionType.SHOP_GET_ALL_PRODUCTS, null));
+    }
+
+    public void searchProducts(String keyword) {
+        socketClient.sendMessage(new Message(ActionType.SHOP_SEARCH_PRODUCTS, keyword));
+    }
+
     public void getProductDetail(String productId) {
-        // 【核心修正】只发送消息，不等待响应。
-        // 我们假设发送方法是 getGlobalSocketClient().send(message)
-        // 请根据您项目中其他 Service 的写法，确认是 send 还是 sendMessage
-        Message request = new Message(ActionType.SHOP_GET_PRODUCT_DETAIL, productId);
-        getGlobalSocketClient().sendMessage(request);
+        socketClient.sendMessage(new Message(ActionType.SHOP_GET_PRODUCT_DETAIL, productId));
+    }
+
+    // --- 订单与收藏相关 ---
+
+    public void getMyOrders(String userId) {
+        socketClient.sendMessage(new Message(ActionType.SHOP_GET_MY_ORDERS, userId));
+    }
+
+    public void getMyFavorites(String userId) {
+        socketClient.sendMessage(new Message(ActionType.SHOP_GET_MY_FAVORITES, userId));
+    }
+
+    // --- 【异步】的购买与收藏方法 ---
+
+    /**
+     * 【异步】发送“创建订单”的请求。
+     * @param orderRequest 包含用户ID和商品信息的 ShopTransaction 对象。
+     */
+    public void createOrder(ShopTransaction orderRequest) {
+        System.out.println("客户端 ShopService：异步发送创建订单请求...");
+        socketClient.sendMessage(new Message(ActionType.SHOP_CREATE_ORDER, orderRequest));
+    }
+
+    /**
+     * 【异步】发送“添加收藏”的请求。
+     * @param favoriteRequest 包含用户ID和商品信息的 ShopTransaction 对象。
+     */
+    public void addFavorite(ShopTransaction favoriteRequest) {
+        System.out.println("客户端 ShopService：异步发送添加收藏请求...");
+        socketClient.sendMessage(new Message(ActionType.SHOP_ADD_FAVORITE, favoriteRequest));
+    }
+
+    /**
+     * 【异步】发送“取消收藏”的请求。
+     * @param favoriteId 要取消的收藏记录在数据库中的唯一ID。
+     */
+    public void removeFavorite(String favoriteId) {
+        System.out.println("客户端 ShopService：异步发送取消收藏请求 (ID: " + favoriteId + ")...");
+        socketClient.sendMessage(new Message(ActionType.SHOP_REMOVE_FAVORITE, favoriteId));
+    }
+
+    /**
+     * 【异步】发送“获取余额”的请求。
+     * @param userId 用户ID
+     */
+    public void getBalance(String userId) {
+        System.out.println("客户端 ShopService：异步发送获取余额请求...");
+        socketClient.sendMessage(new Message(ActionType.SHOP_GET_BALANCE, userId));
+    }
+
+    /**
+     * 【异步】发送“充值”的请求。
+     * @param userId 用户ID
+     * @param amount 充值金额
+     */
+    public void recharge(String userId, BigDecimal amount) {
+        System.out.println("客户端 ShopService：异步发送充值请求...");
+        Balance rechargeData = new Balance();
+        rechargeData.setUserId(userId);
+        rechargeData.setBalance(amount);
+        socketClient.sendMessage(new Message(ActionType.SHOP_RECHARGE, rechargeData));
+    }
+
+    // 在 ShopService.java (客户端) 中添加
+    public void payForOrder(ShopTransaction order) {
+        System.out.println("客户端 ShopService：异步发送支付请求...");
+        // 假设你已经在 ActionType 枚举中添加了 SHOP_PAY_FOR_ORDER
+        socketClient.sendMessage(new Message(ActionType.SHOP_PAY_FOR_ORDER, order));
+    }
+
+    /**
+     * 【新增】发送“删除订单”的请求。
+     * @param orderId 要删除的订单ID。
+     */
+    public void deleteOrder(String orderId) {
+        System.out.println("客户端 ShopService：异步发送删除订单请求 (ID: " + orderId + ")...");
+        socketClient.sendMessage(new Message(ActionType.SHOP_DELETE_ORDER, orderId));
+    }
+
+    /**
+     * 【新增】发送“为未支付订单付款”的请求。
+     * @param order 包含订单ID和用户ID的 ShopTransaction 对象。
+     */
+    public void payForUnpaidOrder(ShopTransaction order) {
+        System.out.println("客户端 ShopService：异步发送支付未支付订单的请求...");
+        socketClient.sendMessage(new Message(ActionType.SHOP_PAY_FOR_UNPAID_ORDER, order));
     }
 }

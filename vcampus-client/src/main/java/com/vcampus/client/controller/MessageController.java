@@ -1,16 +1,20 @@
 package com.vcampus.client.controller;
 
+import com.vcampus.client.controller.courseAdmin.CourseAdminController;
+import com.vcampus.client.controller.libraryAdmin.BookCreateViewController;
+import com.vcampus.client.controller.libraryAdmin.BookListViewController;
+import com.vcampus.client.controller.libraryAdmin.BorrowLogCreateController;
+import com.vcampus.client.controller.libraryAdmin.BorrowLogListViewController;
+import com.vcampus.client.controller.shopAdmin.FavoriteManagementViewController;
+import com.vcampus.client.controller.shopAdmin.OrderManagementViewController;
+import com.vcampus.client.controller.shopAdmin.ProductAddViewController;
+import com.vcampus.client.controller.shopAdmin.ProductEditViewController;
+import com.vcampus.client.controller.shopAdmin.ProductManagementViewController;
 import com.vcampus.client.controller.userAdmin.ForgetPasswordTableViewController;
 import com.vcampus.client.controller.userAdmin.UserCreateViewController;
 import com.vcampus.client.controller.userAdmin.UserListViewController;
 import com.vcampus.client.controller.userAdmin.UserPasswordResetViewController;
-import com.vcampus.client.controller.shopAdmin.ProductManagementViewController;
-import com.vcampus.client.controller.shopAdmin.ProductAddViewController;
-import com.vcampus.client.controller.shopAdmin.ProductEditViewController;
-import com.vcampus.client.controller.shopAdmin.OrderManagementViewController;
-import com.vcampus.client.controller.shopAdmin.FavoriteManagementViewController;
-import com.vcampus.common.dto.Message;
-import com.vcampus.client.controller.courseAdmin.CourseAdminController; // 确保导入
+import com.vcampus.common.dto.Message; // 确保导入
 
 /**
  * 客户端消息控制器
@@ -21,6 +25,7 @@ public class MessageController {
 
     private LoginController loginController;
     private StudentController studentController;
+    private TeacherController teacherController;
     private LibraryController libraryController;
     private StudentAdminController studentadminController;
     private ShopController shopController;
@@ -39,7 +44,15 @@ public class MessageController {
     private CourseAdminController courseAdminController;
 
     private TimetableController timetableController;
-
+    private BookListViewController bookListViewController;
+    private BookCreateViewController bookCreateViewController;
+    private BorrowLogListViewController borrowLogListViewController;
+    private BorrowLogCreateController borrowLogCreateController; // 【新增】引用
+    
+    // 邮件系统控制器
+    private EmailController emailController;
+    private ComposeEmailController composeEmailController;
+    private EmailAdminViewController emailAdminViewController;
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -54,7 +67,19 @@ public class MessageController {
         this.studentController=controller;
     }
     public void setStudentAdminController(StudentAdminController controller){this.studentadminController=controller;}
-    public void setLibraryController(LibraryController controller){this.libraryController=controller;}
+    public void setTeacherController(TeacherController controller){
+        this.teacherController=controller;
+    }
+    /**
+     * 【修正】注册 LibraryController 时，注销掉管理员的 BookListViewController。
+     * 确保主图书馆视图能收到数据。
+     */
+    public void setLibraryController(LibraryController controller) {
+        this.libraryController = controller;
+        this.bookListViewController = null; // 关键：注销另一个控制器
+        System.out.println("INFO: LibraryController 已注册, BookListViewController 已注销。");
+    }
+
     public void setShopController(ShopController controller){this.shopController=controller;}
     // ⭐ 新增 AcademicController 的注册方法
     public void setAcademicController(AcademicController controller) {
@@ -84,6 +109,10 @@ public class MessageController {
     public void setProductManagementViewController(ProductManagementViewController controller) {
         this.productManagementViewController = controller;
     }
+    
+    public ProductManagementViewController getProductManagementViewController() {
+        return this.productManagementViewController;
+    }
     public void setProductAddViewController(ProductAddViewController controller) {
         this.productAddViewController = controller;
     }
@@ -101,6 +130,43 @@ public class MessageController {
     public void setCourseAdminController(CourseAdminController controller) {
         this.courseAdminController = controller;
     }
+    /**
+     * 【修正】注册 BookListViewController 时，注销掉学生/教师的 LibraryController。
+     * 确保管理员图书列表视图能收到数据。
+     */
+    public void setBookListViewController(BookListViewController controller) {
+        this.bookListViewController = controller;
+        this.libraryController = null; // 关键：注销另一个控制器
+        System.out.println("INFO: BookListViewController 已注册, LibraryController 已注销。");
+    }
+    // 【新增】添加 BookCreateViewController 的注册方法
+    public void setBookCreateViewController(BookCreateViewController controller) {
+        this.bookCreateViewController = controller;
+    }
+    public void setBorrowLogListViewController(BorrowLogListViewController controller) {
+        this.borrowLogListViewController = controller;
+    }
+    // 【新增】注册 BorrowLogCreateController 的方法
+    public void setBorrowLogCreateController(BorrowLogCreateController controller) {
+        this.borrowLogCreateController = controller;
+    }
+    
+    // 【新增】注册 EmailController 的方法
+    public void setEmailController(EmailController controller) {
+        this.emailController = controller;
+    }
+    
+    // 【新增】注册 EmailAdminViewController 的方法
+    public void setEmailAdminViewController(EmailAdminViewController controller) {
+        this.emailAdminViewController = controller;
+    }
+    
+    // 【新增】注册 ComposeEmailController 的方法
+    public void setComposeEmailController(ComposeEmailController controller) {
+        this.composeEmailController = controller;
+    }
+
+
     /**
      * 处理服务端消息
      * @param message 服务端发送的消息
@@ -207,6 +273,20 @@ public class MessageController {
                         System.err.println("StudentController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case STUDENT_STATUS_APPLICATION:
+                    if (studentController != null) {
+                        studentController.handleStudentLeaveApplicationResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case REVOKE_APPLICATION:
+                    if (studentController != null) {
+                        studentController.handleRevokeApplicationResponse(message);
+                    } else {
+                        System.err.println("StudentController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
                 case ALL_STUDENT:
                     if(studentadminController!=null){
                         studentadminController.handleAllStudentResponse(message);
@@ -235,16 +315,80 @@ public class MessageController {
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case GET_ALL_APPLICATIONS:
+                    if(studentadminController!=null){
+                        studentadminController.handleAllApplicationsResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case UPDATE_APPLICATION_STATUS:
+                    if(studentadminController!=null){
+                        studentadminController.handleUpdateStatusResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case ALL_TEACHER:
+                    if(studentadminController!=null){
+                        studentadminController.handleAllTeachersResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case UPDATE_TEACHER:
+                    if(studentadminController!=null){
+                        studentadminController.handleUpdateTeacherResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case INFO_TEACHER:
+                    if(teacherController!=null){
+                        teacherController.handleTeacherInfoResponse(message);
+                    }else{
+                        System.err.println("TeacherController未设置，无法处理教师信息获取响应");
+                    }
+                    break;
+                case UPDATE_TEACHER_INFO:
+                    if(teacherController!=null){
+                        teacherController.handleTeacherUpdateResponse(message);
+                    }else{
+                        System.err.println("TeacherController未设置，无法处理教师信息获取响应");
+                    }
+                    break;
+
                 // --- 商店模块 ---
                 case SHOP_GET_ALL_PRODUCTS:
                 case SHOP_SEARCH_PRODUCTS: // 搜索和获取所有商品的响应，都由同一个方法处理(这里利用了一个很巧妙的穿透特性）
-                    // 优先分发给商店管理员控制器，如果没有则分发给普通商店控制器
-                    if (productManagementViewController != null) {
-                        productManagementViewController.handleSearchProductsResponse(message);
-                    } else if (shopController != null) {
-                        shopController.handleProductListResponse(message);
+                    // 根据当前用户角色决定路由
+                    com.vcampus.client.session.UserSession userSession = com.vcampus.client.session.UserSession.getInstance();
+                    if (userSession.isLoggedIn() && userSession.getCurrentUserRole() != null) {
+                        String roleDesc = userSession.getCurrentUserRole().getDesc();
+                        if ("商店管理员".equals(roleDesc)) {
+                            // 管理员角色，路由到管理员控制器
+                            if (productManagementViewController != null) {
+                                productManagementViewController.handleSearchProductsResponse(message);
+                            } else {
+                                System.err.println("路由警告：收到管理员商品列表响应，但ProductManagementViewController未注册。");
+                            }
+                        } else {
+                            // 学生/教师角色，路由到学生控制器
+                            if (shopController != null) {
+                                shopController.handleProductListResponse(message);
+                            } else {
+                                System.err.println("路由警告：收到学生商品列表响应，但ShopController未注册。");
+                            }
+                        }
                     } else {
-                        System.err.println("路由警告：收到商品列表响应，但相关控制器未注册。");
+                        // 未登录或角色未知，优先分发给商店管理员控制器，如果没有则分发给普通商店控制器
+                        if (productManagementViewController != null) {
+                            productManagementViewController.handleSearchProductsResponse(message);
+                        } else if (shopController != null) {
+                            shopController.handleProductListResponse(message);
+                        } else {
+                            System.err.println("路由警告：收到商品列表响应，但相关控制器未注册。");
+                        }
                     }
                     break;
                 case SHOP_GET_MY_ORDERS:
@@ -269,6 +413,69 @@ public class MessageController {
                         System.err.println("路由警告：收到商品详情响应，但ShopController未注册。");
                     }
                     break;
+                case SHOP_CREATE_ORDER:
+                    if (shopController != null) {
+                        // 当收到创建订单的响应时，调用 ShopController 中对应的处理方法
+                        shopController.handleCreateOrderResponse(message);
+                    } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
+                        System.err.println("路由警告：收到创建订单响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_ADD_FAVORITE:
+                    if (shopController != null) {
+                        shopController.handleAddFavoriteResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到添加收藏响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_REMOVE_FAVORITE:
+                    if (shopController != null) {
+                        shopController.handleRemoveFavoriteResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到取消收藏响应，但ShopController未注册。");
+                    }
+                    break;
+                case SHOP_GET_BALANCE:
+                    if (shopController != null) {
+                        // 当收到获取余额的响应时，调用 ShopController 中对应的处理方法
+                        shopController.handleGetBalanceResponse(message);
+                    } else {
+                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
+                        System.err.println("路由警告：收到获取余额响应，但ShopController未注册。");
+                    }
+                    break;
+
+                case SHOP_RECHARGE:
+                    if (shopController != null) {
+                        shopController.handleRechargeResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到充值响应，但ShopController未注册。");
+                    }
+                    break; // 确保充值逻辑结束后就跳出
+
+                // --- 【核心修正】将所有支付和删除逻辑整合到这里 ---
+
+                case SHOP_PAY_FOR_ORDER:        // 响应：为新创建的订单支付
+                case SHOP_PAY_FOR_UNPAID_ORDER: // 响应：为已存在的未支付订单付款
+                    if (shopController != null) {
+                        // 无论哪种支付成功，都统一调用您正确的 handlePayForOrderResponse 方法
+                        shopController.handlePayForOrderResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到支付成功响应，但ShopController未注册。");
+                    }
+                    break; // 【关键】在处理完所有支付逻辑后，必须跳出！
+
+                case SHOP_DELETE_ORDER: // 响应：删除订单
+                    if (shopController != null) {
+                        shopController.handleDeleteOrderResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到删除订单响应，但ShopController未注册。");
+                    }
+                    break; // 确保删除逻辑结束后也跳出
+
 
                 // 商店管理员相关响应处理
                 case SHOP_ADMIN_ADD_PRODUCT:
@@ -367,32 +574,42 @@ public class MessageController {
                     break;
 
                     // --- 图书馆模块 ---
+                // --- 图书馆模块 ---
                 case LIBRARY_GET_ALL_BOOKS:
-                case LIBRARY_SEARCH_BOOKS: // 获取全部/搜索书籍，都返回书籍列表
-                    if (libraryController != null) {
+                case LIBRARY_SEARCH_BOOKS:
+                    // 【修正后】这个路由逻辑现在可以正确工作了
+                    if (bookListViewController != null) {
+                        bookListViewController.handleBookListResponse(message);
+                    } else if (libraryController != null) {
                         libraryController.handleBookListResponse(message);
                     } else {
-                        System.err.println("路由警告：收到书籍列表响应，但LibraryController未注册。");
+                        System.err.println("路由警告：收到书籍列表响应，但相关控制器均未注册。");
                     }
                     break;
 
-                case LIBRARY_GET_MY_BORROWS: // 获取“我的借阅”
+                case LIBRARY_GET_MY_BORROWS:
+                    // 用户的“我的借阅”仍然由 LibraryController 处理
                     if (libraryController != null) {
                         libraryController.handleBorrowLogResponse(message);
                     } else {
                         System.err.println("路由警告：收到我的借阅响应，但LibraryController未注册。");
                     }
                     break;
+                case LIBRARY_GET_ADMIN_BORROW_HISTORY:
+                case LIBRARY_SEARCH_HISTORY: // 搜索和获取所有记录，都由同一个方法处理
+                    // 【修改】将管理员的借阅历史响应路由给新的控制器
+                    if (borrowLogListViewController != null) {
+                        borrowLogListViewController.handleBorrowLogListResponse(message);
+                    } else if (libraryController != null) {
+                        // 保留对旧控制器的兼容
+                        libraryController.handleBorrowLogResponse(message);
 
-                case LIBRARY_GET_ADMIN_BORROW_HISTORY: // 管理员获取“所有借阅记录”
-                    if (libraryController != null) {
-                        libraryController.handleBorrowLogResponse(message); // 也返回借阅记录，可复用同一个处理器
                     } else {
-                        System.err.println("路由警告：收到借阅历史响应，但LibraryController未注册。");
+                        System.err.println("路由警告：收到借阅记录响应，但相关控制器未注册。");
                     }
                     break;
 
-                case LIBRARY_GET_ALL_USERS_STATUS: // 管理员获取“所有人借阅情况”
+                case LIBRARY_GET_ALL_USERS_STATUS:
                     if (libraryController != null) {
                         libraryController.handleUserStatusResponse(message);
                     } else {
@@ -466,9 +683,116 @@ public class MessageController {
 
 
 
+                case LIBRARY_ADD_BOOK:
+                    // 【修改】将 ADD_BOOK 的响应路由给 BookCreateViewController
+                    if (bookCreateViewController != null) {
+                        bookCreateViewController.handleCreateBookResponse(message);
+                    } else if (bookListViewController != null) {
+                        // 如果创建页面不存在，则将消息给列表页面刷新
+                        bookListViewController.handleBookUpdateResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到创建图书响应，但相关控制器未注册。");
+                    }
+                    break;
+                case LIBRARY_DELETE_BOOK:
+                case LIBRARY_MODIFY_BOOK:
+                    if (bookListViewController != null) {
+                        bookListViewController.handleBookUpdateResponse(message);
+                    } else if (libraryController != null) {
+                        libraryController.handleBookUpdateResponse(message);
+                    }
+                    else {
+                        System.err.println("路由警告：收到书籍更新响应，但相关控制器未注册。");
+                    }
+                    break;
+                // 【新增】为修改和归还（删除）操作添加路由
+                case LIBRARY_UPDATE_BORROW_LOG:
+                case LIBRARY_RETURN_BOOK:
+                    if (borrowLogListViewController != null) {
+                        borrowLogListViewController.handleBorrowLogUpdateResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到借阅记录更新响应，但BorrowLogListViewController未注册。");
+                    }
+                    break;
+                // --- 图书馆模块 ---
+                // 【新增】为创建借阅记录操作添加路由
+                case LIBRARY_CREATE_BORROW_LOG:
+                    if (borrowLogCreateController != null) {
+                        borrowLogCreateController.handleCreateBorrowLogResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到创建借阅记录响应，但BorrowLogCreateController未注册。");
+                    }
+                    break;
+                
+                // --- 邮件系统模块 ---
+                case EMAIL_SEND:
+                case EMAIL_SAVE_DRAFT:
+                    // 发送和保存草稿的响应由ComposeEmailController处理
+                    if (composeEmailController != null) {
+                        composeEmailController.handleEmailResponse(message);
+                    } else if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("ComposeEmailController和EmailController都未设置，无法处理邮件响应");
+                    }
+                    break;
+                    
+                case EMAIL_GET_INBOX:
+                case EMAIL_GET_SENT:
+                case EMAIL_GET_DRAFT:
+                case EMAIL_READ:
+                case EMAIL_DELETE:
+                case EMAIL_MARK_READ:
+                case EMAIL_MARK_UNREAD:
+                case EMAIL_SEARCH:
+                case EMAIL_BATCH_MARK_READ:
+                case EMAIL_BATCH_DELETE:
+                    if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("EmailController未设置，无法处理邮件响应");
+                    }
+                    break;
+                    
+                // 邮件管理员相关响应
+                case EMAIL_ADMIN_GET_ALL:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleGetAllEmailsResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理获取所有邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_SEARCH_ALL:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleSearchEmailsResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理搜索邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_SEARCH_BY_USER:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleSearchEmailsByUserResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理用户搜索邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_GET_USER_EMAILS:
+                    if (emailController != null) {
+                        emailController.handleEmailResponse(message);
+                    } else {
+                        System.err.println("EmailController未设置，无法处理邮件响应");
+                    }
+                    break;
+                case EMAIL_ADMIN_DELETE:
+                    if (emailAdminViewController != null) {
+                        emailAdminViewController.handleDeleteEmailResponse(message);
+                    } else {
+                        System.err.println("EmailAdminViewController未设置，无法处理删除邮件响应");
+                    }
+                    break;
+                    
                 default:
                     System.out.println("未处理的消息类型: " + message.getAction());
-                    break;
             }
             
         } catch (Exception e) {

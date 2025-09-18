@@ -2,8 +2,14 @@ package com.vcampus.server.controller;
 
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.StudentLeaveApplication;
+import com.vcampus.common.dto.Teacher;
 import com.vcampus.common.enums.ActionType;
+import com.vcampus.server.dao.impl.StudentLeaveApplicationDao;
+import com.vcampus.server.service.StudentAdminService;
 import com.vcampus.server.service.StudentService;
+
+import java.util.List;
 
 /**
  * 服务端 学生控制器
@@ -13,9 +19,11 @@ import com.vcampus.server.service.StudentService;
 public class StudentController {
 
     private final StudentService studentService;
+    private final StudentAdminService studentAdminService;
 
     public StudentController() {
         this.studentService = new StudentService();
+        this.studentAdminService=new StudentAdminService();
     }
 
     /**
@@ -66,6 +74,89 @@ public class StudentController {
         } catch (Exception e) {
             System.err.println("更新学生信息过程中发生异常: " + e.getMessage());
             return Message.failure(ActionType.UPDATE_STUDENT, "服务器内部错误");
+        }
+    }
+
+    /**
+     * 处理学籍异动申请（休学/复学）
+     */
+    public Message handleStudentStatusApplication(Message message) {
+        Message response = new Message();
+        response.setAction(ActionType.STUDENT_STATUS_APPLICATION);
+
+        try {
+            Object data = message.getData();
+            if (data instanceof StudentLeaveApplication application) {
+                // 保存到数据库
+                boolean success = studentService.saveApplication(application);
+                response.setStatus(success);
+                response.setMessage(success ? "申请提交成功" : "申请提交失败");
+                response.setData(application);
+            } else {
+                response.setStatus(false);
+                response.setMessage("无效数据类型");
+            }
+        } catch (Exception e) {
+            response.setStatus(false);
+            response.setMessage("处理申请时发生异常：" + e.getMessage());
+        }
+
+        return response;
+    }
+
+    public Message handleRevokeApplication(Message request) {
+        try {
+            if (request.getData() instanceof StudentLeaveApplication application) {
+                // 更新申请状态为 "已撤回"
+                application.setStatus("已撤回");
+
+                boolean success = studentAdminService.updateApplicationStatus(
+                        application.getApplicationId(), "已撤回");
+
+                if (success) {
+                    return new Message(
+                            ActionType.REVOKE_APPLICATION,
+                            application,
+                            true,
+                            "申请已成功撤回");
+                } else {
+                    return new Message(
+                            ActionType.REVOKE_APPLICATION,
+                            null,
+                            false,
+                            "撤回失败，申请不存在或已处理");
+                }
+            } else {
+                return new Message(
+                        ActionType.REVOKE_APPLICATION,
+                        null,
+                        false,
+                        "请求数据格式错误");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Message(
+                    ActionType.REVOKE_APPLICATION,
+                    null,
+                    false,
+                    "服务器处理异常: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 教师信息查询
+     */
+    public Message handleInfoTeacher(Message request) {
+        Object data = request.getData();
+        if (!(data instanceof String teacherId) || teacherId.isBlank()) {
+            return Message.failure(ActionType.INFO_TEACHER, "参数错误，应为非空 teacherId(String)");
+        }
+
+        Teacher teacher = studentService.getTeacherById(teacherId);
+        if (teacher != null) {
+            return Message.success(ActionType.INFO_TEACHER, teacher, "教师信息查询成功");
+        } else {
+            return Message.failure(ActionType.INFO_TEACHER, "未找到教师信息");
         }
     }
 

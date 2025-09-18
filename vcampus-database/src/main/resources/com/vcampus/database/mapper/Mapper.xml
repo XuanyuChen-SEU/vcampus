@@ -20,8 +20,19 @@
     </update>
 
     <update id="dropTables">
-        DROP TABLE IF EXISTS vcampus_db.tb_user
-        DROP TABLE IF EXISTS vcampus_db.tb_student
+        DROP TABLE IF EXISTS vcampus_db.tb_email;
+        DROP TABLE IF EXISTS vcampus_db.tb_course_selections;
+        DROP TABLE IF EXISTS vcampus_db.tb_class_sessions;
+        DROP TABLE IF EXISTS vcampus_db.tb_courses;
+        DROP TABLE IF EXISTS vcampus_db.tb_balance;
+        DROP TABLE IF EXISTS vcampus_db.tb_favorite;
+        DROP TABLE IF EXISTS vcampus_db.tb_order;
+        DROP TABLE IF EXISTS vcampus_db.tb_product;
+        DROP TABLE IF EXISTS vcampus_db.tb_password_reset_application;
+        DROP TABLE IF EXISTS vcampus_db.tb_borrow_log;
+        DROP TABLE IF EXISTS vcampus_db.tb_book;
+        DROP TABLE IF EXISTS vcampus_db.tb_student;
+        DROP TABLE IF EXISTS vcampus_db.tb_user;
     </update>
 
     <update id="InsertTempData">
@@ -78,6 +89,40 @@
         `motherWorkUnit` VARCHAR(100) COMMENT '母亲工作单位'
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生信息表（以userId为主键）';
     </update>
+    <update id="createStudentLeaveApplicationTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_student_leave_application (
+        application_id INT NOT NULL AUTO_INCREMENT COMMENT '申请ID（主键）',
+        student_id VARCHAR(50) NOT NULL COMMENT '学生ID（userId）',
+        student_name VARCHAR(50) NOT NULL COMMENT '学生姓名',
+        type VARCHAR(20) NOT NULL COMMENT '申请类型：休学/复学',
+        reason TEXT COMMENT '申请理由',
+        status VARCHAR(20) NOT NULL DEFAULT '待审批' COMMENT '申请状态：待审批/已批准/已拒绝',
+        create_time DATETIME NOT NULL COMMENT '申请时间',
+        PRIMARY KEY (application_id),
+        INDEX idx_student_id (student_id),
+        FOREIGN KEY (student_id) REFERENCES tb_student(userId) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生学籍异动申请表';
+    </update>
+    <!-- 创建教师信息表 -->
+    <update id="createTeacherTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.`teacher` (
+        `userId` VARCHAR(50) NOT NULL COMMENT '教师用户ID（主键）',
+        `teacherId` CHAR(8) COMMENT '教师工号（8位数字）',
+        `name` VARCHAR(50) NOT NULL COMMENT '姓名',
+        `gender` VARCHAR(10) COMMENT '性别',
+        `college` VARCHAR(100) COMMENT '学院',
+        `department` VARCHAR(100) COMMENT '系/部门',
+        `title` VARCHAR(50) COMMENT '职称',
+        `phone` VARCHAR(20) COMMENT '手机号',
+        `email` VARCHAR(100) COMMENT '电子邮箱',
+        `birth_date` DATE COMMENT '出生日期',
+        `politics_status` VARCHAR(50) COMMENT '政治面貌',
+        `office` VARCHAR(100) COMMENT '办公室',  -- 新增
+        PRIMARY KEY (`userId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='教师信息表（以userId为主键）';
+
+    </update>
+
     <update id="createBookTable">
         CREATE TABLE IF NOT EXISTS vcampus_db.`tb_book` (
                                                             `book_id`       VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '图书ID',
@@ -137,7 +182,7 @@
             `price` DECIMAL(10,2) NOT NULL COMMENT '商品价格',
             `stock` INT NOT NULL DEFAULT 0 COMMENT '商品库存',
             `description` TEXT COMMENT '商品描述',
-            `imageUrl` VARCHAR(500) COMMENT '商品图片URL',
+            `imagePath` VARCHAR(500) COMMENT '商品图片路径',
             `status` ENUM('ON_SALE', 'OFF_SHELF') NOT NULL DEFAULT 'ON_SALE' COMMENT '商品状态',
             `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
             `updateTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -218,5 +263,40 @@
             FOREIGN KEY (sessionId) REFERENCES tb_class_sessions(sessionId) ON DELETE CASCADE
             );
     </update>
+
+    <!-- 创建余额表 -->
+    <update id="createBalanceTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_balance (
+            userId VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '用户ID（主键）',
+            balance DECIMAL(10,2) NOT NULL COMMENT '余额'
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='余额表';
+    </update>
+
+    <update id="useDatabase">
+        USE ${dbName}
+    </update>
+
+    <!-- 创建邮件表 -->
+    <update id="createEmailTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_email (
+            emailId VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '邮件ID（主键）',
+            senderId VARCHAR(50) NOT NULL COMMENT '发送者用户ID',
+            recipientId VARCHAR(50) NOT NULL COMMENT '接收者用户ID',
+            subject VARCHAR(255) NOT NULL COMMENT '邮件主题',
+            content TEXT COMMENT '邮件内容',
+            sendTime DATETIME NOT NULL COMMENT '发送时间',
+            status ENUM('DRAFT', 'SENT', 'READ') NOT NULL DEFAULT 'DRAFT' COMMENT '邮件状态',
+            hasAttachment BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否有附件',
+            replyToEmailId VARCHAR(50) DEFAULT NULL COMMENT '回复的邮件ID',
+            INDEX idx_sender (senderId),
+            INDEX idx_recipient (recipientId),
+            INDEX idx_sendTime (sendTime),
+            INDEX idx_status (status),
+            FOREIGN KEY (senderId) REFERENCES tb_user(userId) ON DELETE CASCADE,
+            FOREIGN KEY (recipientId) REFERENCES tb_user(userId) ON DELETE CASCADE,
+            FOREIGN KEY (replyToEmailId) REFERENCES tb_email(emailId) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='邮件表';
+    </update>
+
 
 </mapper>

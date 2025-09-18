@@ -49,6 +49,7 @@ public class LibraryController {
 
 
 
+
             // --- 【新增】处理借阅相关的请求 ---
             case LIBRARY_GET_MY_BORROWS:
                 return handleGetMyBorrows(message);
@@ -58,6 +59,11 @@ public class LibraryController {
                 return handleGetAllUsersStatus(message);
             case LIBRARY_RENEW_ALL:
                 return handleRenewAll(message);
+            // 【新增】添加对新指令的处理
+            case LIBRARY_UPDATE_BORROW_LOG:
+                return handleUpdateBorrowLog(message);
+            case LIBRARY_CREATE_BORROW_LOG:
+                return handleCreateBorrowLog(message);
             // --- 【新增】处理上下文相关的搜索请求 ---
             case LIBRARY_SEARCH_HISTORY:
                 return handleSearchBorrowHistory(message);
@@ -385,5 +391,42 @@ public class LibraryController {
             return Message.failure(ActionType.LIBRARY_GET_BOOK_PDF, "获取PDF文件异常: " + e.getMessage());
         }
     }
+    /**
+     * 【新增】处理修改借阅记录请求的方法
+     * @param request 包含 BorrowLog 对象的请求消息
+     * @return 包含操作结果的响应消息
+     */
+    private Message handleUpdateBorrowLog(Message request) {
+        BorrowLog logToUpdate = (BorrowLog) request.getData();
+        if (libraryService.updateBorrowLog(logToUpdate)) {
+            return Message.success(ActionType.LIBRARY_UPDATE_BORROW_LOG, "借阅记录更新成功。");
+        } else {
+            return Message.failure(ActionType.LIBRARY_UPDATE_BORROW_LOG,"借阅记录更新失败或数据未变动。");
+        }
+    }
 
+
+    /**
+     * 【推荐的修正方案】
+     * 处理管理员创建借阅记录的请求
+     * @param request 包含 [bookId, userId] 数组的请求消息
+     * @return 包含操作结果和原始ActionType的响应消息
+     */
+    private Message handleCreateBorrowLog(Message request) {
+        String[] params = (String[]) request.getData();
+        if (params == null || params.length < 2) {
+            // 使用构造函数创建响应，并传入原始请求的 ActionType
+            return new Message(request.getAction(), null, false, "请求参数不足。");
+        }
+        String bookId = params[0];
+        String userId = params[1];
+
+        if (libraryService.createBorrowLog(bookId, userId)) {
+            // 成功时，返回一个status为true的消息
+            return new Message(request.getAction(), null, true, "借阅记录创建成功！");
+        } else {
+            // 失败时，返回一个status为false的消息
+            return new Message(request.getAction(), null, false, "创建失败，请检查书籍ID和用户ID是否正确，以及书籍是否在馆。");
+        }
+    }
 }

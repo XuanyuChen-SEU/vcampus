@@ -10,6 +10,8 @@ public interface Mapper {
     // 创建表
     void createUserTable();
     void createStudentTable();
+    void createStudentLeaveApplicationTable();
+    void createTeacherTable();
     void createBookTable();
     void createBorrowLogTable();
     void createPasswordResetApplicationTable();
@@ -17,10 +19,14 @@ public interface Mapper {
     void createProductTable();
     void createOrderTable();
     void createFavoriteTable();
+    void createBalanceTable();
 
     //课程选择模块
     void createCoursesTable();
     void createClassSessionsTable();
     void createCourseSelectionsTable();
 
+    void useDatabase(String dbName);
+    //邮件模块
+    void createEmailTable();
 }

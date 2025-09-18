@@ -15,16 +15,6 @@ public enum ActionType {
     SYSTEM_BROADCAST("系统广播"),
     EMERGENCY_NOTIFICATION("紧急通知"),
 
-    // --- 学籍模块 - 用户端 ---
-    INFO_STUDENT("获取学生信息"),
-    UPDATE_STUDENT("修改学生信息"),
-    // --- 学籍模块 -管理员端 ---
-    ALL_STUDENT("获取所有学生信息"),
-    SEARCH_STUDENT("姓名模糊搜索"),
-    INFO_STUDENT_ADMIN("查看学生详细信息"),
-    UPDATE_STUDENT_ADMIN("更新学生信息"),
-    INFO_BOOK("获取图书信息"),
-    UPDATE_BOOK("更新图书信息"),
     // === 用户管理相关操作 ===
     CREATE_USER("创建用户"),                   // 创建新用户
     DELETE_USER("删除用户"),                   // 删除用户
@@ -35,6 +25,27 @@ public enum ActionType {
     REJECT_FORGET_PASSWORD_APPLICATION("拒绝忘记密码申请"),         // 拒绝忘记密码申请
 
 
+    // --- 学籍模块 - 用户端 ---
+    INFO_STUDENT("获取学生信息"),
+    UPDATE_STUDENT("修改学生信息"),
+    STUDENT_STATUS_APPLICATION("学籍状态调整申请"),
+    REVOKE_APPLICATION("撤回学籍状态申请"),
+    // --- 学籍模块 -管理员端 ---
+    ALL_STUDENT("获取所有学生信息"),
+    SEARCH_STUDENT("姓名模糊搜索"),
+    INFO_STUDENT_ADMIN("查看学生详细信息"),
+    UPDATE_STUDENT_ADMIN("更新学生信息"),
+    GET_ALL_APPLICATIONS("获取所有请假申请"),
+    UPDATE_APPLICATION_STATUS("更新请假申请状态"),
+    INFO_BOOK("获取图书信息"),
+    UPDATE_BOOK("更新图书信息"),
+    UPDATE_STUDENTS("批量修改学生学籍状态"),
+    ALL_TEACHER("获取所有教师信息"),
+    UPDATE_TEACHER("修改教师信息"),
+    // --- 学籍模块 -教师端 ---
+    INFO_TEACHER("获取教师信息"),
+    UPDATE_TEACHER_INFO("修改教师信息"),
+
     // --- 商店模块 - 用户端 ---
     // 商品浏览与搜索
     SHOP_GET_ALL_PRODUCTS("获取所有商品"),
@@ -42,14 +53,20 @@ public enum ActionType {
     SHOP_GET_PRODUCT_DETAIL("获取商品详情"),
     // 订单管理
     SHOP_CREATE_ORDER("创建订单"),
+    SHOP_PAY_FOR_ORDER("支付订单"),
     SHOP_GET_MY_ORDERS("获取我的订单"),
     SHOP_CANCEL_ORDER("取消订单"),
+    // --- 【新增】余额相关操作 ---
+    SHOP_GET_BALANCE("获取用户余额"),
+    SHOP_RECHARGE("用户充值"),
     // 收藏夹管理
     SHOP_ADD_FAVORITE("添加收藏"),
     SHOP_GET_MY_FAVORITES("获取我的收藏"),
     SHOP_REMOVE_FAVORITE("取消收藏"),
     // 售后服务
     SHOP_REQUEST_RETURN("申请退货"),
+    SHOP_PAY_FOR_UNPAID_ORDER("支付一个之前未支付成功订单"),   // 支付一个已创建的订单
+    SHOP_DELETE_ORDER("删除订单"),
 
 
     // --- 商店模块 - 管理员端 ---
@@ -108,6 +125,9 @@ public enum ActionType {
     ADMIN_GET_ALL_COURSES("管理员获取所有课程"),          // 管理员获取所有课程
     ADMIN_GET_ALL_COURSES_RESPONSE("管理员获取所有课程响应"),
 
+    LIBRARY_UPDATE_BORROW_LOG("修改借阅记录"),
+    LIBRARY_CREATE_BORROW_LOG("创建借阅记录"),
+
     ADMIN_ADD_COURSE("管理员增加课程"),               // 管理员增加课程
     ADMIN_ADD_COURSE_RESPONSE("管理员增加课程响应"),
 
@@ -136,9 +156,33 @@ public enum ActionType {
     LIBRARY_DELETE_BOOK("管理员删除图书"),
     LIBRARY_MODIFY_BOOK("管理员修改图书"),
     LIBRARY_SEARCH_HISTORY   ("搜索借阅历史"),
-    LIBRARY_SEARCH_USERS("搜索用户借阅历史");
+    LIBRARY_SEARCH_USERS("搜索用户借阅历史"),
 
 
+    // --- 邮件系统 - 用户端 ---
+    EMAIL_SEND("发送邮件"),                    // 发送邮件
+    EMAIL_SAVE_DRAFT("保存草稿"),              // 保存草稿
+    EMAIL_GET_INBOX("获取收件箱"),             // 获取收件箱
+    EMAIL_GET_SENT("获取发件箱"),              // 获取发件箱
+    EMAIL_GET_DRAFT("获取草稿箱"),             // 获取草稿箱
+    EMAIL_READ("阅读邮件"),                    // 阅读邮件
+    EMAIL_DELETE("删除邮件"),                  // 删除邮件
+    EMAIL_MARK_READ("标记已读"),               // 标记已读
+    EMAIL_MARK_UNREAD("标记未读"),             // 标记未读
+    EMAIL_SEARCH("搜索邮件"),                  // 搜索邮件
+    EMAIL_BATCH_MARK_READ("批量标记已读"),      // 批量标记已读
+    EMAIL_BATCH_DELETE("批量删除邮件"),        // 批量删除邮件
+
+    // --- 邮件系统 - 管理员端 ---
+    EMAIL_ADMIN_GET_ALL("管理员获取所有邮件"),  // 管理员获取所有邮件
+    EMAIL_ADMIN_GET_USER_EMAILS("管理员获取用户邮件"), // 管理员获取指定用户的邮件
+    EMAIL_ADMIN_SEARCH_ALL("管理员搜索所有邮件"), // 管理员搜索所有邮件
+    EMAIL_ADMIN_SEARCH_BY_USER("管理员按用户搜索邮件"), // 管理员按用户ID搜索邮件
+    EMAIL_ADMIN_DELETE("管理员删除邮件"),       // 管理员删除邮件
+    EMAIL_ADMIN_GET_STATISTICS("管理员获取邮件统计"), // 管理员获取邮件统计信息
+
+    // === 错误处理 ===
+    ERROR("错误"); // 通用错误类型
 
     private final String description;
 

@@ -2,9 +2,12 @@ package com.vcampus.client.service;
 
 import com.vcampus.client.MainApp;
 import com.vcampus.client.net.SocketClient;
+import com.vcampus.common.dto.BorrowLog;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.common.dto.Book;
+
+import java.util.HashMap;
 
 public class LibraryService {
 
@@ -30,7 +33,39 @@ public class LibraryService {
         Message request = new Message(ActionType.LIBRARY_SEARCH_BOOKS, keyword);
         return socketClient.sendMessage(request);
     }
+    /**
+     * 【新增】请求归还一本书
+     * @param logId  借阅记录的ID
+     * @param bookId 图书的ID
+     * @return 服务器的响应消息
+     */
+    public Message returnBook(String logId, String bookId) {
+        try {
+            // 将两个ID打包到一个HashMap中发送
+            HashMap<String, String> params = new HashMap<>();
+            params.put("logId", logId);
+            params.put("bookId", bookId);
 
+            Message request = new Message(ActionType.LIBRARY_RETURN_BOOK, params);
+            return socketClient.sendMessage(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Message(ActionType.LIBRARY_RETURN_BOOK, null, false, "客户端请求异常");
+        }
+    }
+    /**
+     * 【新增】【为 handleBorrowBook() 服务】
+     * 发送用户借阅书籍的请求。
+     * @param userId  借阅用户的ID
+     * @param bookId  要借阅的书籍ID
+     */
+    public Message borrowBook(String userId, String bookId) {
+        // 可以将 userId 和 bookId 打包成一个数组或专用的DTO对象
+        String[] params = {userId, bookId};
+        // 这里需要一个您在通用模块中新定义的 ActionType，例如 LIBRARY_BORROW_BOOK
+        Message request = new Message(ActionType.LIBRARY_BORROW_BOOK, params);
+        return socketClient.sendMessage(request);
+    }
 
 
 
@@ -159,19 +194,7 @@ public class LibraryService {
         Message request = new Message(ActionType.LIBRARY_SEARCH_MY_BORROWS, params);
         return socketClient.sendMessage(request);
     }
-    /**
-     * 【新增】【为 handleBorrowBook() 服务】
-     * 发送用户借阅书籍的请求。
-     * @param userId  借阅用户的ID
-     * @param bookId  要借阅的书籍ID
-     */
-    public Message borrowBook(String userId, String bookId) {
-        // 可以将 userId 和 bookId 打包成一个数组或专用的DTO对象
-        String[] params = {userId, bookId};
-        // 这里需要一个您在通用模块中新定义的 ActionType，例如 LIBRARY_BORROW_BOOK
-        Message request = new Message(ActionType.LIBRARY_BORROW_BOOK, params);
-        return socketClient.sendMessage(request);
-    }
+
 
     /**
      * 【异步模式】向服务器请求获取图书PDF文件。
@@ -187,7 +210,27 @@ public class LibraryService {
     }
 
 
-
-
-
+    /**
+     * 【修正后】发送更新借阅记录的请求
+     * @param borrowLog 包含更新后信息的借阅记录对象 (主要是 dueDate)
+     * @return 服务器的响应
+     */
+    public Message updateBorrowLog(BorrowLog borrowLog) {
+        // 【修正】使用正确的 ActionType
+        Message request = new Message(ActionType.LIBRARY_UPDATE_BORROW_LOG, borrowLog);
+        return socketClient.sendMessage(request);
+    }
+    /**
+     * 【新增】(管理员) 创建一条新的借阅记录
+     * @param bookId 要借阅的书籍ID
+     * @param userId 借阅用户的ID
+     * @return 服务器的响应
+     */
+    public Message createBorrowLog(String bookId, String userId) {
+        // 将两个ID打包成数组发送
+        String[] params = {bookId, userId};
+        // 注意：这里需要一个新的 ActionType
+        Message request = new Message(ActionType.LIBRARY_CREATE_BORROW_LOG, params);
+        return socketClient.sendMessage(request);
+    }
 }

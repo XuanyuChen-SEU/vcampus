@@ -5,191 +5,223 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.geometry.Insets?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <AnchorPane prefHeight="700.0" prefWidth="800.0"
             xmlns="http://javafx.com/javafx/19"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.vcampus.client.controller.StudentController"
+            stylesheets="@../../css/student.css"
             styleClass="student-record-background">
 
     <children>
         <!-- 顶部标题栏 -->
-        <HBox spacing="10" alignment="CENTER_LEFT" prefHeight="60.0"
+        <HBox spacing="10" alignment="CENTER_LEFT" prefHeight="70.0"
               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
               styleClass="student-record-header">
+            <padding>
+                <Insets top="10" left="20" right="20" bottom="10"/>
+            </padding>
             <Label text="学籍管理模块" styleClass="student-record-title">
                 <font>
                     <Font name="Microsoft YaHei Bold" size="22.0"/>
                 </font>
             </Label>
+            <Region HBox.hgrow="ALWAYS"/>
         </HBox>
 
         <!-- 主内容 -->
-        <ScrollPane fx:id="mainScrollPane" fitToWidth="true" 
-                    AnchorPane.topAnchor="70.0" AnchorPane.bottomAnchor="60.0"
-                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+        <ScrollPane fx:id="mainScrollPane" fitToWidth="true"
+                    AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="60.0"
+                    AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
                     styleClass="student-record-scroll-pane">
             <content>
-                <VBox spacing="15" styleClass="student-record-content">
+                <VBox spacing="18" styleClass="student-record-content">
                     <padding>
-                        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+                        <Insets top="16.0" right="16.0" bottom="16.0" left="16.0" />
                     </padding>
 
-            <!-- 基本信息（核心修改区域） -->
-            <TitledPane text="基本信息" expanded="true" styleClass="student-record-titled-pane">
-                <content>
-                    <GridPane fx:id="studentGridPane" hgap="10" vgap="10" styleClass="student-record-grid">
-                        <columnConstraints>
-                            <ColumnConstraints prefWidth="100"/>
-                            <ColumnConstraints prefWidth="180"/>
-                            <ColumnConstraints prefWidth="100"/>
-                            <ColumnConstraints prefWidth="180"/>
-                        </columnConstraints>
-                        <!-- 关键修改：为所有行添加固定高度约束（32px），防止被DatePicker撑开 -->
-                        <rowConstraints>
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/> <!-- 第0行：用户ID/学号 -->
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/> <!-- 第1行：姓名/性别 -->
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/> <!-- 第2行：学院/专业 -->
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/> <!-- 第3行：年级/出生日期 -->
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/> <!-- 第4行：籍贯/政治面貌 -->
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/> <!-- 第5行：学籍状态 -->
-                        </rowConstraints>
+                    <!-- 基本信息 -->
+                    <!-- 基本信息 -->
+                    <TitledPane text="基本信息" expanded="true" collapsible="false" styleClass="student-record-titled-pane">
+                        <content>
+                            <HBox spacing="20">
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <GridPane fx:id="studentGridPane" hgap="12" vgap="10" styleClass="student-record-grid">
+                                        <columnConstraints>
+                                            <ColumnConstraints prefWidth="110" halignment="LEFT"/>
+                                            <ColumnConstraints hgrow="ALWAYS" halignment="LEFT"/>
+                                            <ColumnConstraints prefWidth="110" halignment="LEFT"/>
+                                            <ColumnConstraints hgrow="ALWAYS" halignment="LEFT"/>
+                                        </columnConstraints>
+                                        <rowConstraints>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                            <RowConstraints minHeight="32" valignment="CENTER"/>
+                                        </rowConstraints>
 
-                        <!-- 第一行：用户ID / 学号 -->
-                        <Label text="用户ID" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <Label fx:id="userIdLabel" text="" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                        <Label text="学号" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                        <Label fx:id="studentIdLabel" text="" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                                        <!-- 第一行 -->
+                                        <Label text="用户ID" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="userIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="学号" GridPane.rowIndex="0" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="studentIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
 
-                        <!-- 第二行：姓名 / 性别 -->
-                        <Label text="姓名" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <Label fx:id="nameLabel" text="" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                        <Label text="性别" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-                        <Label fx:id="genderLabel" text="" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+                                        <!-- 第二行 -->
+                                        <Label text="姓名" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="nameLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="性别" GridPane.rowIndex="1" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="genderLabel" GridPane.rowIndex="1" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
 
-                        <!-- 第三行：学院 / 专业 -->
-                        <Label text="学院" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <Label fx:id="collegeLabel" text="" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                        <Label text="专业" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
-                        <Label fx:id="majorLabel" text="" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+                                        <!-- 第三行 -->
+                                        <Label text="学院" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="collegeLabel" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="专业" GridPane.rowIndex="2" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="majorLabel" GridPane.rowIndex="2" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
 
-                        <!-- 第四行：年级 / 出生日期（问题行） -->
-                        <Label text="年级" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                        <Label fx:id="gradeLabel" text="" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                        <Label text="出生日期" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
-                        <Label fx:id="birthDateLabel" text="" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+                                        <!-- 第四行 -->
+                                        <Label text="年级" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="gradeLabel" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="出生日期" GridPane.rowIndex="3" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="birthDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
 
-                        <!-- 第五行：籍贯 / 政治面貌 -->
-                        <Label text="籍贯" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                        <Label fx:id="nativePlaceLabel" text="" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-                        <Label text="政治面貌" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
-                        <Label fx:id="politicsStatusLabel" text="" GridPane.rowIndex="4" GridPane.columnIndex="3"/>
+                                        <!-- 第五行 -->
+                                        <Label text="籍贯" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="nativePlaceLabel" GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="field-value" wrapText="true"/>
+                                        <Label text="政治面貌" GridPane.rowIndex="4" GridPane.columnIndex="2" styleClass="field-label"/>
+                                        <Label fx:id="politicsStatusLabel" GridPane.rowIndex="4" GridPane.columnIndex="3" styleClass="field-value" wrapText="true"/>
 
-                        <!-- 第六行：学籍状态（单独占两列） -->
-                        <Label text="学籍状态" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                        <Label fx:id="studentStatusLabel" text="" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
-                    </GridPane>
-                </content>
-            </TitledPane>
+                                        <!-- 第六行 -->
+                                        <Label text="学籍状态" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Label fx:id="studentStatusLabel" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="3" styleClass="field-value" wrapText="true"/>
+                                    </GridPane>
+                                </VBox>
 
-            <!-- 联系方式 -->
-            <TitledPane text="联系方式" expanded="false" styleClass="student-record-titled-pane">
-                <content>
-                    <GridPane fx:id="contactGridPane" hgap="10" vgap="10" styleClass="student-record-grid">
-                        <columnConstraints>
-                            <ColumnConstraints prefWidth="100"/>
-                            <ColumnConstraints prefWidth="200"/>
-                            <ColumnConstraints prefWidth="100"/>
-                            <ColumnConstraints prefWidth="200"/>
-                        </columnConstraints>
-                        <!-- 补充行高约束，保持一致性 -->
-                        <rowConstraints>
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/>
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/>
-                        </rowConstraints>
+                                <!-- 学生头像 -->
+                                <ImageView fx:id="studentImageView" fitWidth="120" fitHeight="150" preserveRatio="true" translateX="-10"/>
+                            </HBox>
+                        </content>
+                    </TitledPane>
 
-                        <Label text="手机号" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <Label fx:id="phoneLabel" text="" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <!-- 联系方式 -->
+                    <TitledPane fx:id="contactPane" text="联系方式" expanded="false" styleClass="student-record-titled-pane">
+                        <content>
+                            <GridPane fx:id="contactGridPane" hgap="12" vgap="10" styleClass="student-record-grid">
+                                <columnConstraints>
+                                    <ColumnConstraints prefWidth="100" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="260" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="100" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="260" halignment="LEFT"/>
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="32" valignment="CENTER"/>
+                                    <RowConstraints minHeight="32" valignment="CENTER"/>
+                                </rowConstraints>
 
-                        <Label text="电子邮箱" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                        <Label fx:id="emailLabel" text="" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                                <Label text="手机号" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                                <Label fx:id="phoneLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="field-value"/>
+                                <Label text="电子邮箱" GridPane.rowIndex="0" GridPane.columnIndex="2" styleClass="field-label"/>
+                                <Label fx:id="emailLabel" GridPane.rowIndex="0" GridPane.columnIndex="3" styleClass="field-value"/>
+                                <Label text="宿舍地址" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                                <Label fx:id="dormAddressLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="field-value"/>
+                            </GridPane>
+                        </content>
+                    </TitledPane>
 
-                        <Label text="宿舍地址" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <Label fx:id="dormAddressLabel" text="" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                    </GridPane>
-                </content>
-            </TitledPane>
+                    <!-- 父亲信息 -->
+                    <TitledPane fx:id="fatherPane" text="父亲信息" expanded="false" styleClass="student-record-titled-pane">
+                        <content>
+                            <GridPane fx:id="fatherGridPane" hgap="12" vgap="10" styleClass="student-record-grid">
+                                <columnConstraints>
+                                    <ColumnConstraints prefWidth="100" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="260" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="100" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="260" halignment="LEFT"/>
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="32" valignment="CENTER"/>
+                                    <RowConstraints minHeight="32" valignment="CENTER"/>
+                                </rowConstraints>
 
-            <!-- 父亲信息 -->
-            <TitledPane text="父亲信息" expanded="false" styleClass="student-record-titled-pane">
-                <content>
-                    <GridPane fx:id="fatherGridPane" hgap="10" vgap="10" styleClass="student-record-grid">
-                        <columnConstraints>
-                            <ColumnConstraints prefWidth="100"/>
-                            <ColumnConstraints prefWidth="200"/>
-                            <ColumnConstraints prefWidth="100"/>
-                            <ColumnConstraints prefWidth="200"/>
-                        </columnConstraints>
-                        <!-- 补充行高约束 -->
-                        <rowConstraints>
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/>
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/>
-                        </rowConstraints>
+                                <Label text="姓名" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                                <Label fx:id="fatherNameLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="field-value"/>
+                                <Label text="手机号" GridPane.rowIndex="0" GridPane.columnIndex="2" styleClass="field-label"/>
+                                <Label fx:id="fatherPhoneLabel" GridPane.rowIndex="0" GridPane.columnIndex="3" styleClass="field-value"/>
+                                <Label text="政治面貌" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                                <Label fx:id="fatherPoliticsLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="field-value"/>
+                                <Label text="工作单位" GridPane.rowIndex="1" GridPane.columnIndex="2" styleClass="field-label"/>
+                                <Label fx:id="fatherWorkLabel" GridPane.rowIndex="1" GridPane.columnIndex="3" styleClass="field-value"/>
+                            </GridPane>
+                        </content>
+                    </TitledPane>
 
-                        <Label text="姓名" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <Label fx:id="fatherNameLabel" text="" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <!-- 母亲信息 -->
+                    <TitledPane fx:id="motherPane" text="母亲信息" expanded="false" styleClass="student-record-titled-pane">
+                        <content>
+                            <GridPane fx:id="motherGridPane" hgap="12" vgap="10" styleClass="student-record-grid">
+                                <columnConstraints>
+                                    <ColumnConstraints prefWidth="100" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="260" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="100" halignment="LEFT"/>
+                                    <ColumnConstraints prefWidth="260" halignment="LEFT"/>
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="32" valignment="CENTER"/>
+                                    <RowConstraints minHeight="32" valignment="CENTER"/>
+                                </rowConstraints>
 
-                        <Label text="手机号" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                        <Label fx:id="fatherPhoneLabel" text="" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
-
-                        <Label text="政治面貌" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <Label fx:id="fatherPoliticsLabel" text="" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                        <Label text="工作单位" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-                        <Label fx:id="fatherWorkLabel" text="" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
-                    </GridPane>
-                </content>
-            </TitledPane>
-
-            <!-- 母亲信息 -->
-            <TitledPane text="母亲信息" expanded="false" styleClass="student-record-titled-pane">
-                <content>
-                    <GridPane fx:id="motherGridPane" hgap="10" vgap="10" styleClass="student-record-grid">
-                        <columnConstraints>
-                            <ColumnConstraints prefWidth="100"/>
-                            <ColumnConstraints prefWidth="200"/>
-                            <ColumnConstraints prefWidth="100"/>
-                            <ColumnConstraints prefWidth="200"/>
-                        </columnConstraints>
-                        <!-- 补充行高约束 -->
-                        <rowConstraints>
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/>
-                            <RowConstraints minHeight="32" prefHeight="32" maxHeight="32"/>
-                        </rowConstraints>
-
-                        <Label text="姓名" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <Label fx:id="motherNameLabel" text="" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                        <Label text="手机号" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                        <Label fx:id="motherPhoneLabel" text="" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
-
-                        <Label text="政治面貌" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <Label fx:id="motherPoliticsLabel" text="" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                        <Label text="工作单位" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-                        <Label fx:id="motherWorkLabel" text="" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
-                    </GridPane>
-                </content>
-            </TitledPane>
-
+                                <Label text="姓名" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                                <Label fx:id="motherNameLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="field-value"/>
+                                <Label text="手机号" GridPane.rowIndex="0" GridPane.columnIndex="2" styleClass="field-label"/>
+                                <Label fx:id="motherPhoneLabel" GridPane.rowIndex="0" GridPane.columnIndex="3" styleClass="field-value"/>
+                                <Label text="政治面貌" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                                <Label fx:id="motherPoliticsLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="field-value"/>
+                                <Label text="工作单位" GridPane.rowIndex="1" GridPane.columnIndex="2" styleClass="field-label"/>
+                                <Label fx:id="motherWorkLabel" GridPane.rowIndex="1" GridPane.columnIndex="3" styleClass="field-value"/>
+                            </GridPane>
+                        </content>
+                    </TitledPane>
                 </VBox>
             </content>
         </ScrollPane>
 
-        <!-- 按钮 -->
-        <HBox spacing="10" alignment="CENTER_RIGHT"
-              AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="20.0">
-            <Button fx:id="editOrSaveButton" text="修改" styleClass="student-record-button-edit" prefWidth="80" prefHeight="30"/>
-            <Button fx:id="pdfOrCancelButton" text="导出PDF" styleClass="student-record-button-pdf" prefWidth="80" prefHeight="30"/>
+        <!-- 按钮区 -->
+        <HBox spacing="12" alignment="CENTER_RIGHT"
+              AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="24.0">
+
+            <Button fx:id="exportPdfButton" text="导出PDF" styleClass="student-record-button-export" prefWidth="120" prefHeight="34">
+                <graphic>
+                    <ImageView fitWidth="16" fitHeight="16" preserveRatio="true" styleClass="white-icon">
+                        <image>
+                            <Image url="@../../images/StudentIcons/text_icon.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Button fx:id="editOrSaveButton" text="修改" styleClass="student-record-button-edit" prefWidth="90" prefHeight="34">
+                <graphic>
+                    <ImageView fitWidth="16" fitHeight="16" preserveRatio="true" styleClass="white-icon">
+                        <image>
+                            <Image url="@../../images/StudentIcons/edit_icon.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Button fx:id="pdfOrCancelButton" text="申请" styleClass="student-record-button-status" prefWidth="120" prefHeight="34" visible="false">
+                <graphic>
+                    <ImageView fitWidth="16" fitHeight="16" preserveRatio="true" styleClass="white-icon">
+                        <image>
+                            <Image url="@../../images/StudentIcons/person_icon.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
         </HBox>
+
     </children>
 </AnchorPane>

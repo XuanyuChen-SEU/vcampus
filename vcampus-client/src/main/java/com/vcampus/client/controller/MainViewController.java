@@ -69,7 +69,12 @@ public class MainViewController {
     
     @FXML
     private Button academicButton;
-    
+
+    @FXML
+    private Button emailButton;
+
+    @FXML
+    private Button chatButton;
     // 动画相关字段
     private boolean isSidebarExpanded = false;
     private Timeline expandTimeline;
@@ -218,6 +223,11 @@ public class MainViewController {
     void handleAcademicNav(ActionEvent event) {
         loadView("/fxml/academic/AcademicView.fxml");
     }
+    
+    @FXML
+    void handleEmailNav(ActionEvent event) {
+        loadView("/fxml/email/EmailView.fxml");
+    }
 
     /**
      * 一个通用的、可复用的方法，用于将指定的FXML视图加载到主内容面板中。
@@ -247,7 +257,11 @@ public class MainViewController {
             System.err.println("加载视图时发生错误: " + e.getMessage());
         }
     }
-    
+
+    @FXML
+    private void handleShowChatView() {
+        loadView("/fxml/library/ChatView.fxml");
+    }
     /**
      * 初始化侧边栏动画
      */
@@ -310,12 +324,17 @@ public class MainViewController {
             libraryButton.setText("📚 图书馆");
             studentRecordButton.setText("📋 学籍管理");
             academicButton.setText("🎓 教务管理");
+            emailButton.setText("📧 邮件系统");
+            chatButton.setText("AI助手");
         } else {
             homeButton.setText("🏠");
             storeButton.setText("🛒");
             libraryButton.setText("📚");
             studentRecordButton.setText("📋");
             academicButton.setText("🎓");
+            emailButton.setText("📧");
+            // 【新增】当侧边栏折叠时，清空AI助手按钮的文本（只留图标）
+            chatButton.setText("");
         }
     }
 }

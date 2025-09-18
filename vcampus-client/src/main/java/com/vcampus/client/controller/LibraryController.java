@@ -7,8 +7,15 @@ import com.vcampus.client.session.UserSession;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
 // 引入您的数据模型类
@@ -27,31 +34,41 @@ import com.vcampus.common.dto.*;
 //import com.vcampus.common.dto.UserBorrowStatus;
 //import com.vcampus.common.dto.Message;
 
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 
 public class LibraryController implements IClientController {
 
-    // ================== UI 控件声明区 ==================
+    // UI 控件声明
     @FXML private Label libraryLabel;
     @FXML private Button viewToggleButton;
     @FXML private TextField searchField;
-    @FXML private Button searchButton;
     @FXML private HBox userButtonsHBox;
     @FXML private Button myBorrowsButton;
-    @FXML private Button renewAllButton;
     @FXML private HBox adminButtonsHBox;
     @FXML private Button addButton;
     @FXML private Button deleteButton;
     @FXML private Button modifyButton;
     @FXML private TableView<Object> bookTable;
     @FXML private Label userInfoLabel;
+    @FXML private Button returnButton; // 【新增】对新按钮的引用
     @FXML private Button borrowButton;
+    @FXML private HBox topBarHBox; // 【新增】顶部工具栏的引用
+    @FXML private Button literatureSearchButton;
+    @FXML private Button returnFromAcademicViewButton;
+    @FXML private BorderPane rootPane;
 
+    // 【新增】一个变量来保存图书馆的主视图内容
+    private Node libraryCenterView;
+    private List<Node> originalTopBarChildren; // 【新增】用于保存原始的顶部栏控件
+    private HBox academicTopBarContent; // 【新增】用于存放新的学术网站按钮
+    private AcademicSearchController academicSearchController; // 【新增】用于引用WebView的控制器
 
     // --- 表格列定义 ---
     @FXML private TableColumn<Object, String> colBookId;
@@ -73,39 +90,89 @@ public class LibraryController implements IClientController {
     @FXML private TableColumn<Object, String> colBorrowedBook3;
 
     // ================== 状态管理变量 ==================
-    private boolean isAdmin ;
-//    private Integer currentViewIndex = 1;
-//    //1. 所有图书（默认）
-//    //2. 我的借阅
-//    //3. 借阅历史
-
-    private LibAdminView currentLibAdminView;
-    private LibUserView currentLibUserView;
-
-    private final LibraryService libraryService = new LibraryService();
+    // 状态管理变量
+    private boolean isAdmin;
     private User currentUser;
+    private LibAdminView currentLibAdminView = LibAdminView.ALL_BOOKS;
+    private LibUserView currentLibUserView = LibUserView.ALL_BOOKS;
+    private final LibraryService libraryService = new LibraryService();
+
 
 
     // ================== 初始化与核心逻辑 ==================
     @FXML
     public void initialize() {
-        System.out.println("图书馆控制器初始化完成！");
-
-        // [重要] 在此切换 true/false 来测试不同角色
-        this.isAdmin = false;
-
-        ;//管理员角色
-        this.currentLibAdminView = LibAdminView.ALL_BOOKS;
-        this.currentLibUserView = LibUserView.ALL_BOOKS;
-
-        setcurrentUser(); // 先设置为空，等到登录成功后再设置用户信息
+        System.out.println("图书馆控制器初始化...");
+        registerToMessageController(); // 必须先注册，才能接收后续请求的响应
+        setCurrentUser();
         setupUIForRole();
-        addTableSelectionListener();
-        loadInitialAllData();
-        setupOverdueRowFactory();
         configureColumnFactories();
-        registerToMessageController();
+        addTableSelectionListener();
+        setupOverdueRowFactory();
         setupRowDoubleClickListener();
+
+        // 初始化时异步加载所有图书
+        loadInitialAllData();
+        // 【新增】在初始化时，保存原始的中央视图
+        if (rootPane != null) {
+            libraryCenterView = rootPane.getCenter();
+        } else {
+            System.err.println("错误: 未能获取到根布局 rootPane，请检查 FXML 文件中的 fx:id 设置。");
+        }
+        createAcademicTopBar();
+    }
+    /**
+     * 【最终完整版】预创建学术模式下的顶部按钮栏
+     * - 包含了全部四个网站的按钮
+     * - 修正了所有按钮的文字和图标
+     */
+    private void createAcademicTopBar() {
+        // --- 1. 创建 arXiv 按钮 (带图标) ---
+        Button arxivBtn = new Button("arXiv");
+        try {
+            Image arxivImg = new Image(getClass().getResourceAsStream("/images/LibraryIcons/arxiv_icon.png"));
+            ImageView arxivIconView = new ImageView(arxivImg);
+            arxivIconView.setFitHeight(16);
+            arxivIconView.setFitWidth(16);
+            arxivBtn.setGraphic(arxivIconView);
+            arxivBtn.setContentDisplay(ContentDisplay.LEFT);
+        } catch (Exception e) {
+            System.err.println("未能加载 arXiv 图标");
+        }
+
+        // --- 2. 创建 OpenReview 按钮 (使用指定文字) ---
+        Button openReviewBtn = new Button("OpenReview.net");
+
+        // --- 3. 创建谷歌学术按钮 (使用完整中文文字) ---
+        Button googleScholarBtn = new Button("GoogleScholar");
+        try {
+            Image googleScholarImg = new Image(getClass().getResourceAsStream("/images/LibraryIcons/GoogleScholar_icon.png"));
+            ImageView googleScholarIconView = new ImageView(googleScholarImg);
+            googleScholarIconView.setFitHeight(16);
+            googleScholarIconView.setFitWidth(16);
+            googleScholarBtn.setGraphic(googleScholarIconView);
+            googleScholarBtn.setContentDisplay(ContentDisplay.LEFT);
+        } catch (Exception e) {
+            System.err.println("未能加载 googleScholar 图标");
+        }
+        // --- 4. 创建 Z-Library 按钮 ---
+        Button zlibraryBtn = new Button("Z-Library");
+
+        // --- 设置样式 ---
+        arxivBtn.getStyleClass().add("action-button");
+        openReviewBtn.getStyleClass().add("action-button");
+        googleScholarBtn.getStyleClass().add("action-button");
+        zlibraryBtn.getStyleClass().add("action-button");
+
+        // --- 设置点击回调 ---
+        arxivBtn.setOnAction(event -> loadAcademicWebsite("arXiv"));
+        openReviewBtn.setOnAction(event -> loadAcademicWebsite("OpenReview"));
+        googleScholarBtn.setOnAction(event -> loadAcademicWebsite("GoogleScholar"));
+        zlibraryBtn.setOnAction(event -> loadAcademicWebsite("ZLibrary"));
+
+        // --- 将所有四个按钮添加到 HBox 中 ---
+        this.academicTopBarContent = new HBox(15, arxivBtn, openReviewBtn, googleScholarBtn, zlibraryBtn);
+        this.academicTopBarContent.setAlignment(Pos.CENTER_LEFT);
     }
 
     private void setupOverdueRowFactory() {
@@ -172,15 +239,11 @@ public class LibraryController implements IClientController {
     }
     @Override
     public void registerToMessageController() {
-        // 通过自身的 Service 获取全局 MessageController
-        com.vcampus.client.controller.MessageController messageController =
-                libraryService.getGlobalSocketClient().getMessageController();
-
+        com.vcampus.client.controller.MessageController messageController = MainApp.getGlobalSocketClient().getMessageController();
         if (messageController != null) {
             messageController.setLibraryController(this);
-            System.out.println("LibraryController 已成功注册到 MessageController。");
         } else {
-            System.err.println("严重错误：LibraryController 注册失败，无法获取 MessageController 实例！");
+            System.err.println("严重错误：LibraryController 注册失败！");
         }
     }
     /**
@@ -188,13 +251,14 @@ public class LibraryController implements IClientController {
      * 这个方法由外部调用（比如 MainViewController 或 initialize 自身），
      * 用于设置当前用户，并触发初始数据的加载。
      */
-    public void setcurrentUser() {
-        UserSession userSession = MainApp.getGlobalUserSession();
-        User user = new User();
-        user.setUserId(userSession.getCurrentUserId());
-        this.currentUser = user;
-        updateUserInfo();
-        loadInitialAllData();
+    public void setCurrentUser() {
+        UserSession userSession = UserSession.getInstance();
+        if (userSession.isLoggedIn()) {
+            this.currentUser = new User();
+            this.currentUser.setUserId(userSession.getCurrentUserId());
+            this.isAdmin = userSession.getCurrentUserRole().getDesc().equals("图书馆管理员");
+            updateUserInfo();
+        }
     }
     private void updateUserInfo() {
         Platform.runLater(() -> {
@@ -316,61 +380,57 @@ public class LibraryController implements IClientController {
     }
 
 
-    @FXML
-    private void handleBorrowBook(ActionEvent event) {
-        // 从表格中获取当前选中的项
+    @FXML private void handleBorrowBook(ActionEvent event) {
         Object selectedItem = bookTable.getSelectionModel().getSelectedItem();
-
-        // 1. 检查是否选中了一本书
         if (selectedItem == null || !(selectedItem instanceof Book)) {
-            showError("请先从列表中选择一本要借阅的图书。");
-            return;
+            showError("请先选择一本要借阅的图书。"); return;
         }
-
-        // 2. 检查当前用户是否存在
         if (currentUser == null) {
-            showError("无法识别当前用户信息，请重新登录。");
-            return;
+            showError("无法识别用户信息，请重新登录。"); return;
         }
-
         Book selectedBook = (Book) selectedItem;
-
-
-
-        String status = selectedBook.getBorrowStatus().trim(); // 使用trim()去除前后空白
-        if (!"在馆".equals(status)) {
-            showError("操作失败：这本书当前状态为[" + status + "]，无法借阅。");
-            return;
+        if (!"在馆".equals(selectedBook.getBorrowStatus().trim())) {
+            showError("这本书当前状态为[" + selectedBook.getBorrowStatus() + "]，无法借阅。"); return;
         }
-        // ================== 【核心修改点】结束 ==================
-
-
-        // 4. (原第3步) 弹出对话框，向用户确认操作
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "您确定要借阅《" + selectedBook.getBookName() + "》吗？", ButtonType.OK, ButtonType.CANCEL);
         confirmation.setTitle("确认借阅");
-        confirmation.setHeaderText("您确定要借阅《" + selectedBook.getBookName() + "》吗？");
-        Optional<ButtonType> result = confirmation.showAndWait();
-
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            Message response = libraryService.borrowBook(currentUser.getUserId(), selectedBook.getBookId());
-            System.out.println("借阅请求响应: " + response); // 新增此行查看完整响应
-            if (response.isSuccess()) {
-                showAlert("成功", "图书借阅成功！");
-                showAllBooksView();
-                // 【核心修改】
-                // 调用我们专门的刷新方法，而不是旧的 loadInitialAllData()
-
-            } else {
-                showError("借阅失败：" + response.getMessage());
+        confirmation.setHeaderText(null);
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                libraryService.borrowBook(currentUser.getUserId(), selectedBook.getBookId());
             }
-        }
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
+        });
     }
 
+    /**
+     * 【新增】处理“归还”按钮点击事件的方法
+     * (这个方法的代码风格和 handleBorrowBook 完全一致)
+     */
+    @FXML
+    private void handleReturnBook(ActionEvent event) {
+        Object selectedItem = bookTable.getSelectionModel().getSelectedItem();
+        // 1. 检查是否选中了项目，以及项目类型是否正确
+        if (selectedItem == null || !(selectedItem instanceof BorrowLog)) {
+            showError("请先选择一本您要归还的图书。");
+            return;
+        }
+        BorrowLog selectedLog = (BorrowLog) selectedItem;
 
+        // 2. 弹出确认对话框
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "您确定要归还《" + selectedLog.getBookName() + "》吗？", ButtonType.OK, ButtonType.CANCEL);
+        confirmation.setTitle("确认归还");
+        confirmation.setHeaderText(null);
+
+        // 3. 根据用户确认结果，调用服务发送请求
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                libraryService.returnBook(selectedLog.getLogId(), selectedLog.getBookId());
+            }
+        });
+        showUserMyBorrowsView();
+        showUserMyBorrowsView();
+        showUserMyBorrowsView();
+    }
 
 
 // ================== 异步响应处理入口 (借鉴ShopController) ==================
@@ -419,74 +479,12 @@ public class LibraryController implements IClientController {
         }
     }
 
-    @FXML
-    private void handleSearch(ActionEvent event) {
+    @FXML private void handleSearch(ActionEvent event) {
         String keyword = searchField.getText();
-
-        // 1. 判断搜索框是否为空
         if (keyword == null || keyword.trim().isEmpty()) {
-            // --- 为空：重新加载当前视图的全部数据 ---
-            System.out.println("搜索框为空，重新加载当前视图...");
-            if (isAdmin) {
-                switch (currentLibAdminView) {
-                    case ALL_BOOKS:
-                        showAllBooksView();
-                        break;
-                    case BORROW_HISTORY:
-                        showAdminBorrowHistoryView();
-                        break;
-                    case ALL_USERS_STATUS:
-                        showAllUsersStatusView();
-                        break;
-                }
-            } else { // 学生或教师
-                switch (currentLibUserView) {
-                    case ALL_BOOKS:
-                        showAllBooksView();
-                        break;
-                    case MY_BORROWS:
-                        showUserMyBorrowsView();
-                        break;
-                }
-            }
+            loadInitialAllData(); // 刷新
         } else {
-            // --- 不为空：根据当前视图执行 específicos 搜索 ---
-            System.out.println("正在搜索: " + keyword);
-            if (isAdmin) {
-                switch (currentLibAdminView) {
-                    case ALL_BOOKS:
-                        performBookSearch(keyword);
-                        break;
-                    case BORROW_HISTORY:
-                        // 【新】调用搜索借阅历史的服务
-                        Message historyResponse = libraryService.searchBorrowHistory(keyword);
-                        if (historyResponse.isSuccess()) updateBorrowLogDisplay((List<BorrowLog>) historyResponse.getData());
-                        else showError("搜索借阅历史失败: " + historyResponse.getMessage());
-                        break;
-                    case ALL_USERS_STATUS:
-                        // 【新】调用搜索用户的服务
-                        Message userResponse = libraryService.searchUserStatus(keyword);
-                        if (userResponse.isSuccess()) updateUserStatusDisplay((List<UserBorrowStatus>) userResponse.getData());
-                        else showError("搜索用户失败: " + userResponse.getMessage());
-                        break;
-                }
-            } else { // 学生或教师
-                switch (currentLibUserView) {
-                    case ALL_BOOKS:
-                        performBookSearch(keyword);
-                        break;
-                    case MY_BORROWS:
-                        if (currentUser == null) {
-                            showError("无法获取当前用户信息！");
-                            return;
-                        }
-                        // 【新】调用在“我的借阅”中搜索的服务
-                        Message myBorrowsResponse = libraryService.searchMyBorrows(currentUser.getUserId(), keyword);
-                        if (myBorrowsResponse.isSuccess()) updateBorrowLogDisplay((List<BorrowLog>) myBorrowsResponse.getData());
-                        else showError("在我的借阅中搜索失败: " + myBorrowsResponse.getMessage());
-                        break;
-                }
-            }
+            libraryService.searchBooks(keyword);
         }
     }
 
@@ -502,242 +500,103 @@ public class LibraryController implements IClientController {
     }
 
     @FXML private void handleAddBook(ActionEvent event) {
-        TextInputDialog dialog = new TextInputDialog("书籍Id,书籍名称,作者,ISBN,出版社,描述");
+        TextInputDialog dialog = new TextInputDialog("ID,书名,作者,ISBN,出版社,描述");
         dialog.setTitle("添加新书");
         dialog.setHeaderText("请输入新书信息，用英文逗号分隔");
-        dialog.setContentText("格式:");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(bookInfo -> {
+        dialog.showAndWait().ifPresent(bookInfo -> {
             String[] parts = bookInfo.split(",");
             if (parts.length == 6) {
-                Book newBook = new Book();
-                newBook.setBookId(parts[0]);
-                newBook.setBookName(parts[1]);
-                newBook.setAuthor(parts[2]);
-                newBook.setISBN(parts[3]);
-                newBook.setPublisher(parts[4]);
-                newBook.setDescription(parts[5]);
-                newBook.setBorrowStatus("在馆");
-                // 其他属性可由服务器设置默认值
-
-                Message response = libraryService.addBook(newBook);
-                if (response.isSuccess()) {
-                    showAlert("成功", "书籍添加成功！");
-                    showAllBooksView();
-                } else {
-                    showError("添加失败: " + response.getMessage());
-                    showAllBooksView();
-                }
+                Book newBook = new Book(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], "在馆");
+                libraryService.addBook(newBook);
             } else {
                 showError("输入格式不正确！");
-                showAllBooksView();
             }
-            showAllBooksView();
         });
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
     }
     @FXML private void handleDeleteBook(ActionEvent event) {
-
         Object selectedItem = bookTable.getSelectionModel().getSelectedItem();
-        if (selectedItem == null || !(selectedItem instanceof Book)) {
-            showError("请先在列表中选择一本要删除的图书！");
-            return;
+        if (!(selectedItem instanceof Book)) {
+            showError("请选择一本要删除的图书！"); return;
         }
         Book selectedBook = (Book) selectedItem;
-
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "您确定要删除《" + selectedBook.getBookName() + "》吗？", ButtonType.OK, ButtonType.CANCEL);
         confirmation.setTitle("确认删除");
-        confirmation.setHeaderText("您确定要删除《" + selectedBook.getBookName() + "》吗？");
-        confirmation.setContentText("此操作不可撤销。");
-
-        Optional<ButtonType> result = confirmation.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            Message response = libraryService.deleteBook(selectedBook.getBookId());
-            if (response.isSuccess()) {
-                showAlert("成功", "书籍已删除。");
-                showAllBooksView();
-            } else {
-                showError("删除失败: " + response.getMessage());
-                showAllBooksView();
+        confirmation.setHeaderText(null);
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                libraryService.deleteBook(selectedBook.getBookId());
             }
-            showAllBooksView();
-        }
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
-
+        });
     }
     @FXML private void handleModifyBook(ActionEvent event) {
-
         Object selectedItem = bookTable.getSelectionModel().getSelectedItem();
-        if (selectedItem == null || !(selectedItem instanceof Book)) {
-            showError("请先在列表中选择一本要修改的图书！");
-            return;
+        if (!(selectedItem instanceof Book)) {
+            showError("请选择一本要修改的图书！"); return;
         }
         Book selectedBook = (Book) selectedItem;
-
-        // 步骤 2: 创建一个预先填充好当前书籍信息的字符串
-        String currentInfo = String.join(",",
-                selectedBook.getBookName(),
-                selectedBook.getAuthor(),
-                selectedBook.getISBN(),
-                selectedBook.getPublisher(),
-                selectedBook.getDescription()
-        );
-
-        // 步骤 3: 创建并显示一个带有默认值的对话框
+        String currentInfo = String.join(",", selectedBook.getBookName(), selectedBook.getAuthor(), selectedBook.getISBN(), selectedBook.getPublisher(), selectedBook.getDescription());
         TextInputDialog dialog = new TextInputDialog(currentInfo);
         dialog.setTitle("修改书籍信息");
         dialog.setHeaderText("您正在修改《" + selectedBook.getBookName() + "》");
-        dialog.setContentText("请按格式修改 (书籍名称,作者,ISBN,出版社,描述):");
-
-        // 步骤 4: 处理用户的输入
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(bookInfo -> {
+        dialog.showAndWait().ifPresent(bookInfo -> {
             String[] parts = bookInfo.split(",");
             if (parts.length == 5) {
-                // 步骤 5: 更新 'selectedBook' 对象的属性，而不是创建新对象
                 selectedBook.setBookName(parts[0].trim());
                 selectedBook.setAuthor(parts[1].trim());
                 selectedBook.setISBN(parts[2].trim());
                 selectedBook.setPublisher(parts[3].trim());
                 selectedBook.setDescription(parts[4].trim());
-
-                // 步骤 6: 调用 'modifyBook' 服务
-                Message response = libraryService.modifyBook(selectedBook);
-                if (response.isSuccess()) {
-                    showAlert("成功", "书籍信息已更新！");
-                    // 步骤 7: 刷新列表以显示更新后的信息
-                    showAllBooksView();
-                } else {
-                    showError("修改失败: " + response.getMessage());
-                }
+                libraryService.modifyBook(selectedBook);
             } else {
                 showError("输入格式不正确！");
             }
         });
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
-
     }
 
-    @FXML private void handleRenewAll(ActionEvent event)
-    {
-        /* TODO: 实现一键续借逻辑 */
+    @FXML private void handleRenewAll(ActionEvent event) {
         if (currentUser == null) {
-            showError("无法获取用户信息，请重新登录。");
-            return;
+            showError("无法获取用户信息。"); return;
         }
-        Message response = libraryService.renewAllBooks(currentUser.getUserId());
-        if (response.isSuccess()) {
-            showAlert("成功", "所有已借阅书籍已成功续借！");
-            // 如果当前在“我的借阅”视图，则刷新它
-            if (!isAdmin && currentLibUserView == LibUserView.MY_BORROWS) {
-                showUserMyBorrowsView();
-            }
-        } else {
-            showError("续借失败: " + response.getMessage());
-        }
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
-        showAllBooksView();
-
-
-
+        libraryService.renewAllBooks(currentUser.getUserId());
     }
 
 
     // ================== 视图切换辅助方法 ==================
 
     private void showAllBooksView() {
-        if (isAdmin) {
-            currentLibAdminView = LibAdminView.ALL_BOOKS;
-            viewToggleButton.setText("查看借阅记录");
-            // 【修改点】确保按钮组可见，并根据是否有选中项来决定是否可用
-            adminButtonsHBox.setVisible(true);
-            // 切换回此视图时，重置按钮为禁用状态，等待用户选择
-            setAdminActionButtonsDisabled(false);
-        } else {
-            currentLibUserView = LibUserView.ALL_BOOKS;
-            myBorrowsButton.setText("我的借阅");
-        }
-        bookTable.getColumns().setAll(colBookId, colBookName, colAuthor, colISBN, colPublisher, colDescription, colBorrowStatus);
-        System.out.println("切换到【所有图书】视图");
+        configureTableForBooks();
+        // 【修正】只发送请求，由响应处理器负责更新UI
+        borrowButton.setVisible(true);
+        borrowButton.setManaged(true);
+        returnButton.setVisible(false);
+        returnButton.setManaged(false);
 
-
-        System.out.println("【步骤3】showAllBooksView被调用，准备发送'获取所有图书'的请求...");
-        Message response = libraryService.getAllBooks();
-        if(response.isSuccess()) {
-            updateBookDisplay((List<Book>) response.getData());
-        } else {
-            showError("加载书籍列表失败: " + response.getMessage());
-        }
-
-
+        libraryService.getAllBooks();
     }
 
     private void showAdminBorrowHistoryView() {
-        currentLibAdminView = LibAdminView.BORROW_HISTORY;
-        viewToggleButton.setText("查看借阅情况");
-        // 【修改点】确保按钮组可见，但始终设置为禁用状态
-        adminButtonsHBox.setVisible(true);
-        setAdminActionButtonsDisabled(true);
-        bookTable.getColumns().setAll(colBookId, colBookName, colUserId, colBorrowerName, colBorrowDate, colDueDate);
-        System.out.println("切换到【管理员-借阅记录】视图");
-        // TODO: 加载 BookProcess 类型的数据
-        // ... (逻辑不变，但现在会触发数据加载)
-        Message response = libraryService.getAdminBorrowHistory();
-        if(response.isSuccess()) {
-            updateBorrowLogDisplay((List<BorrowLog>) response.getData());
-        } else {
-            showError("加载借阅记录失败: " + response.getMessage());
-        }
-
-
-
+        configureTableForAdminHistory();
+        // 【修正】只发送请求
+        libraryService.getAdminBorrowHistory();
     }
 
     private void showAllUsersStatusView() {
-        currentLibAdminView = LibAdminView.ALL_USERS_STATUS;
-        viewToggleButton.setText("查看所有图书");
-        // 【修改点】确保按钮组可见，但始终设置为禁用状态
-        adminButtonsHBox.setVisible(true);
-        setAdminActionButtonsDisabled(true);
-        bookTable.getColumns().setAll(colUserId, colUserName, colUserIdentity, colBorrowedBook1, colBorrowedBook2, colBorrowedBook3);
-        System.out.println("切换到【管理员-所有人借阅情况】视图");
-        // TODO: 加载 Borrower 类型的数据
-        // ... (逻辑不变，但现在会触发数据加载)
-        Message response = libraryService.getAllUsersStatus();
-        if(response.isSuccess()) {
-            updateUserStatusDisplay((List<UserBorrowStatus>) response.getData());
-        } else {
-            showError("加载用户借阅情况失败: " + response.getMessage());
-        }
+        configureTableForAllUsersStatus();
+        // 【修正】只发送请求
+        libraryService.getAllUsersStatus();
     }
 
     private void showUserMyBorrowsView() {
-        currentLibUserView = LibUserView.MY_BORROWS;
-        myBorrowsButton.setText("返回书库");
-        colBorrowDate.setVisible(true); // 确保可见
-        colDueDate.setVisible(true);
-        bookTable.getColumns().setAll(colBookId, colBookName, colBorrowDate,colDueDate);
-        System.out.println("切换到【用户-我的借阅】视图");
-        // TODO: 加载当前用户的 BookProcess 类型数据
+        configureTableForMyBorrows();
+
+        // 【修改】隐藏“借阅”按钮，显示“归还”按钮
+        borrowButton.setVisible(false);
+        borrowButton.setManaged(false);
+        returnButton.setVisible(true);
+        returnButton.setManaged(true);
         if (currentUser == null) return;
-        Message response = libraryService.getMyBorrows(currentUser.getUserId());
-        if(response.isSuccess()) {
-            updateBorrowLogDisplay((List<BorrowLog>) response.getData());
-        } else {
-            showError("加载我的借阅失败: " + response.getMessage());
-        }
+        // 【修正】只发送请求
+        libraryService.getMyBorrows(currentUser.getUserId());
     }
 
     /**
@@ -755,16 +614,13 @@ public class LibraryController implements IClientController {
      * (由 MessageController 在收到 LIBRARY_GET_ALL_BOOKS 和 LIBRARY_SEARCH_BOOKS 类型消息时调用)
      */
     public void handleBookListResponse(Message message) {
-        if (message.isSuccess()) {
-            // 这个方法之前已经存在，现在作为异步入口
-            updateBookDisplay((List<Book>) message.getData());
-
-
-
-
-        } else {
-            showError("异步加载书籍列表失败: " + message.getMessage());
-        }
+        Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                updateBookDisplay((List<Book>) message.getData());
+            } else {
+                showError("加载书籍列表失败: " + message.getMessage());
+            }
+        });
     }
 
     /**
@@ -772,12 +628,13 @@ public class LibraryController implements IClientController {
      * (由 MessageController 在收到 LIBRARY_GET_MY_BORROWS 和 LIBRARY_GET_ADMIN_BORROW_HISTORY 类型消息时调用)
      */
     public void handleBorrowLogResponse(Message message) {
-        if (message.isSuccess()) {
-            // 这个方法之前已经存在，现在作为异步入口
-            updateBorrowLogDisplay((List<BorrowLog>) message.getData());
-        } else {
-            showError("异步加载借阅记录失败: " + message.getMessage());
-        }
+        Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                updateBorrowLogDisplay((List<BorrowLog>) message.getData());
+            } else {
+                showError("加载借阅记录失败: " + message.getMessage());
+            }
+        });
     }
 
     /**
@@ -785,12 +642,13 @@ public class LibraryController implements IClientController {
      * (由 MessageController 在收到 LIBRARY_GET_ALL_USERS_STATUS 类型消息时调用)
      */
     public void handleUserStatusResponse(Message message) {
-        if (message.isSuccess()) {
-            // 这个方法之前已经存在，现在作为异步入口
-            updateUserStatusDisplay((List<UserBorrowStatus>) message.getData());
-        } else {
-            showError("异步加载用户借阅情况失败: " + message.getMessage());
-        }
+        Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                updateUserStatusDisplay((List<UserBorrowStatus>) message.getData());
+            } else {
+                showError("加载用户借阅情况失败: " + message.getMessage());
+            }
+        });
     }
 
     /**
@@ -801,61 +659,186 @@ public class LibraryController implements IClientController {
     public void handleGetBookPdfResponse(Message response) {
         if (response != null && response.isSuccess()) {
             byte[] pdfBytes = (byte[]) response.getData();
-            if (pdfBytes != null && pdfBytes.length > 0) {
-                // 必须使用 Platform.runLater，以确保文件和UI操作在JavaFX主线程上执行
-                Platform.runLater(() -> {
-                    try {
-                        // 创建临时文件
-                        File tempFile = File.createTempFile("vcampus_book_" + ((BorrowLog) bookTable.getSelectionModel().getSelectedItem()).getBookId(), ".pdf");
-                        Files.write(tempFile.toPath(), pdfBytes);
-                        tempFile.deleteOnExit(); // 程序退出时自动删除
-
-                        // 打开文件
-                        Desktop.getDesktop().open(tempFile);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        showAlert("文件操作失败", "无法创建或打开临时PDF文件。");
-                    }
-                });
-            }
+            Platform.runLater(() -> {
+                try {
+                    File tempFile = File.createTempFile("vcampus_book_", ".pdf");
+                    Files.write(tempFile.toPath(), pdfBytes);
+                    tempFile.deleteOnExit();
+                    Desktop.getDesktop().open(tempFile);
+                } catch (IOException e) {
+                    showAlert("文件操作失败", "无法创建或打开临时PDF文件。");
+                }
+            });
         } else {
-            String errorMsg = (response != null) ? response.getMessage() : "未能从服务器获取响应。";
-            // 确保在UI线程中显示弹窗
-            Platform.runLater(() -> showAlert("获取失败", errorMsg));
+            showError("未能从服务器获取PDF文件。");
+        }
+    }
+    /**
+     * 【修改后】的响应处理方法，能智能刷新当前视图
+     */
+    public void handleBookUpdateResponse(Message message) {
+        Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                showAlert("操作成功", message.getMessage());
+                // 判断当前在哪个视图，就刷新哪个视图
+                if (currentLibUserView == LibUserView.MY_BORROWS) {
+                    showUserMyBorrowsView(); // 刷新“我的借阅”
+                } else {
+                    showAllBooksView(); // 刷新“所有图书”
+                }
+            } else {
+                showError(message.getMessage());
+            }
+        });
+    }
+    /**
+     * 点击“文献检索”按钮时，显示网站选择页面
+     */
+    @FXML
+    private void handleShowAcademicView() {
+        try {
+            // 1. 隐藏顶部工具栏并切换底部按钮
+            topBarHBox.setVisible(false);
+            literatureSearchButton.setVisible(false);
+            literatureSearchButton.setManaged(false);
+            returnFromAcademicViewButton.setVisible(true);
+            returnFromAcademicViewButton.setManaged(true);
+
+            // 2. 加载并显示“网站选择”视图
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/library/AcademicChoiceView.fxml"));
+            Parent choiceView = loader.load();
+            AcademicChoiceController choiceController = loader.getController();
+
+            // 3. 设置回调：当用户做出选择后，加载WebView并动态修改顶部栏
+            choiceController.setOnChoiceMade(siteName -> {
+                // 保存原始的顶部栏子节点
+                if (originalTopBarChildren == null) {
+                    originalTopBarChildren = new ArrayList<>(topBarHBox.getChildren());
+                }
+                // 加载对应的网站
+                loadAcademicWebsite(siteName);
+            });
+
+            rootPane.setCenter(choiceView);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("无法加载学术网站选择页面: " + e.getMessage());
         }
     }
 
+    /**
+     * 【最终修正版】根据用户的选择，加载对应的学术网站
+     * - 新增了对 "GoogleScholar" 的处理逻辑
+     */
+    private void loadAcademicWebsite(String siteName) {
+        try {
+            // ... (切换顶部栏和加载WebView的代码不变) ...
+            topBarHBox.getChildren().clear();
+            topBarHBox.getChildren().add(academicTopBarContent);
+            topBarHBox.setVisible(true);
 
-//    /**
-//     * 核心刷新方法：从服务器获取最新的图书列表并更新UI表格。
-//     */
-//    private void refreshBookTable() {
-//        System.out.println("CLIENT: 正在向服务器请求最新的图书列表...");
-//
-//        // 1. 调用客户端的 Service，从服务器获取最新的图书列表
-//        Message response = libraryService.getAllBooks(); // 这会发送 LIBRARY_GET_ALL_BOOKS 请求
-//
-//        if (response != null && response.isSuccess()) {
-//            // 2. 从 Message 中解析出数据 (服务端返回的是 List<Book>)
-//            List<Book> latestBookList = (List<Book>) response.getData();
-//
-//            if (latestBookList != null) {
-//                System.out.println("CLIENT: 成功获取到 " + latestBookList.size() + " 本书。正在刷新表格...");
-//
-//                // 3. 【最关键的一步】使用 setAll 来更新 TableView 的数据源。
-//                // 这是触发 JavaFX TableView UI 更新的标准、最高效的方式。
-//                bookTable.getItems().setAll(latestBookList);
-//
-//                System.out.println("CLIENT: 表格UI刷新完成。");
-//            }
-//        } else {
-//            // 如果获取失败，显示错误
-//            String errorMsg = (response != null) ? response.getMessage() : "无法连接到服务器";
-//            showError("数据刷新失败：" + errorMsg);
-//        }
-//    }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/library/AcademicSearchView.fxml"));
+            Parent academicView = loader.load();
+            this.academicSearchController = loader.getController();
 
-// 在 LibraryController.java 中
+            String query = searchField.getText();
+            String url;
+
+            if ("arXiv".equals(siteName)) {
+                url = (query == null || query.trim().isEmpty()) ? "https://arxiv.org" :
+                        "https://arxiv.org/search/?query=" + URLEncoder.encode(query, "UTF-8");
+
+            } else if ("OpenReview".equals(siteName)) {
+                url = (query == null || query.trim().isEmpty()) ? "https://openreview.net" :
+                        "https://openreview.net/search?q=" + URLEncoder.encode(query, "UTF-8");
+
+            } else if("GoogleScholar".equals(siteName)){ // 谷歌学术
+                url = (query == null || query.trim().isEmpty()) ? "https://scholar.google.com/" :
+                        "https://scholar.google.com/scholar?q=" + URLEncoder.encode(query, "UTF-8");
+            } else { // 【新增】处理 Z-Library 的 case
+                // 注意：Z-Library 域名经常变化，这里使用一个当前可用的
+                url = (query == null || query.trim().isEmpty()) ? "https://z-lib.is/" :
+                        "https://z-lib.is/s/" + URLEncoder.encode(query, "UTF-8");
+            }
+
+            academicSearchController.loadURL(url);
+            rootPane.setCenter(academicView);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("无法加载学术网站页面: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleReturnFromAcademicView() {
+        // 恢复主视图
+        rootPane.setCenter(libraryCenterView);
+
+        // 恢复原始的顶部栏内容和按钮
+        if (originalTopBarChildren != null) {
+            topBarHBox.getChildren().setAll(originalTopBarChildren);
+        }
+        topBarHBox.setVisible(true);
+        literatureSearchButton.setVisible(true);
+        literatureSearchButton.setManaged(true);
+        returnFromAcademicViewButton.setVisible(false);
+        returnFromAcademicViewButton.setManaged(false);
+
+        // 清理引用，以便下次能正确执行
+        this.academicSearchController = null;
+    }
+    /**
+     * 【核心】辅助方法，用于统一管理进入/退出学术检索模式的UI变化
+     * @param isAcademicMode true为进入学术模式，false为退出
+     */
+    private void setAcademicMode(boolean isAcademicMode) {
+        // 控制顶部工具栏的可见性
+        if (topBarHBox != null) {
+            topBarHBox.setVisible(!isAcademicMode);
+            topBarHBox.setManaged(!isAcademicMode);
+        }
+
+        // 控制底部按钮的切换
+        literatureSearchButton.setVisible(!isAcademicMode);
+        literatureSearchButton.setManaged(!isAcademicMode);
+        returnFromAcademicViewButton.setVisible(isAcademicMode);
+        returnFromAcademicViewButton.setManaged(isAcademicMode);
+    }
+// ================== UI配置与辅助方法 (结构优化) ==================
+
+    private void configureTableForBooks() {
+        if (isAdmin) {
+            currentLibAdminView = LibAdminView.ALL_BOOKS;
+            viewToggleButton.setText("查看借阅记录");
+            adminButtonsHBox.setVisible(true);
+            setAdminActionButtonsDisabled(bookTable.getSelectionModel().getSelectedItem() == null);
+        } else {
+            currentLibUserView = LibUserView.ALL_BOOKS;
+            myBorrowsButton.setText("我的借阅");
+        }
+        bookTable.getColumns().setAll(colBookId, colBookName, colAuthor, colISBN, colPublisher, colDescription, colBorrowStatus);
+    }
+
+    private void configureTableForAdminHistory() {
+        currentLibAdminView = LibAdminView.BORROW_HISTORY;
+        viewToggleButton.setText("查看借阅情况");
+        adminButtonsHBox.setVisible(false);
+        bookTable.getColumns().setAll(colBookId, colBookName, colUserId, colBorrowerName, colBorrowDate, colDueDate);
+    }
+
+    private void configureTableForAllUsersStatus() {
+        currentLibAdminView = LibAdminView.ALL_USERS_STATUS;
+        viewToggleButton.setText("查看所有图书");
+        adminButtonsHBox.setVisible(false);
+        bookTable.getColumns().setAll(colUserId, colUserName, colUserIdentity, colBorrowedBook1, colBorrowedBook2, colBorrowedBook3);
+    }
+
+    private void configureTableForMyBorrows() {
+        currentLibUserView = LibUserView.MY_BORROWS;
+        myBorrowsButton.setText("返回书库");
+        bookTable.getColumns().setAll(colBookId, colBookName, colBorrowDate, colDueDate);
+    }
 
 }

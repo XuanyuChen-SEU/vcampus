@@ -2,11 +2,15 @@ package com.vcampus.server.service;
 
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.dto.User;
+import com.vcampus.common.dto.Teacher;
+import com.vcampus.server.dao.impl.TeacherDao;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.server.dao.impl.StudentDao;
-
+import com.vcampus.server.dao.impl.StudentLeaveApplicationDao;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * 服务端学生信息服务类
@@ -15,9 +19,12 @@ import java.sql.SQLException;
 public class StudentService {
 
     private final StudentDao studentDao;
+    private final TeacherDao teacherDao;
+    private final StudentLeaveApplicationDao applicationDAO = new StudentLeaveApplicationDao();
 
     public StudentService() {
         this.studentDao = new StudentDao();
+        this.teacherDao = new TeacherDao();
     }
 
     /**
@@ -57,6 +64,34 @@ public class StudentService {
         }
     }
 
+    /**
+     * 保存休学/复学申请
+     * @param application 申请对象
+     * @return true 成功，false 失败
+     */
+    public boolean saveApplication(StudentLeaveApplication application) {
+        try {
+            return applicationDAO.insert(application);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 根据教师工号/ID获取教师信息
+     * @param teacherId 教师ID
+     * @return Teacher 对象，如果不存在返回 null
+     */
+    public Teacher getTeacherById(String teacherId) {
+        if (teacherId == null || teacherId.isBlank()) return null;
+        try {
+            return teacherDao.getTeacherByUserId(teacherId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 }
 

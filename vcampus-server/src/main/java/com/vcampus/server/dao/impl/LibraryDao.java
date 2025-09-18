@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LibraryDao implements ILibraryDao {
 
@@ -99,6 +100,12 @@ public class LibraryDao implements ILibraryDao {
         }
         return count>0;
     }
+
+    @Override
+    public boolean deleteBorrowLogById(String logId) {
+        return false;
+    }
+
     @Override
     public List<BorrowLog> getBorrowLogsByUserId(String userId)
     {
@@ -204,45 +211,110 @@ public class LibraryDao implements ILibraryDao {
 
     }
     /**
-     * 【新增】实现 ILibraryDao 接口中定义的 returnBook 方法
-     * @param logId 要删除的借阅记录ID
-     * @param bookId 要更新状态的图书ID
-     * @return 操作是否成功
+     * 【确保存在】实现归还图书的事务操作
      */
     @Override
     public boolean returnBook(String logId, String bookId) {
-        SqlSession session = null;
-        try {
-            // 获取数据库会话，并开启事务
-            session = MyBatisUtil.getSqlSessionFactory().openSession();
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            try {
+                LibraryMapper libraryMapper = session.getMapper(LibraryMapper.class);
 
-            // 1. 删除借阅记录 (调用 LibraryMapper.xml 中的 deleteBorrowLog)
-            int deletedRows = session.delete("com.vcampus.common.dao.ILibraryDao.deleteBorrowLog", logId);
+                // 操作1：删除借阅记录
+                int deletedRows = libraryMapper.deleteBorrowLogById(logId);
+                if (deletedRows == 0) {
+                    session.rollback(); // 如果没有记录被删除，说明logId无效，回滚
+                    return false;
+                }
 
-            // 2. 更新图书状态为“在馆” (调用 LibraryMapper.xml 中的 updateBookStatus)
-            int updatedRows = session.update("com.vcampus.common.dao.ILibraryDao.updateBookStatus", bookId);
+                // 操作2：更新图书状态为“在馆”
+                Book bookToReturn = libraryMapper.selectBookById(bookId);
+                if (bookToReturn == null) {
+                    session.rollback(); // 找不到书，数据异常，回滚
+                    return false;
+                }
+                bookToReturn.setBorrowStatus("在馆");
+                libraryMapper.updateBook(bookToReturn);
 
-            // 3. 如果两个操作都成功，则提交事务
-            if (deletedRows > 0 && updatedRows > 0) {
+                // 所有操作成功，提交事务
                 session.commit();
                 return true;
-            } else {
-                // 否则回滚事务
+
+            } catch (Exception e) {
+                // 出现任何异常，回滚事务
                 session.rollback();
+                e.printStackTrace();
                 return false;
-            }
-        } catch (Exception e) {
-            // 如果发生任何异常，都回滚事务
-            if (session != null) {
-                session.rollback();
-            }
-            e.printStackTrace();
-            return false;
-        } finally {
-            // 确保最后关闭会话
-            if (session != null) {
-                session.close();
             }
         }
     }
+    /**
+     * 【新增】实现管理员创建借阅记录的事务
+     * @param bookId 要借阅的书籍ID
+     * @param userId 借阅用户的ID
+     * @return 操作是否成功
+     */
+    @Override
+    public boolean adminCreateBorrowLog(String bookId, String userId) {
+        // 使用 try-with-resources 确保 session 总能被关闭，并手动控制事务
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            try {
+                LibraryMapper libraryMapper = session.getMapper(LibraryMapper.class);
+
+                // ========== 约束检查 ==========
+
+                // 1. 检查书籍是否存在且状态为“在馆”
+                Book book = libraryMapper.selectBookById(bookId);
+                if (book == null) {
+                    System.err.println("创建借阅记录失败：书籍ID " + bookId + " 不存在。");
+                    return false; // 约束失败
+                }
+                if (!"在馆".equals(book.getBorrowStatus().trim())) {
+                    System.err.println("创建借阅记录失败：书籍《" + book.getBookName() + "》已被借出。");
+                    return false; // 约束失败
+                }
+
+                // 2. 检查用户是否存在 (通过查询用户名来间接验证)
+                String username = libraryMapper.findUsernameByUserId(userId);
+                if (username == null || username.isEmpty()) {
+                    System.err.println("创建借阅记录失败：用户ID " + userId + " 不存在。");
+                    return false; // 约束失败
+                }
+
+                // ========== 执行操作 ==========
+
+
+
+                // 3. 准备新的 BorrowLog 对象
+                String bookName = book.getBookName();
+                String borrowDate = LocalDate.now().toString();
+                String dueDate = LocalDate.now().plusMonths(1).toString(); // 默认借期一个月
+                BorrowLog newLog = new BorrowLog(bookId, bookName, userId, username, borrowDate, dueDate);
+                long timestamp = System.currentTimeMillis();
+                int randomNumber = ThreadLocalRandom.current().nextInt(10, 100);
+                newLog.setLogId("L" + timestamp + randomNumber); // 生成唯一的记录ID
+
+                // 4. 操作1：插入新的借阅记录
+                libraryMapper.insertBorrowLog(newLog);
+
+                // 5. 操作2：更新书籍的借阅状态
+                book.setBorrowStatus("已借出");
+                libraryMapper.updateBook(book);
+
+                // 6. 提交事务：所有操作成功，将更改写入数据库
+                session.commit();
+                System.out.println("成功创建借阅记录，书籍：" + bookName + "，用户：" + username);
+                return true;
+
+            } catch (Exception e) {
+                // 7. 回滚事务：过程中出现任何异常，撤销所有已执行的操作
+                session.rollback();
+                System.err.println("创建借阅记录时发生异常，事务已回滚！");
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+
+
 }

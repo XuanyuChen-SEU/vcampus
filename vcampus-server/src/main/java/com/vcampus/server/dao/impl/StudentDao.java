@@ -5,6 +5,8 @@ import com.vcampus.database.mapper.StudentMapper;
 import com.vcampus.database.utils.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -65,6 +67,39 @@ public class StudentDao implements IStudentDao{
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
             return studentMapper.selectAll();
+        }
+    }
+
+    @Override
+    public List<Student> findByGrade(Integer grade) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("grade", grade);
+
+            return studentMapper.selectByCondition(params);
+        }
+    }
+
+    @Override
+    public List<Student> findByMajor(String major) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            StudentMapper studentMapper = sqlSession.getMapper(StudentMapper.class);
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("major", major);
+
+            return studentMapper.selectByCondition(params);
+        }
+    }
+
+    @Override
+    public void updateStudents(List<Student> students) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            StudentMapper mapper = sqlSession.getMapper(StudentMapper.class);
+            mapper.updateStudents(students);
+            sqlSession.commit();
         }
     }
 }

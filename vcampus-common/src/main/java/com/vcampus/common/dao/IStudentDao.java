@@ -1,6 +1,8 @@
 package com.vcampus.common.dao;
 
 import com.vcampus.common.dto.Student;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -21,10 +23,10 @@ public interface IStudentDao {
      */
     List<Student> findByNameLike(String name);
 
-    /**
-     * 通过学号模糊搜索学生
-     */
-//    List<Student> findByStudentId(String name);
+    List<Student> findByGrade(Integer grade);
+
+    List<Student> findByMajor(String major);
+
 
     /**
      * 插入新学生信息
@@ -46,5 +48,5 @@ public interface IStudentDao {
      */
     List<Student> findAll();
 
-
+    void updateStudents(@Param("students") List<Student> students);
 }
