@@ -50,7 +50,7 @@ import javafx.scene.text.Text;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.text.Text;
-
+import javafx.geometry.Pos;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -81,6 +81,7 @@ public class ShopController implements IClientController{
     @FXML private TableColumn<ShopTransaction, Product> orderProductColumn;
     @FXML private TableColumn<ShopTransaction, Double> orderPriceColumn;
     @FXML private TableColumn<ShopTransaction, OrderStatus> orderStatusColumn;
+    @FXML private TableColumn<ShopTransaction, Void> orderActionColumn;
 
 
     // --- 成员变量 ---

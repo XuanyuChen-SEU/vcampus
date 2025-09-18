@@ -408,6 +408,7 @@
         DELETE FROM vcampus_db.tb_balance WHERE userId = #{userId}
     </delete>
 
+    <!--更新订单状态-->
     <update id="updateOrder" parameterType="com.vcampus.common.dto.ShopTransaction">
         UPDATE vcampus_db.tb_order
         SET
@@ -416,5 +417,34 @@
         WHERE
         orderId = #{orderId}
     </update>
+    <!-- 更新商品库存 -->
+    <update id="updateProductStock">
+        UPDATE tb_product
+        SET stock = stock - #{quantity}
+        WHERE id = #{productId} AND stock >= #{quantity}
+    </update>
+
+    <!-- 更新用户余额 -->
+    <update id="updateUserBalance">
+        UPDATE tb_balance
+        SET balance = balance - #{amount}
+        WHERE userId = #{userId} AND balance >= #{amount}
+    </update>
+
+    <!-- 支付成功后更新订单 -->
+    <update id="updateOrderOnPayment" parameterType="com.vcampus.common.dto.ShopTransaction">
+        UPDATE tb_order
+        SET
+        orderStatus = '已支付',
+        payTime = NOW(),
+        quantity = #{quantity},
+        totalPrice = #{totalPrice}
+        WHERE orderId = #{orderId}
+    </update>
+
+    <!--删除订单记录-->
+    <delete id="deleteOrderById" parameterType="java.lang.String">
+        DELETE FROM vcampus_db.tb_order WHERE orderId = #{orderId}
+    </delete>
 
 </mapper>

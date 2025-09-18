@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.time.LocalDateTime;
+import java.time.ZoneId; // 用于时区转换
 
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
@@ -554,92 +555,112 @@ public class ShopService {
         return currentBalance;
     }
 
+    // 在您服务器端的 ShopService.java 中
+
     /**
-     * 【最终正确版】处理支付订单的核心业务逻辑。
-     * - 完全遵循你的要求，使用 ShopDao 进行所有数据库操作。
-     * - 所有计算逻辑都在此方法内完成。
-     *
-     * @param orderToPay 客户端传来的、包含订单ID和用户ID的支付请求对象
-     * @return 支付成功后，返回包含了最新余额的 Balance 对象
-     * @throws RuntimeException 如果发生任何业务校验失败或数据库操作失败
+     * 【零修改DAO · 模拟事务版】
+     *  - 严格遵循您的要求，不对 IShopDao 和 ShopDao 进行任何修改。
+     *  - 仅使用您现有的DAO方法，在Service层通过“预检->执行->补偿”的策略实现支付功能。
+     *  - 注意：此版本在极端情况下（如服务器在补偿阶段崩溃）无法100%保证原子性。
      */
-    public Balance payForOrder(ShopTransaction orderToPay) {
-        // --- 1. 数据准备与安全校验 ---
+    public Balance payForOrder(ShopTransaction orderToPay) throws RuntimeException {
+        // 1. 准备 DAO 实例
+
+        // --- 2. 预校验阶段 (只读不写，绝对安全) ---
         String userId = orderToPay.getUserId();
         String orderId = orderToPay.getOrderId();
+        int requestedQuantity = orderToPay.getQuantity();
 
-        // a. 【使用你的DAO】从数据库获取用户当前的真实余额
+        // a. 校验订单
+        ShopTransaction realOrderInDB = shopDao.getOrderById(orderId);
+        if (realOrderInDB == null) throw new RuntimeException("订单不存在。");
+        if (realOrderInDB.getOrderStatus() != OrderStatus.UNPAID) {
+            // 如果不是 UNPAID (例如是 PAID 或 CANCELLED)，则抛出异常
+            throw new RuntimeException("订单已支付或已取消。");
+        }
+
+        // b. 校验商品和库存
+        String productId = String.valueOf(realOrderInDB.getProduct().getId());
+        Product currentProduct = shopDao.getProductById(productId);
+        if (currentProduct == null) throw new RuntimeException("商品不存在。");
+        if (currentProduct.getStock() < requestedQuantity) throw new RuntimeException("商品库存不足。");
+
+        // c. 在服务器端重新计算总价并校验
+        BigDecimal finalTotalPrice = BigDecimal.valueOf(currentProduct.getPrice()).multiply(new BigDecimal(requestedQuantity));
+        if (orderToPay.getTotalPrice().compareTo(finalTotalPrice.doubleValue()) != 0) {
+            throw new RuntimeException("订单金额异常，请重新下单。");
+        }
+
+        // d. 校验余额
         Balance currentBalance = shopDao.getBalanceByUserId(userId);
-        if (currentBalance == null) {
-            throw new RuntimeException("支付失败：无法找到该用户的账户信息。");
-        }
-        System.out.println(currentBalance);
+        if (currentBalance == null) throw new RuntimeException("用户余额账户不存在。");
+        if (currentBalance.getBalance().compareTo(finalTotalPrice) < 0) throw new RuntimeException("账户余额不足。");
 
-        // b. 【使用你的DAO】从数据库获取订单的真实信息
-        //    (你需要确保 shopDao.getOrderById() 能通过 orderId 正常工作)
-        ShopTransaction realOrder = shopDao.getOrderById(orderId);
-        if (realOrder == null) {
-            throw new RuntimeException("支付失败：订单不存在或已被删除。");
-        }
-        System.out.println(realOrder);
+        // --- 3. 核心执行与补偿阶段 (高风险区) ---
 
-        // c. 业务状态校验
-        if (realOrder.getOrderStatus() != OrderStatus.UNPAID) {
-            throw new RuntimeException("支付失败：此订单已支付或已取消，请勿重复操作。");
+        // a. 更新商品信息 (库存)
+        //    我们必须借用 updateProductById 方法来同时更新整个商品对象
+        Product productToUpdate = shopDao.getProductById(productId); // 再次获取，确保最新
+        productToUpdate.setStock(productToUpdate.getStock() - requestedQuantity);
+        boolean stockUpdated = shopDao.updateProductById(productToUpdate);
+
+        if (!stockUpdated) {
+            throw new RuntimeException("支付失败：更新商品库存时失败或发生并发冲突。");
         }
 
-        // --- 2. 核心计算逻辑 ---
-        BigDecimal userMoney = currentBalance.getBalance();
-        BigDecimal orderPrice = BigDecimal.valueOf(realOrder.getTotalPrice()); // 将double转为BigDecimal以保证精度
-
-        // a. 检查余额是否充足
-        if (userMoney.compareTo(orderPrice) < 0) {
-            throw new RuntimeException("支付失败：您的账户余额不足！");
-        }
-
-        // b. 计算扣款后的新余额
-        BigDecimal newBalanceAmount = userMoney.subtract(orderPrice);
-
-        // --- 3. 准备更新数据库 ---
-
-        // a. 创建一个新的 Balance 对象用于更新数据库
-        Balance balanceToUpdate = new Balance();
-        balanceToUpdate.setUserId(userId);
-        balanceToUpdate.setBalance(newBalanceAmount);
-
-
-        // b. 更新订单对象的状态和支付时间
-        //    (你需要确保 shopDao.updateProductById 这种方式可以更新订单状态)
-        //    或者最好有一个专门的 updateOrder 方法
-        realOrder.setOrderStatus(OrderStatus.PAID);
-        realOrder.setPayTime(LocalDateTime.now());
-
-        // --- 4. 执行数据库事务性操作 ---
-        // 在真实项目中，以下两步应在一个数据库事务中完成，以保证数据一致性。
-        // 对于当前项目，我们按顺序执行。
-
-        // a. 【使用你的DAO】更新用户余额
+        // b. 更新用户余额
+        Balance balanceToUpdate = shopDao.getBalanceByUserId(userId); // 再次获取，确保最新
+        balanceToUpdate.setBalance(balanceToUpdate.getBalance().subtract(finalTotalPrice));
         boolean balanceUpdated = shopDao.updateBalance(balanceToUpdate);
+
+        // 【关键补偿逻辑 #1】
         if (!balanceUpdated) {
-            // 如果更新失败，直接抛出异常，不继续执行
-            throw new RuntimeException("支付失败：更新用户余额时发生数据库错误。");
+            // 如果扣款失败，我们必须把刚刚扣掉的库存【还回去】
+            System.err.println("警告：扣款失败，正在尝试回滚库存...");
+            Product productToRollback = shopDao.getProductById(productId);
+            productToRollback.setStock(productToRollback.getStock() + requestedQuantity);
+            shopDao.updateProductById(productToRollback); // 写回数据库
+            throw new RuntimeException("支付失败：更新用户余额时失败，库存已回滚。");
         }
 
-        // b. 【使用一个假设的DAO方法】更新订单状态
-        //    注意：你的 ShopDao 目前没有一个完美的 updateOrder 方法，我们暂时借用
-        //    updateProductById 的逻辑，你需要一个 shopDao.updateOrder(realOrder) 才最标准。
-        //    这里需要你提供一个更新订单的方法，我们先假设它叫 updateOrder。
-        boolean orderUpdated = shopDao.updateOrder(realOrder); // <--- 你需要实现这个DAO方法
+        // c. 更新订单信息 (状态、时间、最终数量和总价)
+        ShopTransaction orderToUpdate = shopDao.getOrderById(orderId);
 
+        orderToUpdate.setOrderStatus(OrderStatus.PAID);
+
+        // --- 【最终、正确的代码】 ---
+        // 直接将 LocalDateTime.now() 的结果传入 setPayTime 方法
+        orderToUpdate.setPayTime(LocalDateTime.now());
+        // --- 修正结束 ---
+        // --- 修正结束 ---
+        orderToUpdate.setQuantity(requestedQuantity);
+        orderToUpdate.setTotalPrice(finalTotalPrice.doubleValue());
+        boolean orderUpdated = shopDao.updateOrder(orderToUpdate);
+
+        // 【最关键的补偿逻辑 #2】
         if (!orderUpdated) {
-            // 【重要】如果更新订单失败，必须把刚才扣掉的钱还给用户（数据回滚）
-            shopDao.updateBalance(currentBalance); // 恢复旧的余额
-            throw new RuntimeException("支付失败：更新订单状态时发生数据库错误，已回滚余额。");
+            // 如果更新订单状态失败，这是最糟糕的情况
+            // 我们必须把【库存】和【余额】都还回去
+            System.err.println("严重警告：更新订单失败，正在尝试回滚库存和余额...");
+
+            // 回滚库存
+            Product productToRollback = shopDao.getProductById(productId);
+            productToRollback.setStock(productToRollback.getStock() + requestedQuantity);
+            shopDao.updateProductById(productToRollback);
+
+            // 回滚余额
+            Balance balanceToRollback = shopDao.getBalanceByUserId(userId);
+            balanceToRollback.setBalance(balanceToRollback.getBalance().add(finalTotalPrice));
+            shopDao.updateBalance(balanceToRollback);
+
+            throw new RuntimeException("支付失败：更新订单状态时发生错误，库存和余额已尝试回滚。");
         }
 
-        System.out.println("用户 " + userId + " 支付成功！订单号: " + orderId);
-
-        // --- 5. 返回最新的余额信息给上层 ---
+        // --- 4. 成功返回 ---
+        System.out.println("支付流程成功完成！");
+        // 返回包含最新余额的对象 (我们之前已经更新过 balanceToUpdate)
         return balanceToUpdate;
     }
+
+
 }

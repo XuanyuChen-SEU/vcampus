@@ -5,6 +5,8 @@ import java.util.List;
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
 import com.vcampus.common.entity.Balance;
+import org.apache.ibatis.annotations.Param;
+import java.math.BigDecimal;
 
 /**
  * 
@@ -178,6 +180,14 @@ public interface ShopMapper {
      * @return 如果删除成功，返回 true；否则返回 false
      */
     boolean deleteBalanceByUserId(String userId);
-    
-    boolean updateOrder(ShopTransaction order);
+
+    /**
+     * 【新增】根据 ShopTransaction 对象更新订单信息。
+     * 这个方法会对应到 ShopMapper.xml 中的 "updateOrder" SQL 语句。
+     * @param order 包含要更新的订单ID、新状态、支付时间等信息的对象
+     * @return 返回受影响的行数，成功应为 1
+     */
+    int updateOrder(ShopTransaction order);
+    boolean deleteOrderById(String orderId);
+
 }

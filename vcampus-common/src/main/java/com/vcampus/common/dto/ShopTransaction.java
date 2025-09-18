@@ -3,6 +3,7 @@ package com.vcampus.common.dto;
 // 确保这些 import 语句是正确的
 import java.io.Serializable;
 import java.time.LocalDateTime; // 修正为您项目中的正确类名
+import java.util.Date;
 
 import com.vcampus.common.enums.OrderStatus;
 

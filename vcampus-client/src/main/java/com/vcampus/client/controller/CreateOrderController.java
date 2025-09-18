@@ -1,23 +1,18 @@
 package com.vcampus.client.controller;
 
-import com.vcampus.client.service.ShopService; // 1. 【新增】导入ShopService
+import com.vcampus.client.service.ShopService;
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
 
-/**
- * 确认订单窗口的控制器。
- * 负责显示订单详情、检查余额，并向服务器发送最终的支付请求。
- */
 public class CreateOrderController {
 
     // --- FXML 控件 ---
@@ -29,98 +24,114 @@ public class CreateOrderController {
     @FXML private Label totalPriceLabel;
     @FXML private Button confirmButton;
     @FXML private Label orderIdLabel;
+    @FXML private Spinner<Integer> quantitySpinner; // 1. 【新增】获取 Spinner 控件
 
     // --- 成员变量 ---
-    private ShopTransaction currentOrder; // 用于保存当前正在处理的订单
-    private double userBalance;           // 用于保存用户的余额
-    private final ShopService shopService = new ShopService(); // 2. 【新增】创建Service实例，用于和服务器通信
+    private ShopTransaction currentOrder;
+    private double userBalance;
+    private final ShopService shopService = new ShopService();
 
     /**
-     * FXML 初始化方法，在加载界面时自动调用。
-     */
-    @FXML
-    void initialize() {
-        // 可以在这里做一些初始设置，如果需要的话
-    }
-
-    /**
-     * 由主控制器(ShopController)调用，用于在显示窗口前注入必要的数据。
-     *
-     * @param order       服务器创建的、待支付的订单对象
-     * @param userBalance 用户当前的账户余额
+     * 由主控制器调用，用于注入数据并初始化界面。
      */
     public void initData(ShopTransaction order, double userBalance) {
         this.currentOrder = order;
         this.userBalance = userBalance;
-
         Product product = order.getProduct();
-        if (product == null) {
-            System.err.println("严重错误：传入的订单对象中不包含商品信息！");
-            return;
-        }
+        if (product == null) return;
 
         // --- 填充UI控件 ---
-        // 3. 【修正】使用 getOrderId() 来获取字符串类型的订单号，更可靠
         orderIdLabel.setText(order.getOrderId());
-
-        // 尝试加载图片
+        // ... (图片、名称等填充代码保持不变) ...
         try {
             if (product.getImageData() != null && product.getImageData().length > 0) {
                 productImageView.setImage(new Image(new ByteArrayInputStream(product.getImageData())));
             } else if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
                 productImageView.setImage(new Image(product.getImagePath()));
             }
-        } catch (Exception e) {
-            System.err.println("订单页面加载图片失败: " + e.getMessage());
-        }
-
+        } catch (Exception e) { System.err.println("订单页面加载图片失败: " + e.getMessage()); }
         productNameLabel.setText(product.getName());
         productPriceLabel.setText(String.format("¥ %.2f", product.getPrice()));
         productDescLabel.setText(product.getDescription());
-
         balanceLabel.setText(String.format("¥ %.2f", this.userBalance));
-        totalPriceLabel.setText(String.format("¥ %.2f", order.getTotalPrice()));
 
-        // --- 检查余额是否充足，并更新UI状态 ---
-        if (this.userBalance < order.getTotalPrice()) {
-            confirmButton.setDisable(true); // 禁用按钮
-            confirmButton.setText("余额不足");   // 修改按钮文本
-            balanceLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;"); // 将余额显示为红色
+        // 2. 【核心逻辑】初始化 Spinner
+        int maxStock = (product.getStock() > 0) ? product.getStock() : 1; // 确保库存至少为1
+        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, maxStock, 1);
+        quantitySpinner.setValueFactory(valueFactory);
+
+        // 3. 【核心逻辑】添加监听器，当数量变化时，自动更新总价
+        quantitySpinner.valueProperty().addListener((obs, oldValue, newValue) -> updateTotalAndCheckBalance());
+
+        // 4. 初始化总价和按钮状态
+        updateTotalAndCheckBalance();
+    }
+
+    /**
+     * 辅助方法：更新总价标签，并检查余额是否充足。
+     */
+    private void updateTotalAndCheckBalance() {
+        int quantity = quantitySpinner.getValue();
+        double unitPrice = currentOrder.getProduct().getPrice();
+        double newTotal = unitPrice * quantity;
+
+        // 更新总价标签
+        totalPriceLabel.setText(String.format("¥ %.2f", newTotal));
+
+        // 检查余额并更新按钮状态
+        if (this.userBalance < newTotal) {
+            confirmButton.setDisable(true);
+            confirmButton.setText("余额不足");
+            balanceLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
+        } else {
+            confirmButton.setDisable(false);
+            confirmButton.setText("确认支付");
+
+            balanceLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #208837;");
         }
     }
 
     /**
      * 处理用户点击“确认支付”按钮的事件。
-     * 【核心修改】将模拟支付替换为向服务器发送真实的支付请求。
+     * 【最终适配版】在 Controller 内部使用 BigDecimal 进行精确计算，
+     * 最后将结果转换为 double 类型以适配未修改的 ShopTransaction 类。
      */
     @FXML
     void handleConfirmPurchase(ActionEvent event) {
-        // 4. 【核心逻辑】
-        System.out.println("用户确认支付，订单ID: " + this.currentOrder.getOrderId());
+        // 1. 获取最终确定的购买数量 (int)
+        int finalQuantity = quantitySpinner.getValue();
 
-        // a. 调用ShopService，向服务器异步发送“支付订单”的请求
+        // 2. 使用 BigDecimal 进行精确的中间计算
+        // a. 将商品的单价 (double) 转换为高精度的 BigDecimal
+        BigDecimal unitPrice = BigDecimal.valueOf(currentOrder.getProduct().getPrice());
+
+        // b. 将购买数量 (int) 转换为高精度的 BigDecimal
+        BigDecimal quantity = new BigDecimal(finalQuantity);
+
+        // c. 使用 BigDecimal 的 multiply 方法进行精确计算
+        BigDecimal finalTotalPrice = unitPrice.multiply(quantity);
+
+        // 3. 更新订单对象的数量
+        this.currentOrder.setQuantity(finalQuantity);
+
+        // 4. 【核心修正】将精确计算出的 BigDecimal 结果，转换回 double 类型
+        //    以便 setTotalPrice(double) 方法能够接收它
+        this.currentOrder.setTotalPrice(finalTotalPrice.doubleValue());
+
+        // 5. 打印日志并发送请求
+        System.out.println("用户确认支付, 数量: " + finalQuantity + ", (转换后)总价: " + finalTotalPrice.doubleValue());
         shopService.payForOrder(this.currentOrder);
 
-        // b. 请求发送后，此窗口的任务已经完成，直接关闭即可。
-        //    服务器的响应将由主控制器(ShopController)的响应处理器来接收，
-        //    并由主控制器负责更新余额和显示最终的成功/失败提示。
+        // 6. 关闭窗口
         closeWindow();
     }
 
-    /**
-     * 处理用户点击“取消”按钮的事件。
-     */
     @FXML
     void handleCancel(ActionEvent event) {
-        System.out.println("用户取消了支付。");
         closeWindow();
     }
 
-    /**
-     * 一个辅助方法，用于获取当前窗口的Stage并关闭它。
-     */
     private void closeWindow() {
-        // 从任意一个控件获取其所在的场景(Scene)，再从场景获取窗口(Stage)
         Stage stage = (Stage) confirmButton.getScene().getWindow();
         if (stage != null) {
             stage.close();

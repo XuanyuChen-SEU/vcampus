@@ -159,6 +159,7 @@ public class MessageController {
                 case SHOP_RECHARGE:
                     return shopController.handleRecharge(request);
 
+
                 // --- 商店管理员相关 ---
                 case SHOP_ADMIN_ADD_PRODUCT:
                     return shopController.handleAddProduct(request);

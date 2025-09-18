@@ -497,4 +497,6 @@ public class ShopController {
             return new Message(ActionType.SHOP_PAY_FOR_ORDER, false, e.getMessage());
         }
     }
+
+
 }
