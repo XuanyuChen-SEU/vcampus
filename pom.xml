@@ -21,7 +21,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>20.0.1</javafx.version>
+        <javafx.version>11.0.2</javafx.version>
         <mybatis.version>3.5.13</mybatis.version>
         <mysql.version>8.0.33</mysql.version>
         <slf4j.version>2.0.9</slf4j.version>
@@ -136,39 +136,4 @@
 
         </dependencies>
     </dependencyManagement>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <!-- JavaFX Maven Plugin -->
-                <plugin>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-maven-plugin</artifactId>
-                    <version>0.0.8</version>
-                </plugin>
-                <!-- Maven Shade Plugin -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.4.1</version>
-                </plugin>
-                <!-- Maven Compiler Plugin -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
-                    <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
-                    </configuration>
-                </plugin>
-                <!-- Maven Dependency Plugin -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.6.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>
