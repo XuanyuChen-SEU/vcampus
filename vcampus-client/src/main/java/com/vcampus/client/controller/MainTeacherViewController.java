@@ -224,7 +224,7 @@ public class MainTeacherViewController {
      */
     @FXML
     void handleTeacherRecordNav(ActionEvent event) {
-        loadView("/fxml/studentrecord/StudentRecordView.fxml");
+        loadView("/fxml/studentrecord/TeacherRecordView.fxml");
     }
     
     /**

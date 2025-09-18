@@ -4,6 +4,7 @@ import com.vcampus.client.MainApp;
 import com.vcampus.client.net.SocketClient;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
+import com.vcampus.common.dto.Teacher;
 import com.vcampus.common.enums.ActionType;
 
 import java.util.List;
@@ -129,6 +130,14 @@ public class StudentAdminService {
 
     public void getAllTeachers() {
         Message request = new Message(ActionType.ALL_TEACHER, null);
+        socketClient.sendMessage(request);
+    }
+
+    /**
+     * 发送更新教师请求
+     */
+    public void sendRequest(Teacher teacher) {
+        Message request = new Message(ActionType.UPDATE_TEACHER, teacher);
         socketClient.sendMessage(request);
     }
 }

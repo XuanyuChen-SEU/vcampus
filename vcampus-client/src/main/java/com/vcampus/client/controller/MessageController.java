@@ -25,6 +25,7 @@ public class MessageController {
 
     private LoginController loginController;
     private StudentController studentController;
+    private TeacherController teacherController;
     private LibraryController libraryController;
     private StudentAdminController studentadminController;
     private ShopController shopController;
@@ -51,9 +52,7 @@ public class MessageController {
     private EmailController emailController;
     private ComposeEmailController composeEmailController;
     private EmailAdminViewController emailAdminViewController;
-    
-    // 教师端标识
-    private boolean isTeacherMode = false;
+
     /**
      * 设置LoginController实例（由UI层调用）
      * @param controller LoginController实例
@@ -68,8 +67,9 @@ public class MessageController {
         this.studentController=controller;
     }
     public void setStudentAdminController(StudentAdminController controller){this.studentadminController=controller;}
-
-
+    public void setTeacherController(TeacherController controller){
+        this.teacherController=controller;
+    }
     /**
      * 【修正】注册 LibraryController 时，注销掉管理员的 BookListViewController。
      * 确保主图书馆视图能收到数据。
@@ -330,6 +330,27 @@ public class MessageController {
                         studentadminController.handleAllTeachersResponse(message);
                     }else{
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case UPDATE_TEACHER:
+                    if(studentadminController!=null){
+                        studentadminController.handleUpdateTeacherResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
+                case INFO_TEACHER:
+                    if(teacherController!=null){
+                        teacherController.handleTeacherInfoResponse(message);
+                    }else{
+                        System.err.println("TeacherController未设置，无法处理教师信息获取响应");
+                    }
+                    break;
+                case UPDATE_TEACHER_INFO:
+                    if(teacherController!=null){
+                        teacherController.handleTeacherUpdateResponse(message);
+                    }else{
+                        System.err.println("TeacherController未设置，无法处理教师信息获取响应");
                     }
                     break;
 

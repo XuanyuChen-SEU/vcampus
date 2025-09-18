@@ -216,6 +216,7 @@ public class StudentAdminController implements IClientController {
                 });
             }
 
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
@@ -223,6 +224,34 @@ public class StudentAdminController implements IClientController {
             }
 
         });
+
+        // 教师表操作列
+        colTeacherAction.setCellFactory(param -> new TableCell<Teacher, Void>() {
+            private final Button btnEdit = new Button("修改");
+
+            {
+                btnEdit.getStyleClass().add("create-button");
+                btnEdit.setMaxWidth(Double.MAX_VALUE);
+
+                btnEdit.setOnAction(event -> {
+                    int idx = getIndex();
+                    if (idx < 0 || idx >= getTableView().getItems().size()) return;
+                    Teacher teacher = getTableView().getItems().get(idx);
+                    showEditTeacherDialog(teacher);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btnEdit);
+                }
+            }
+        });
+
 
 
         // 申请表操作列
@@ -793,6 +822,7 @@ public class StudentAdminController implements IClientController {
     private void refreshAllData() {
         loadAllStudent();
         loadAllApplications();
+        loadAllTeachers();
     }
 
     /** 根据当前表格选择搜索逻辑 */
@@ -937,6 +967,85 @@ public class StudentAdminController implements IClientController {
         }
     }
 
+    /**
+     * 弹出修改教师信息对话框（支持所有字段）
+     */
+    private void showEditTeacherDialog(Teacher teacher) {
+        Dialog<Teacher> dialog = new Dialog<>();
+        dialog.setTitle("修改教师信息");
+
+        // 按钮
+        ButtonType updateButtonType = new ButtonType("保存", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
+
+        // 表单布局
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        // 输入字段
+        TextField userIdField = new TextField(teacher.getUserId());
+        TextField nameField = new TextField(teacher.getName());
+        ComboBox<String> genderBox = new ComboBox<>();
+        genderBox.getItems().addAll("男", "女");
+        genderBox.setValue(teacher.getGender());
+
+        TextField collegeField = new TextField(teacher.getCollege());
+        TextField departmentField = new TextField(teacher.getDepartment());
+        ComboBox<String> titleBox = new ComboBox<>();
+        titleBox.getItems().addAll("讲师", "副教授", "教授");
+        titleBox.setValue(teacher.getTitle());
+
+        TextField phoneField = new TextField(teacher.getPhone());
+        TextField emailField = new TextField(teacher.getEmail());
+        TextField officeField = new TextField(teacher.getOffice());
+
+        // 表单布局
+        grid.add(new Label("工号:"), 0, 0);
+        grid.add(userIdField, 1, 0);
+        grid.add(new Label("姓名:"), 0, 1);
+        grid.add(nameField, 1, 1);
+        grid.add(new Label("性别:"), 0, 2);
+        grid.add(genderBox, 1, 2);
+        grid.add(new Label("学院:"), 0, 3);
+        grid.add(collegeField, 1, 3);
+        grid.add(new Label("院系:"), 0, 4);
+        grid.add(departmentField, 1, 4);
+        grid.add(new Label("职称:"), 0, 5);
+        grid.add(titleBox, 1, 5);
+        grid.add(new Label("电话:"), 0, 6);
+        grid.add(phoneField, 1, 6);
+        grid.add(new Label("邮箱:"), 0, 7);
+        grid.add(emailField, 1, 7);
+        grid.add(new Label("办公室:"), 0, 8);
+        grid.add(officeField, 1, 8);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // 结果转换
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == updateButtonType) {
+                teacher.setUserId(userIdField.getText());
+                teacher.setName(nameField.getText());
+                teacher.setGender(genderBox.getValue());
+                teacher.setCollege(collegeField.getText());
+                teacher.setDepartment(departmentField.getText());
+                teacher.setTitle(titleBox.getValue());
+                teacher.setPhone(phoneField.getText());
+                teacher.setEmail(emailField.getText());
+                teacher.setOffice(officeField.getText());
+                return teacher;
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(updatedTeacher -> {
+            studentAdminService.sendRequest(updatedTeacher);
+        });
+    }
+
+
 //    /**
 //     * 处理模糊搜索教师的响应
 //     */
@@ -965,15 +1074,25 @@ public class StudentAdminController implements IClientController {
 //        }
 //    }
 //
-//    /**
-//     * 处理更新单个教师信息的响应
-//     */
-//    public void handleUpdateTeacherResponse(Message response) {
-//        if (response.isSuccess()) {
-//            System.out.println("教师更新成功");
-//        } else {
-//            System.err.println("教师更新失败: " + response.getMessage());
-//        }
-//    }
+    /**
+     * 处理更新单个教师信息的响应
+     */
+    public void handleUpdateTeacherResponse(Message response) {
+        Platform.runLater(() -> {
+            if (response.isSuccess()) {
+                System.out.println("教师更新成功");
+                // 修改完成后刷新表格
+                refreshAllData();
+            } else {
+                System.err.println("教师更新失败: " + response.getMessage());
+                // 可选：弹窗提示失败
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("更新失败");
+                alert.setHeaderText(null);
+                alert.setContentText("教师更新失败: " + response.getMessage());
+                alert.showAndWait();
+            }
+        });
+    }
 
 }

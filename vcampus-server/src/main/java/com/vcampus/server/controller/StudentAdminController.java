@@ -199,24 +199,24 @@ public class StudentAdminController {
 //        }
 //    }
 //
-//    /**
-//     * 更新单个教师信息
-//     */
-//    public Message updateTeacher(Message request) {
-//        try {
-//            if (!(request.getData() instanceof Teacher updatedTeacher)) {
-//                return Message.failure(ActionType.UPDATE_TEACHER_ADMIN, "参数错误，必须是教师对象");
-//            }
-//            boolean ok = teacherAdminService.updateTeacherInfo(updatedTeacher);
-//            if (ok) {
-//                return Message.success(ActionType.UPDATE_TEACHER_ADMIN, "更新教师成功");
-//            } else {
-//                return Message.failure(ActionType.UPDATE_TEACHER_ADMIN, "更新教师失败");
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return Message.failure(ActionType.UPDATE_TEACHER_ADMIN, "服务端异常: " + e.getMessage());
-//        }
-//    }
+    /**
+     * 更新单个教师信息
+     */
+    public Message updateTeacher(Message request) {
+        try {
+            if (!(request.getData() instanceof Teacher updatedTeacher)) {
+                return Message.failure(ActionType.UPDATE_TEACHER, "参数错误，必须是教师对象");
+            }
+            boolean ok = studentAdminService.updateTeacher(updatedTeacher);
+            if (ok) {
+                return Message.success(ActionType.UPDATE_TEACHER, "更新教师成功");
+            } else {
+                return Message.failure(ActionType.UPDATE_TEACHER, "更新教师失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.UPDATE_TEACHER, "服务端异常: " + e.getMessage());
+        }
+    }
 }
 
