@@ -170,5 +170,38 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+            <plugins>
+                <!-- Javadoc 插件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.6.3</version>
+                    <configuration>
+                        <!-- 避免中文乱码 -->
+                        <encoding>UTF-8</encoding>
+                        <docencoding>UTF-8</docencoding>
+                        <charset>UTF-8</charset>
+
+                        <!-- 可选信息 -->
+                        <failOnError>false</failOnError>
+                        <doctitle>VCampus 系统接口文档</doctitle>
+                        <windowtitle>VCampus API 文档</windowtitle>
+                        <author>true</author>
+                        <version>true</version>
+                    </configuration>
+
+                    <executions>
+                        <execution>
+                            <id>aggregate</id>
+                            <phase>site</phase>
+                            <goals>
+                                <goal>aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+
+            </plugins>
     </build>
 </project>

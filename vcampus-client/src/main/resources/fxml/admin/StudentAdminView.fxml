@@ -99,4 +99,9 @@
         <Button fx:id="btnAdjustStatus" text="调整学籍状态" styleClass="status-button"/>
     </HBox>
 
+<!--    <HBox spacing="10" alignment="BOTTOM_RIGHT">-->
+<!--        <Region HBox.hgrow="ALWAYS"/> &lt;!&ndash; 占位，将按钮推到右边 &ndash;&gt;-->
+<!--        <Button fx:id="btnAppSelectAll" text="全选" styleClass="all-button"/>-->
+<!--        <Button fx:id="btnAppBatchApprove" text="批量审核" styleClass="status-button"/>-->
+<!--    </HBox>-->
 </VBox>
