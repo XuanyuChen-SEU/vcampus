@@ -233,11 +233,48 @@ public class ShopDao implements IShopDao {
             return false;
         }
     }
+
+    /**
+     * 【新增】更新订单的具体实现。
+     */
     @Override
     public boolean updateOrder(ShopTransaction order) {
+        SqlSession sqlSession = null;
+        try {
+            // 1. 获取 SqlSession
+            sqlSession = MyBatisUtil.openSession();
+            // 2. 获取 Mapper 实例
+            ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
+            // 3. 调用 Mapper 方法，并获取受影响的行数
+            int affectedRows = shopMapper.updateOrder(order);
+            // 4. 提交事务
+            sqlSession.commit();
+            // 5. 判断操作是否成功（只有当恰好更新了1行时才算成功）
+            return affectedRows == 1;
+        } catch (Exception e) {
+            // 如果发生异常，回滚事务
+            if (sqlSession != null) {
+                sqlSession.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            // 确保 SqlSession 被关闭
+            if (sqlSession != null) {
+                sqlSession.close();
+            }
+        }
+    }
+
+    /**
+     * 【新增】根据订单ID删除订单。
+     * @param orderId 要删除的订单ID
+     * @return 是否删除成功
+     */
+    public boolean deleteOrderById(String orderId) {
         try (SqlSession sqlSession = MyBatisUtil.openSession()) {
             ShopMapper shopMapper = sqlSession.getMapper(ShopMapper.class);
-            boolean result = shopMapper.updateOrder(order);
+            boolean result = shopMapper.deleteOrderById(orderId);
             sqlSession.commit();
             return result;
         } catch (Exception e) {
@@ -245,4 +282,5 @@ public class ShopDao implements IShopDao {
             return false;
         }
     }
+
 }

@@ -59,6 +59,8 @@ public enum ActionType {
     SHOP_REMOVE_FAVORITE("取消收藏"),
     // 售后服务
     SHOP_REQUEST_RETURN("申请退货"),
+    SHOP_PAY_FOR_UNPAID_ORDER("支付一个之前未支付成功订单"),   // 支付一个已创建的订单
+    SHOP_DELETE_ORDER("删除订单"),
 
 
     // --- 商店模块 - 管理员端 ---

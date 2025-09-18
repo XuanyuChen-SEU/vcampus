@@ -103,4 +103,6 @@ public class ShopService {
         // 假设你已经在 ActionType 枚举中添加了 SHOP_PAY_FOR_ORDER
         socketClient.sendMessage(new Message(ActionType.SHOP_PAY_FOR_ORDER, order));
     }
+
+
 }

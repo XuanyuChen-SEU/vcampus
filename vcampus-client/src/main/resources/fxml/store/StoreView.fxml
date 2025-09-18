@@ -83,6 +83,7 @@
                         <TableColumn fx:id="orderProductColumn" text="商品" />
                         <TableColumn fx:id="orderPriceColumn" text="实付款" />
                         <TableColumn fx:id="orderStatusColumn" text="订单状态" />
+                        <TableColumn fx:id="orderActionColumn" prefWidth="180.0" text="操作" />
                     </columns>
                     <!-- 3. 恢复了列宽自适应策略，让所有列自动平分表格的总宽度 -->
                     <columnResizePolicy>
