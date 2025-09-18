@@ -8,6 +8,7 @@ import com.vcampus.common.dto.User;
 import com.vcampus.common.dto.UserSearch;
 import com.vcampus.common.enums.ActionType;
 import com.vcampus.common.enums.Role;
+import com.vcampus.common.util.PasswordUtil;
 import com.vcampus.server.dao.impl.PasswordResetApplicationDao;
 import com.vcampus.server.dao.impl.UserDao;
 
@@ -38,12 +39,20 @@ public class UserService {
             if (user==null||user.getUserId()==null||user.getUserId().equals("")) {
                 return Message.failure(ActionType.LOGIN, "用户不存在");
             }
-            if (!user.getPassword().trim().equals(loginUser.getPassword().trim())) {
+            
+            // 使用jBCrypt验证密码
+            String plainPassword = loginUser.getPassword().trim();
+            String hashedPassword = user.getPassword();
+            
+            if (!PasswordUtil.verifyPassword(plainPassword, hashedPassword)) {
                 return Message.failure(ActionType.LOGIN, "密码错误");
             }
+            
             Role role = Role.fromUserId(loginUser.getUserId());
             
             User resultUser = new User(loginUser.getUserId(), ""); // 密码置空，不返回给客户端
+            
+            System.out.println("用户登录成功 - 用户ID: " + loginUser.getUserId() + ", 角色: " + role.getDesc());
             
             return Message.success(ActionType.LOGIN, resultUser, "登录成功，欢迎 " + role.getDesc() + " " + loginUser.getUserId());
             
@@ -96,10 +105,22 @@ public class UserService {
         if (user == null || user.getUserId() == null || user.getUserId().equals("")) {
             return Message.failure(ActionType.CHANGE_PASSWORD, "用户不存在");
         }
-        if (!user.getPassword().equals(changePassword.getOldPassword())) {
+        
+        // 验证原密码
+        String plainOldPassword = changePassword.getOldPassword();
+        String hashedOldPassword = user.getPassword();
+        
+        if (!PasswordUtil.verifyPassword(plainOldPassword, hashedOldPassword)) {
             return Message.failure(ActionType.CHANGE_PASSWORD, "原密码错误");
         }
-        user.setPassword(changePassword.getNewPassword());
+        
+        // 加密新密码
+        String plainNewPassword = changePassword.getNewPassword();
+        String hashedNewPassword = PasswordUtil.hashPassword(plainNewPassword);
+        user.setPassword(hashedNewPassword);
+        
+        System.out.println("密码修改成功 - 用户ID: " + changePassword.getUserId());
+        
         userDao.updateUser(user);
             return Message.success(ActionType.CHANGE_PASSWORD, "密码修改成功");
         } catch (Exception e) {
@@ -152,6 +173,14 @@ public class UserService {
             if (!userDao.isUserIdExists(user.getUserId())) {
                 return Message.failure(ActionType.RESET_USER_PASSWORD, "用户不存在");
             }
+            
+            // 加密重置后的密码
+            String plainPassword = user.getPassword();
+            String hashedPassword = PasswordUtil.hashPassword(plainPassword);
+            user.setPassword(hashedPassword);
+            
+            System.out.println("密码重置成功 - 用户ID: " + user.getUserId());
+            
             boolean success = userDao.resetUserPassword(user);
             if (success) {
                 return Message.success(ActionType.RESET_USER_PASSWORD, "密码重置成功");
@@ -175,6 +204,14 @@ public class UserService {
             if (userDao.isUserIdExists(user.getUserId())) {
                 return Message.failure(ActionType.CREATE_USER, "用户ID已存在");
             }
+            
+            // 加密密码
+            String plainPassword = user.getPassword();
+            String hashedPassword = PasswordUtil.hashPassword(plainPassword);
+            user.setPassword(hashedPassword);
+            
+            System.out.println("用户创建 - 用户ID: " + user.getUserId());
+            System.out.println("密码加密完成，原始密码长度: " + plainPassword.length());
             
             boolean success = userDao.createUser(user);
             if (success) {
