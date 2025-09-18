@@ -14,7 +14,7 @@
 
 <VBox spacing="15.0" style="-fx-padding: 20;" styleClass="admin-background" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.courseAdmin.CourseAdminController">
     <stylesheets>
-        <URL value="@/css/academicadmin-styles.css" />
+        <URL value="@../../css/academicadmin-styles.css" />
     </stylesheets>
     <children>
         <Label text="教务管理后台" styleClass="admin-title">

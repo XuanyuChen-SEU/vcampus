@@ -81,7 +81,27 @@
 
     <build>
         <plugins>
+<<<<<<< HEAD
             <!-- Maven Compiler Plugin，确保编译版本一致 -->
+=======
+            <!-- 添加这段配置 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Multi-Release>false</Multi-Release>
+                        </manifestEntries>
+                    </archive>
+                    <modular>false</modular>
+                </configuration>
+            </plugin>
+            
+            <!-- 保留原有的其他插件配置 -->
+            <!-- Maven Compiler Plugin -->
+>>>>>>> a122f618588507bcb251fd8de4ce485b6c81b1a1
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
