@@ -3,7 +3,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.geometry.Pos;
@@ -43,7 +43,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-
+import javafx.util.Callback;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableCell;
+import javafx.scene.text.Text;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.text.Text;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -85,37 +91,95 @@ public class ShopController implements IClientController{
 
     @FXML
     void initialize() {
+        // --- 1. 基本布局参数定义 ---
         final int numColumns = 4;
         final double hgap = 15.0;
         final double vgap = 15.0;
         final Insets padding = new Insets(15.0);
 
+        // --- 2. TilePane 基础设置 ---
         productPane.setHgap(hgap);
         productPane.setVgap(vgap);
         productPane.setPadding(padding);
-
-        // 关键：让 TilePane 的宽度能跟随 ScrollPane 变化
         productScrollPane.setFitToWidth(true);
 
-        // 【核心】让 TilePane (父亲) 自己计算并规定每个瓦片（儿子）的宽度
-        // 这是最稳定、最不会出错的方式
-        productPane.prefTileWidthProperty().bind(
-                productScrollPane.widthProperty() // 我们从 ScrollPane 获取总可用宽度
-                        .subtract(padding.getLeft() + padding.getRight()) // 减去左右内边距
-                        .subtract((numColumns - 1) * hgap) // 减去3个水平间距
-                        .subtract(18) // 减去滚动条宽度和安全边距
-                        .divide(numColumns)
-        );
-        // --- 配置结束 ---
-        System.out.println("商店控制器初始化完成！");
-        currentUser = new User(MainApp.getGlobalUserSession().getCurrentUserId(),"");        // 1. 配置UI相关的组件
-        setupOrderTable();
+        // --- 3. 【核心修改】禁用自适应宽度绑定 ---
+        // 由于您要求在 createProductCard 中使用固定的 card.setPrefWidth(355);
+        // 我们必须将下面的自适应宽度计算逻辑注释掉，以避免布局冲突。
+    /*
+    productScrollPane.sceneProperty().addListener((sceneObs, oldScene, newScene) -> {
+        if (oldScene == null && newScene != null) {
+            newScene.windowProperty().addListener((windowObs, oldWindow, newWindow) -> {
+                if (oldWindow == null && newWindow != null) {
+                    final double FIXED_SIDEBAR_WIDTH = 200.0;
+                    System.out.println("成功附加宽度绑定到主窗口！");
+                    productPane.prefTileWidthProperty().bind(
+                            newWindow.widthProperty()
+                                    .subtract(FIXED_SIDEBAR_WIDTH)
+                                    .subtract(padding.getLeft() + padding.getRight())
+                                    .subtract((numColumns - 1) * hgap)
+                                    .subtract(20)
+                                    .divide(numColumns)
+                    );
+                }
+            });
+        }
+    });
+    */
 
-        // 2. 将自己注册到消息中心，以便接收异步消息
+        // --- 4. 订单表格的行工厂 (保持不变) ---
+        orderTable.setRowFactory(new Callback<TableView<ShopTransaction>, TableRow<ShopTransaction>>() {
+            @Override
+            public TableRow<ShopTransaction> call(TableView<ShopTransaction> tableView) {
+                final TableRow<ShopTransaction> row = new TableRow<>();
+                row.itemProperty().addListener(new ChangeListener<ShopTransaction>() {
+                    @Override
+                    public void changed(ObservableValue<? extends ShopTransaction> observable, ShopTransaction oldValue, ShopTransaction newValue) {
+                        row.getStyleClass().removeAll("row-paid", "row-unpaid", "row-cancelled");
+                        if (newValue != null && newValue.getOrderStatus() != null) {
+                            switch (newValue.getOrderStatus()) {
+                                case PAID: row.getStyleClass().add("row-paid"); break;
+                                case UNPAID: row.getStyleClass().add("row-unpaid"); break;
+                                case CANCELLED: row.getStyleClass().add("row-cancelled"); break;
+                            }
+                        }
+                    }
+                });
+                return row;
+            }
+        });
+
+
+        // --- 5. 订单表格的单元格工厂 (保持不变) ---
+        orderStatusColumn.setCellFactory(column -> {
+            return new TableCell<ShopTransaction, OrderStatus>() {
+                @Override
+                protected void updateItem(OrderStatus item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setGraphic(null);
+                    } else {
+                        Text statusText = new Text(item.name());
+                        String styleClass = "";
+                        switch (item) {
+                            case PAID: styleClass = "status-paid"; break;
+                            case UNPAID: styleClass = "status-unpaid"; break;
+                            case CANCELLED: styleClass = "status-cancelled"; break;
+                        }
+                        statusText.getStyleClass().add(styleClass);
+                        setGraphic(statusText);
+                    }
+                }
+            };
+        });
+
+        // --- 6. 后续初始化逻辑 (保持不变) ---
+        System.out.println("商店控制器初始化完成！");
+        currentUser = new User(MainApp.getGlobalUserSession().getCurrentUserId(), "");
+        setupOrderTable();
         registerToMessageController();
         loadInitialProducts();
         shopService.getBalance(currentUser.getUserId());
-
     }
 
 
@@ -308,45 +372,33 @@ public class ShopController implements IClientController{
         });
     }
 
-    /**
-     * 【超整合 · 单一方法版】
-     *  - 将所有逻辑（UI创建、图片加载、事件处理）都封装在此方法内。
-     *  - 保证所有商品卡片的图片区域视觉效果统一。
-     *  - 您只需要复制这一个方法即可。
-     */
     private VBox createProductCard(Product product) {
         // ==========================================================
         // 1. 创建UI组件
         // ==========================================================
-
-        // 根容器 (整个卡片)
         VBox card = new VBox(5);
         card.setPadding(new Insets(10));
         card.setStyle("-fx-border-color: #DDDDDD; -fx-border-radius: 5; -fx-background-color: #FFFFFF; -fx-background-radius: 5;");
-        card.setPrefWidth(220); // 您可以调整这个宽度来控制布局
 
-        // 固定尺寸的“画框”，用于统一图片区域
+        // 【核心要求】根据您的要求，必须保留此行，不做任何修改
+        card.setPrefWidth(355);
+
         StackPane imageFrame = new StackPane();
-        imageFrame.setPrefHeight(220); // 固定画框高度，形成1:1的图片区
+        imageFrame.setPrefHeight(220);
         imageFrame.setStyle("-fx-background-color: #FFFFFF;");
         imageFrame.setAlignment(Pos.CENTER);
 
-        // 图片视图
         ImageView imageView = new ImageView();
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(220);  // 图片最大宽度
-        imageView.setFitHeight(220); // 图片最大高度
+        imageView.setFitWidth(220);
+        imageView.setFitHeight(220);
 
-        // 文本和按钮的容器
         VBox textContainer = new VBox(5);
         textContainer.setPadding(new Insets(5, 0, 0, 0));
         VBox.setVgrow(textContainer, Priority.ALWAYS);
 
-        // 商品名称
         Label nameLabel = new Label(product.getName());
         nameLabel.setWrapText(true);
-
-        // 价格
         HBox priceBox = new HBox(2);
         Label currencyLabel = new Label("¥ ");
         currencyLabel.setTextFill(Color.RED);
@@ -354,54 +406,60 @@ public class ShopController implements IClientController{
         priceLabel.setTextFill(Color.RED);
         priceLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
         priceBox.getChildren().addAll(currencyLabel, priceLabel);
-
-        // 弹簧，用于将按钮推到底部
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        // 按钮
         Button actionButton = new Button("查看详情");
         actionButton.setMaxWidth(Double.MAX_VALUE);
 
+        actionButton.setStyle(
+                "-fx-background-color: #B3E5FC; " +
+                        "-fx-text-fill: #01579B; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-background-radius: 5px;"
+        );
+
+        actionButton.setOnMouseEntered(e -> actionButton.setStyle(
+                "-fx-background-color: #81D4FA; " +
+                        "-fx-text-fill: #01579B; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-background-radius: 5px;"
+        ));
+        actionButton.setOnMouseExited(e -> actionButton.setStyle(
+                "-fx-background-color: #B3E5FC; " +
+                        "-fx-text-fill: #01579B; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-background-radius: 5px;"
+        ));
 
         // ==========================================================
-        // 2. 图片加载逻辑（直接整合在此）
+        // 2. 图片加载逻辑 (保持不变)
         // ==========================================================
         try {
             Image image;
             if (product.getImageData() != null && product.getImageData().length > 0) {
-                // 优先从二进制数据加载
                 image = new Image(new ByteArrayInputStream(product.getImageData()));
             } else if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
-                // 其次从文件路径加载
                 image = new Image(new FileInputStream(product.getImagePath()));
             } else {
-                // 如果都没有，使用占位图
                 image = new Image("https://via.placeholder.com/220x220.png?text=No+Image");
             }
             imageView.setImage(image);
         } catch (Exception e) {
             System.err.println("加载图片失败: " + product.getName() + " | " + e.getMessage());
-            // 出现任何错误，都显示错误占位图
             imageView.setImage(new Image("https://via.placeholder.com/220x220.png?text=Error"));
         }
 
-
         // ==========================================================
-        // 3. 事件处理逻辑（直接整合在此）
+        // 3. 事件处理逻辑 (保持不变)
         // ==========================================================
         actionButton.setOnAction(event -> {
-            // "查看详情" 按钮被点击后要执行的操作
-            System.out.println("查看商品详情: " + product.getName());
-
-            // 您可以在这里直接编写跳转到详情页或弹出新窗口的逻辑
-            // 例如:
-            // openProductDetailWindow(product);
+            System.out.println("客户端：发送获取商品详情请求 - " + product.getName());
+            shopService.getProductDetail(product.getId().toString());
         });
 
-
         // ==========================================================
-        // 4. 组装并返回最终的卡片
+        // 4. 组装并返回最终的卡片 (保持不变)
         // ==========================================================
         imageFrame.getChildren().add(imageView);
         textContainer.getChildren().addAll(nameLabel, priceBox, spacer, actionButton);
@@ -411,79 +469,102 @@ public class ShopController implements IClientController{
     }
 
 
-    /**
-     * 【最终版】处理“获取商品详情”的异步响应。
-     * 这个方法会被 MessageController 在后台线程中调用，
-     * 它负责创建并显示一个功能丰富的商品详情对话框。
-     */
     public void handleGetProductDetailResponse(Message message) {
         System.out.println("客户端 ShopController：收到异步商品详情响应。");
 
-        // 【关键】所有UI更新都必须在 JavaFX Application Thread 中执行
         Platform.runLater(() -> {
             if (!message.isSuccess() || !(message.getData() instanceof Product)) {
-                showError("（异步）获取详情失败: " + message.getMessage());
-                return; // 如果失败或数据类型不对，直接返回
+                showError("（异步）获取详情失败: ".concat(message.getMessage()));
+                return;
             }
 
             Product product = (Product) message.getData();
-            System.out.println("显示商品详情: " + product.getName() + " (ID: " + product.getId() + ")");
+            System.out.println("显示商品详情: ".concat(product.getName()).concat(" (ID: ").concat(product.getId().toString()).concat(")"));
 
-            // --- 创建和显示对话框的逻辑 ---
+            // --- 1. 创建对话框 ---
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle("商品详情");
             dialog.setHeaderText(product.getName());
+            dialog.getDialogPane().setStyle("-fx-background-color: #FFFFFF;");
 
-            // --- 设置对话框内容 (GridPane) ---
+            // --- 2. 设置内容 ---
             GridPane grid = new GridPane();
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(20, 150, 10, 10));
+            grid.setHgap(20);
+            grid.setVgap(15);
+            grid.setPadding(new Insets(20));
+
             ImageView imageView;
+            final double imageSize = 250.0;
             if (product.getImageData() != null && product.getImageData().length > 0) {
-                // 使用图片数据创建Image
-                imageView = new ImageView(new Image(new java.io.ByteArrayInputStream(product.getImageData()), 200, 200, true, true));
+                imageView = new ImageView(new Image(new java.io.ByteArrayInputStream(product.getImageData()), imageSize, imageSize, true, true));
             } else {
-                // 回退到使用图片路径
-                imageView = new ImageView(new Image(product.getImagePath(), 200, 200, true, true, true));
+                imageView = new ImageView(new Image(product.getImagePath(), imageSize, imageSize, true, true, true));
             }
-            grid.add(imageView, 0, 0, 1, 3);
-            grid.add(new Label(String.format("价格: ¥ %.2f", product.getPrice())), 1, 0);
-            grid.add(new Label("库存: " + product.getStock() + " 件"), 1, 1);
-            grid.add(new Label("描述:"), 0, 3);
+
+            Label priceLabel = new Label(String.format("价格: ¥ %.2f", product.getPrice()));
+            priceLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+            Label stockLabel = new Label("库存: ".concat(String.valueOf(product.getStock())).concat(" 件"));
+            stockLabel.setFont(Font.font("System", 14));
+            Label descTitleLabel = new Label("描述:");
+            descTitleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
             Label descLabel = new Label(product.getDescription());
             descLabel.setWrapText(true);
-            grid.add(descLabel, 0, 4, 2, 1);
+            descLabel.setMaxWidth(300);
+
+            grid.add(imageView, 0, 0, 1, 4);
+            grid.add(priceLabel, 1, 0);
+            grid.add(stockLabel, 1, 1);
+            grid.add(descTitleLabel, 0, 4);
+            grid.add(descLabel, 0, 5, 2, 1);
             dialog.getDialogPane().setContent(grid);
 
-            // --- 【核心逻辑】根据 isViewingFavorites 状态动态添加按钮 ---
-            ButtonType buyButton = new ButtonType("立即购买");
+            // --- 3. 定义并美化按钮 ---
+            String blueButtonStyle = "-fx-background-color: #B3E5FC; -fx-text-fill: #01579B; -fx-font-weight: bold;";
+            String orangeButtonStyle = "-fx-background-color: #FFB74D; -fx-text-fill: white; -fx-font-weight: bold;";
+
+            ButtonType buyButton = new ButtonType("立即购买", ButtonBar.ButtonData.OK_DONE);
+            ButtonType addFavButton = new ButtonType("加入收藏", ButtonBar.ButtonData.LEFT); // 改为 LEFT
+            ButtonType removeFavButton = new ButtonType("取消收藏", ButtonBar.ButtonData.LEFT); // 改为 LEFT
             ButtonType closeButton = new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE);
 
+            // 设置按钮顺序
             if (isViewingFavorites) {
-                // 如果当前正在查看收藏夹
-                ButtonType removeFavButton = new ButtonType("取消收藏");
-                dialog.getDialogPane().getButtonTypes().addAll(buyButton, removeFavButton, closeButton);
+                dialog.getDialogPane().getButtonTypes().addAll(removeFavButton, buyButton, closeButton);
             } else {
-                // 如果当前正在查看普通商品列表
-                ButtonType addFavButton = new ButtonType("加入收藏");
-                dialog.getDialogPane().getButtonTypes().addAll(buyButton, addFavButton, closeButton);
+                dialog.getDialogPane().getButtonTypes().addAll(addFavButton, buyButton, closeButton);
             }
 
-            // --- 显示对话框并处理用户的点击结果 ---
+            // 【核心修改】获取底部的 ButtonBar 并添加“弹簧”
+            ButtonBar buttonBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
+            if (buttonBar != null) {
+                Region spacer = new Region();
+                ButtonBar.setButtonData(spacer, ButtonBar.ButtonData.BIG_GAP); // BIG_GAP 会尽可能推开空间
+                // 将弹簧插入到第一个按钮和第二个按钮之间
+                buttonBar.getButtons().add(1, spacer);
+            }
+
+            // 查找并应用样式
+            Node buyButtonNode = dialog.getDialogPane().lookupButton(buyButton);
+            if (buyButtonNode != null) buyButtonNode.setStyle(blueButtonStyle);
+
+            Node addFavButtonNode = dialog.getDialogPane().lookupButton(addFavButton);
+            if (addFavButtonNode != null) addFavButtonNode.setStyle(blueButtonStyle);
+
+            Node removeFavButtonNode = dialog.getDialogPane().lookupButton(removeFavButton);
+            if (removeFavButtonNode != null) removeFavButtonNode.setStyle(orangeButtonStyle);
+
+            Node closeButtonNode = dialog.getDialogPane().lookupButton(closeButton);
+            if (closeButtonNode != null) closeButtonNode.setStyle(orangeButtonStyle);
+
+            // --- 4. 显示对话框并处理结果 ---
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.isPresent()) {
-                String buttonText = result.get().getText();
-                switch (buttonText) {
-                    case "立即购买":
-                        handleBuyNow(product);
-                        break;
-                    case "加入收藏":
-                        handleAddToFavorites(product);
-                        break;
-                    case "取消收藏":
-                        handleRemoveFavorite(product);
-                        break;
+                if (result.get() == buyButton) {
+                    handleBuyNow(product);
+                } else if (result.get() == addFavButton) {
+                    handleAddToFavorites(product);
+                } else if (result.get() == removeFavButton) {
+                    handleRemoveFavorite(product);
                 }
             }
         });

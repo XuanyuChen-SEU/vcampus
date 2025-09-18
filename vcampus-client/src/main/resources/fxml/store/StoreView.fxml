@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -12,67 +13,83 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<!-- fx:controller 路径保持不变 -->
-<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.ShopController">
+<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="background" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vcampus.client.controller.ShopController">
 
-    <!-- ===== 顶部区域：【已升级】加入了余额显示和充值功能 ===== -->
+    <stylesheets>
+        <URL value="@../../css/ShopView.css" />
+    </stylesheets>
+
+    <!-- ===== 顶部区域 ===== -->
     <top>
-        <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="15.0" style="-fx-background-color: #F0F0F0; -fx-border-color: #CCCCCC; -fx-border-width: 0 0 1 0;">
-            <padding> <Insets left="20.0" right="20.0" /> </padding>
+        <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="15.0" styleClass="glass-panel">
+            <padding>
+                <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
+            </padding>
             <children>
-                <!-- 商店标题 -->
-                <Label text="校园商店"> <font> <Font name="System Bold" size="18.0" /> </font> </Label>
-
-                <!-- 搜索框 -->
-                <TextField fx:id="searchField" onAction="#handleSearch" promptText="搜索商品..." HBox.hgrow="ALWAYS" />
-                <Button fx:id="searchButton" onAction="#handleSearch" text="搜索" />
-
-                <!-- 使用一个可伸缩的 Region 来推开右侧的按钮，实现左右分离布局 -->
-                <Region HBox.hgrow="ALWAYS" />
-
-                <!-- 【新增】余额显示标签 -->
-                <!-- fx:id 必须和 Controller 中的变量名完全对应 -->
-                <Label fx:id="balanceLabel" text="余额: 加载中..." style="-fx-font-weight: bold;">
-                    <font> <Font size="14.0" /> </font>
+                <Label text="校园商店">
+                    <font><Font name="System Bold" size="26.0" /></font>
                 </Label>
-
-                <!-- 【新增】充值按钮 -->
-                <Button fx:id="rechargeButton" onAction="#handleRecharge" text="充值" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
-
-                <!-- 导航按钮 -->
-                <Button fx:id="myOrdersButton" onAction="#handleShowMyOrders" text="我的订单" />
-                <Button fx:id="myFavoritesButton" onAction="#handleShowMyFavorites" text="我的收藏" />
+                <TextField fx:id="searchField" onAction="#handleSearch" promptText="搜索商品..." styleClass="search-box" HBox.hgrow="ALWAYS" />
+                <Button fx:id="searchButton" onAction="#handleSearch" styleClass="action-button, search-button" text="搜索">
+                    <graphic>
+                        <SVGPath content="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" styleClass="icon" />
+                    </graphic>
+                </Button>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="balanceLabel" text="余额: ¥ 0.00" style="-fx-font-weight: bold;">
+                    <font><Font size="14.0" /></font>
+                </Label>
+                <Button fx:id="rechargeButton" onAction="#handleRecharge" styleClass="action-button, recharge-button" text="充值">
+                    <graphic>
+                        <SVGPath content="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" styleClass="icon" />
+                    </graphic>
+                </Button>
+                <Button fx:id="myOrdersButton" onAction="#handleShowMyOrders" styleClass="action-button, my-orders-button" text="我的订单">
+                    <graphic>
+                        <SVGPath content="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" styleClass="icon" />
+                    </graphic>
+                </Button>
+                <Button fx:id="myFavoritesButton" onAction="#handleShowMyFavorites" styleClass="action-button, my-favorites-button" text="我的收藏">
+                    <graphic>
+                        <SVGPath content="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" styleClass="icon" />
+                    </graphic>
+                </Button>
             </children>
         </HBox>
     </top>
 
-    <!-- ===== 中部区域：视图切换区 (保持不变) ===== -->
+    <!-- ===== 中部区域 ===== -->
     <center>
         <StackPane fx:id="centerStackPane" BorderPane.alignment="CENTER">
             <children>
-                <!-- 视图一：商品/收藏 展示区 -->
                 <ScrollPane fx:id="productScrollPane" fitToWidth="true" hbarPolicy="NEVER">
                     <content>
                         <TilePane fx:id="productPane" hgap="20.0" prefColumns="4" vgap="20.0">
-                            <padding> <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /> </padding>
+                            <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
                         </TilePane>
                     </content>
                 </ScrollPane>
 
-                <!-- 视图二：订单 展示区 -->
-                <TableView fx:id="orderTable" visible="false">
+                <!-- 【最终修正版】订单表格区 -->
+                <!-- 1. 新增了 maxWidth="Infinity" 来强制表格水平铺满 -->
+                <TableView fx:id="orderTable" styleClass="order-table" visible="false" maxWidth="Infinity">
                     <columns>
-                        <TableColumn fx:id="orderIdColumn" prefWidth="75.0" text="订单号" />
-                        <TableColumn fx:id="orderDateColumn" prefWidth="150.0" text="购买日期" />
-                        <TableColumn fx:id="orderProductColumn" prefWidth="300.0" text="商品" />
-                        <TableColumn fx:id="orderPriceColumn" prefWidth="100.0" text="实付款" />
-                        <TableColumn fx:id="orderStatusColumn" prefWidth="150.0" text="订单状态" />
+                        <!-- 2. 移除了所有列的 prefWidth 属性 -->
+                        <TableColumn fx:id="orderIdColumn" text="订单号" />
+                        <TableColumn fx:id="orderDateColumn" text="购买日期" />
+                        <TableColumn fx:id="orderProductColumn" text="商品" />
+                        <TableColumn fx:id="orderPriceColumn" text="实付款" />
+                        <TableColumn fx:id="orderStatusColumn" text="订单状态" />
                     </columns>
+                    <!-- 3. 恢复了列宽自适应策略，让所有列自动平分表格的总宽度 -->
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
                 </TableView>
             </children>
         </StackPane>
     </center>
-
 </BorderPane>
