@@ -234,6 +234,7 @@ public class LibraryController implements IClientController {
      */
     private void openBookPdf(BorrowLog log) {
         String bookId = log.getBookId();
+        System.out.println("请求获取PDF: " + bookId);
         // 调用Service发请求，这个方法会立即返回，界面不会卡顿
         libraryService.getBookPdf(bookId);
     }

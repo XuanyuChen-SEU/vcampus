@@ -13,8 +13,8 @@ import java.io.Serializable;
  *   角色（role）使用com.vcampus.common.enums.Role枚举
  *   反序列化时依赖默认构造方法，请勿删除或修改访问权限
  *
- *   Getter方法：可安全获取用户ID、加密密码、角色信息用于展示或业务判断</li>
- *   构造方法：支持通过用户ID、加密密码、角色直接创建实例</li>
+ *   Getter方法：可安全获取用户ID、加密密码、角色信息用于展示或业务判断
+ *   构造方法：支持通过用户ID、加密密码、角色直接创建实例
  */
 
 public class User implements Serializable {//数据传输对象

@@ -377,10 +377,10 @@ public class LibraryController {
                 return Message.failure(ActionType.LIBRARY_GET_BOOK_PDF, "参数错误，应为bookId(String)");
             }
             String bookId = (String) message.getData();
-
+            System.out.println(bookId);
             // 调用【服务端】的 LibraryService 来获取文件字节
             byte[] pdfBytes = libraryService.getBookPdfBytes(bookId);
-
+            System.out.println("pdfBytes: " + pdfBytes);
             if (pdfBytes != null) {
                 return Message.success(ActionType.LIBRARY_GET_BOOK_PDF, pdfBytes, "PDF文件获取成功");
             } else {
