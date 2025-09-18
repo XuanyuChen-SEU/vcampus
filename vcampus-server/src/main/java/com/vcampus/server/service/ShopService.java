@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.time.LocalDateTime;
-import java.time.ZoneId; // 用于时区转换
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 
 import com.vcampus.common.dto.Product;
 import com.vcampus.common.dto.ShopTransaction;
@@ -309,6 +310,23 @@ public class ShopService {
         }
     }
 
+    /**
+     * 【新增】生成一个基于日期的、唯一的订单ID。
+     * 格式：yyyyMMdd-xxxxxxxx (8位随机串)
+     * 示例：20250918-a1b2c3d4
+     * @return 唯一的订单ID字符串
+     */
+    private String generateOrderId() {
+        // 1. 获取当前日期，并格式化为 "yyyyMMdd" 字符串
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = LocalDate.now().format(dateFormatter);
+
+        // 2. 生成一个全球唯一的UUID，并截取前8位作为随机部分，确保唯一性
+        String uniquePart = UUID.randomUUID().toString().substring(0, 8);
+
+        // 3. 拼接成最终的订单ID
+        return datePart + "-" + uniquePart;
+    }
 
     public ShopTransaction createOrder(ShopTransaction orderRequest) {
         // 1. 数据校验和库存更新 (这部分保持不变)
@@ -321,17 +339,12 @@ public class ShopService {
         // 2. 创建并准备新的订单对象
         ShopTransaction newOrder = new ShopTransaction();
 
+        // --- 【核心修改】 ---
+        // 使用我们新的、基于日期的方法来生成订单ID
+        String generatedOrderId = generateOrderId();
+        // --- 修改结束 ---
 
-        // --- 【核心修复】 ---
-
-        // a. 【关键】生成一个全球唯一的字符串ID
-        String generatedOrderId = UUID.randomUUID().toString();
-
-        // b. 【关键】将这个字符串ID设置到 'orderId' 字段中
-        //    这正是为了满足 ShopMapper.xml 的需要！
-        newOrder.setOrderId(generatedOrderId);
-
-        // c. 设置其他订单信息
+        newOrder.setOrderId(generatedOrderId); // 设置新的ID
         newOrder.setUserId(orderRequest.getUserId());
         newOrder.setProduct(product);
         newOrder.setTotalPrice(product.getPrice());
@@ -340,7 +353,6 @@ public class ShopService {
         newOrder.setOrderStatus(OrderStatus.UNPAID);
         newOrder.setCreateTime(LocalDateTime.now());
 
-        // d. 【我们的侦探工具】在保存前打印这个ID，确认它不是null
         System.out.println("【服务器DEBUG】准备保存到数据库的 orderId 是: " + newOrder.getOrderId());
 
         // 3. 保存订单到数据库
@@ -662,5 +674,97 @@ public class ShopService {
         return balanceToUpdate;
     }
 
+    /**
+     * 【新增】删除订单的业务逻辑。
+     * @param orderId 要删除的订单ID (String类型)
+     * @return 如果成功返回 true, 否则返回 false
+     * @throws RuntimeException 如果订单不存在或删除失败
+     */
+    public boolean deleteOrder(String orderId) {
+        // 1. 业务逻辑校验
+        if (orderId == null || orderId.trim().isEmpty()) {
+            throw new IllegalArgumentException("无效的请求数据：订单ID不能为空。");
+        }
+
+        ShopTransaction order = shopDao.getOrderById(orderId);
+        if (order == null) {
+            // 即使订单不存在，从用户角度看也算是“删除成功”了，所以我们返回 true
+            // 或者您可以选择抛出异常 new RuntimeException("订单不存在。");
+            System.out.println("业务逻辑：尝试删除一个不存在的订单 (ID: " + orderId + ")，操作视为成功。");
+            return true;
+        }
+
+        // 2. 调用 DAO 从数据库中删除对应的订单记录
+        System.out.println("业务逻辑：请求从数据库删除订单记录，ID为 " + orderId);
+        boolean success = shopDao.deleteOrderById(orderId);
+
+        if (!success) {
+            throw new RuntimeException("数据库删除订单失败。");
+        }
+
+        return true;
+    }
+
+    /**
+     * 【新增】为已存在的未支付订单付款的业务逻辑。
+     * @param orderToPay 包含订单ID和用户ID的 ShopTransaction 对象
+     * @return 支付成功后，包含最新余额的 Balance 对象
+     * @throws RuntimeException 如果支付过程中出现任何业务逻辑错误
+     */
+    public Balance payForUnpaidOrder(ShopTransaction orderToPay) throws RuntimeException {
+        // 1. 数据校验
+        if (orderToPay == null || orderToPay.getId() == null || orderToPay.getUserId() == null) {
+            throw new IllegalArgumentException("支付请求无效：缺少订单ID或用户ID。");
+        }
+        String orderId = orderToPay.getId().toString();
+        String userId = orderToPay.getUserId();
+
+        // 2. 从数据库获取订单的【真实】信息，防止客户端伪造数据
+        ShopTransaction realOrderInDB = shopDao.getOrderById(orderId);
+        if (realOrderInDB == null) {
+            throw new RuntimeException("支付失败：订单不存在。");
+        }
+        if (!realOrderInDB.getUserId().equals(userId)) {
+            throw new RuntimeException("支付失败：无权操作他人订单。");
+        }
+        if (realOrderInDB.getOrderStatus() != OrderStatus.UNPAID) {
+            throw new RuntimeException("支付失败：订单已支付或已取消。");
+        }
+
+        // 3. 校验余额
+        BigDecimal orderPrice = BigDecimal.valueOf(realOrderInDB.getTotalPrice());
+        Balance currentBalance = shopDao.getBalanceByUserId(userId);
+        if (currentBalance == null) {
+            throw new RuntimeException("支付失败：用户余额账户不存在。");
+        }
+        if (currentBalance.getBalance().compareTo(orderPrice) < 0) {
+            throw new RuntimeException("支付失败：账户余额不足。");
+        }
+
+        // 4. 执行扣款
+        BigDecimal newBalanceAmount = currentBalance.getBalance().subtract(orderPrice);
+        currentBalance.setBalance(newBalanceAmount);
+        boolean balanceUpdated = shopDao.updateBalance(currentBalance);
+        if (!balanceUpdated) {
+            throw new RuntimeException("支付失败：更新用户余额时发生数据库错误。");
+        }
+
+        // 5. 更新订单状态
+        realOrderInDB.setOrderStatus(OrderStatus.PAID);
+        realOrderInDB.setPayTime(LocalDateTime.now());
+        boolean orderUpdated = shopDao.updateOrder(realOrderInDB);
+
+        // 补偿逻辑：如果更新订单失败，把钱退还给用户
+        if (!orderUpdated) {
+            System.err.println("严重警告：更新订单状态失败，正在尝试回滚余额...");
+            currentBalance.setBalance(currentBalance.getBalance().add(orderPrice)); // 把钱加回去
+            shopDao.updateBalance(currentBalance);
+            throw new RuntimeException("支付失败：更新订单状态时发生错误，已尝试回滚余额。");
+        }
+
+        // 6. 成功返回最新的余额信息
+        System.out.println("用户 " + userId + " 成功支付订单 " + orderId);
+        return currentBalance;
+    }
 
 }

@@ -104,5 +104,21 @@ public class ShopService {
         socketClient.sendMessage(new Message(ActionType.SHOP_PAY_FOR_ORDER, order));
     }
 
+    /**
+     * 【新增】发送“删除订单”的请求。
+     * @param orderId 要删除的订单ID。
+     */
+    public void deleteOrder(String orderId) {
+        System.out.println("客户端 ShopService：异步发送删除订单请求 (ID: " + orderId + ")...");
+        socketClient.sendMessage(new Message(ActionType.SHOP_DELETE_ORDER, orderId));
+    }
 
+    /**
+     * 【新增】发送“为未支付订单付款”的请求。
+     * @param order 包含订单ID和用户ID的 ShopTransaction 对象。
+     */
+    public void payForUnpaidOrder(ShopTransaction order) {
+        System.out.println("客户端 ShopService：异步发送支付未支付订单的请求...");
+        socketClient.sendMessage(new Message(ActionType.SHOP_PAY_FOR_UNPAID_ORDER, order));
+    }
 }

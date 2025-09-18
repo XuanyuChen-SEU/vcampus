@@ -425,19 +425,31 @@ public class MessageController {
 
                 case SHOP_RECHARGE:
                     if (shopController != null) {
-                        // 当收到充值的响应时，调用 ShopController 中对应的处理方法
                         shopController.handleRechargeResponse(message);
                     } else {
-                        // 如果 ShopController 没有被注册，打印一个清晰的错误日志
                         System.err.println("路由警告：收到充值响应，但ShopController未注册。");
                     }
-                    break;
-                case SHOP_PAY_FOR_ORDER:
-                    if(shopController!=null){
-                        shopController.handleGetBalanceResponse(message);
-                    }else{
-                        System.err.println("路由警告：收到余额更新响应，但ShopController未注册.");
+                    break; // 确保充值逻辑结束后就跳出
+
+                // --- 【核心修正】将所有支付和删除逻辑整合到这里 ---
+
+                case SHOP_PAY_FOR_ORDER:        // 响应：为新创建的订单支付
+                case SHOP_PAY_FOR_UNPAID_ORDER: // 响应：为已存在的未支付订单付款
+                    if (shopController != null) {
+                        // 无论哪种支付成功，都统一调用您正确的 handlePayForOrderResponse 方法
+                        shopController.handlePayForOrderResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到支付成功响应，但ShopController未注册。");
                     }
+                    break; // 【关键】在处理完所有支付逻辑后，必须跳出！
+
+                case SHOP_DELETE_ORDER: // 响应：删除订单
+                    if (shopController != null) {
+                        shopController.handleDeleteOrderResponse(message);
+                    } else {
+                        System.err.println("路由警告：收到删除订单响应，但ShopController未注册。");
+                    }
+                    break; // 确保删除逻辑结束后也跳出
 
 
                 // 商店管理员相关响应处理

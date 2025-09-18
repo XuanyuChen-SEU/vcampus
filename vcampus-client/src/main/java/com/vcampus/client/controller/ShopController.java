@@ -20,6 +20,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.shape.SVGPath;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -63,6 +64,10 @@ import javafx.scene.control.TextInputDialog;
 import java.math.BigDecimal;
 import java.io.ByteArrayInputStream;
 import javafx.scene.layout.*;
+
+import javafx.scene.control.DialogPane; // 【新增】确保导入
+
+
 
 public class ShopController implements IClientController{
 
@@ -317,22 +322,17 @@ public class ShopController implements IClientController{
         shopService.getAllProducts(); // 只发送，不等待
     }
 
-    /**
-     * 配置订单表格的列和数据如何显示
-     */
     private void setupOrderTable() {
-        orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        // --- 已有列的设置 (保持不变) ---
+        orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderId"));
         orderDateColumn.setCellValueFactory(new PropertyValueFactory<>("createTime"));
         orderPriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
         orderStatusColumn.setCellValueFactory(new PropertyValueFactory<>("orderStatus"));
-
-        // 商品列是复杂的，需要自定义单元格的显示方式
         orderProductColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct()));
         orderProductColumn.setCellFactory(column -> new TableCell<ShopTransaction, Product>() {
             private final ImageView imageView = new ImageView();
             private final Label nameLabel = new Label();
             private final HBox contentBox = new HBox(10, imageView, nameLabel);
-
             @Override
             protected void updateItem(Product product, boolean empty) {
                 super.updateItem(product, empty);
@@ -341,10 +341,8 @@ public class ShopController implements IClientController{
                 } else {
                     Image image;
                     if (product.getImageData() != null && product.getImageData().length > 0) {
-                        // 使用图片数据创建Image
                         image = new Image(new java.io.ByteArrayInputStream(product.getImageData()), 50, 50, true, true);
                     } else {
-                        // 回退到使用图片路径
                         image = new Image(product.getImagePath(), 50, 50, true, true, true);
                     }
                     imageView.setImage(image);
@@ -353,6 +351,69 @@ public class ShopController implements IClientController{
                 }
             }
         });
+
+        // --- 【最终修正版】为“操作”列添加按钮 ---
+        Callback<TableColumn<ShopTransaction, Void>, TableCell<ShopTransaction, Void>> cellFactory = new Callback<>() {
+            @Override
+            public TableCell<ShopTransaction, Void> call(final TableColumn<ShopTransaction, Void> param) {
+                final TableCell<ShopTransaction, Void> cell = new TableCell<>() {
+
+                    private final Button deleteButton = new Button("删除");
+                    private final Button payButton = new Button("支付");
+                    private final HBox pane = new HBox(10, deleteButton);
+
+                    {
+                        deleteButton.setStyle("-fx-background-color: #FFB74D; -fx-text-fill: white;");
+                        payButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+
+                        deleteButton.setOnAction((ActionEvent event) -> {
+                            ShopTransaction order = getTableView().getItems().get(getIndex());
+
+                            // 【核心修改】使用 getOrderId() 而不是 getId()
+                            String orderId = order.getOrderId();
+
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                            alert.setTitle("确认删除");
+                            alert.setHeaderText("您确定要删除这个订单吗？");
+                            alert.setContentText("订单号: " + orderId); // 显示正确的订单号
+
+                            Optional<ButtonType> result = alert.showAndWait();
+                            if (result.isPresent() && result.get() == ButtonType.OK) {
+                                // 【核心修改】传递正确的 orderId (String类型)
+                                shopService.deleteOrder(orderId);
+                            }
+                        });
+
+                        payButton.setOnAction((ActionEvent event) -> {
+                            ShopTransaction order = getTableView().getItems().get(getIndex());
+                            showCreateOrderWindow(order);
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            ShopTransaction order = getTableView().getItems().get(getIndex());
+                            if (order.getOrderStatus() == OrderStatus.UNPAID) {
+                                if (!pane.getChildren().contains(payButton)) {
+                                    pane.getChildren().add(0, payButton);
+                                }
+                            } else {
+                                pane.getChildren().remove(payButton);
+                            }
+                            setGraphic(pane);
+                            setAlignment(Pos.CENTER);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        orderActionColumn.setCellFactory(cellFactory);
     }
 
 
@@ -524,8 +585,8 @@ public class ShopController implements IClientController{
             String orangeButtonStyle = "-fx-background-color: #FFB74D; -fx-text-fill: white; -fx-font-weight: bold;";
 
             ButtonType buyButton = new ButtonType("立即购买", ButtonBar.ButtonData.OK_DONE);
-            ButtonType addFavButton = new ButtonType("加入收藏", ButtonBar.ButtonData.LEFT); // 改为 LEFT
-            ButtonType removeFavButton = new ButtonType("取消收藏", ButtonBar.ButtonData.LEFT); // 改为 LEFT
+            ButtonType addFavButton = new ButtonType("加入购物车", ButtonBar.ButtonData.LEFT); // 改为 LEFT
+            ButtonType removeFavButton = new ButtonType("移出购物车", ButtonBar.ButtonData.LEFT); // 改为 LEFT
             ButtonType closeButton = new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE);
 
             // 设置按钮顺序
@@ -784,23 +845,69 @@ public class ShopController implements IClientController{
         });
     }
 
-    /**
-     * 处理点击“充值”按钮的事件。
-     */
     @FXML
     void handleRecharge(ActionEvent event) {
+        // 1. 创建一个 TextInputDialog
         TextInputDialog dialog = new TextInputDialog("100");
-        dialog.setTitle("账户充值");
-        dialog.setHeaderText("请输入您要充值的金额");
-        dialog.setContentText("金额 (元):");
 
+        // --- 2. 【最终美化版】 ---
+        dialog.setTitle("账户充值");
+        dialog.setHeaderText("安全快捷充值");
+        dialog.setContentText("充值金额 (元):");
+
+        // a. 【已修改】获取 DialogPane 并设置更大的尺寸和样式
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.setPrefSize(400, 250); // 将窗口尺寸放大
+        dialogPane.setStyle(
+                "-fx-background-color: #f8f9fa;"
+        );
+        dialogPane.lookupButton(ButtonType.OK).setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 14px;");
+        dialogPane.lookupButton(ButtonType.CANCEL).setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14px;");
+
+        // b. 【核心修改】使用内置的SVG图标，不再加载外部图片
+        SVGPath bankIcon = new SVGPath();
+        // 这是一个钱包/充值的图标路径
+        bankIcon.setContent("M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z");
+        bankIcon.setStyle("-fx-fill: #007bff;"); // 设置图标颜色为蓝色
+
+        // 创建一个容器来调整图标大小
+        StackPane iconContainer = new StackPane(bankIcon);
+        iconContainer.setPrefSize(48, 48);
+        // 使用-fx-scale-shape来缩放SVG而不改变其原始尺寸，效果更好
+        bankIcon.setStyle("-fx-fill: #007bff; -fx-scale-x: 1.5; -fx-scale-y: 1.5;");
+
+        dialog.setGraphic(iconContainer); // 将图标设置到对话框
+
+        // c. 【已修改】将限额提示添加到布局中
+        GridPane content = (GridPane) dialogPane.getContent();
+        Label limitLabel = new Label("注意：单次充值金额不得超过 5000 元。");
+        limitLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
+
+        // 将提示添加到GridPane的下一行，并让它跨越两列
+        content.add(limitLabel, 0, 1, 2, 1);
+        content.setVgap(10); // 增加垂直间距
+
+
+        // --- 3. 显示对话框并处理结果 (代码不变) ---
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(amountStr -> {
             try {
-                // 将输入的字符串转换为 BigDecimal
                 BigDecimal amount = new BigDecimal(amountStr);
-                // 调用 Service 发送充值请求
+
+                // 金额上限业务逻辑 (代码不变)
+                final BigDecimal limit = new BigDecimal("5000");
+                if (amount.compareTo(limit) > 0) {
+                    amount = limit;
+                    Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+                    infoAlert.setTitle("金额提示");
+                    infoAlert.setHeaderText(null);
+                    infoAlert.setContentText("您输入的金额超过了单次充值上限，已自动为您调整为 5000 元。");
+                    infoAlert.showAndWait();
+                }
+
+                // 调用 Service (代码不变)
                 shopService.recharge(currentUser.getUserId(), amount);
+
             } catch (NumberFormatException e) {
                 showError("无效的金额格式，请输入数字。");
             }
@@ -834,6 +941,21 @@ public class ShopController implements IClientController{
                 showSuccess("充值成功！");
             } else {
                 showError("充值失败: " + message.getMessage());
+            }
+        });
+    }
+
+    /**
+     * 【新增】处理删除订单的异步响应。
+     */
+    public void handleDeleteOrderResponse(Message message) {
+        Platform.runLater(() -> {
+            if (message.isSuccess()) {
+                showSuccess("订单删除成功！");
+                // 刷新订单列表以显示变化
+                handleShowMyOrders(null);
+            } else {
+                showError("删除失败: " + message.getMessage());
             }
         });
     }

@@ -122,6 +122,6 @@ public interface IShopDao {
      * @return 如果更新成功，返回 true；否则返回 false。
      */
     boolean updateOrder(ShopTransaction order);
-    public boolean deleteOrderById(String orderId);
+    boolean deleteOrderById(String orderId);
 
 }

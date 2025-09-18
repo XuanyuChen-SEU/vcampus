@@ -154,6 +154,13 @@ public class MessageController {
 
                 case SHOP_RECHARGE:
                     return shopController.handleRecharge(request);
+                // --- 【新增】路由删除和支付的请求 ---
+                case SHOP_DELETE_ORDER:
+                    return shopController.handleDeleteOrder(request);
+
+                case SHOP_PAY_FOR_UNPAID_ORDER:
+                    return shopController.handlePayForUnpaidOrder(request);
+                // --- 新增结束 ---
 
 
                 // --- 商店管理员相关 ---

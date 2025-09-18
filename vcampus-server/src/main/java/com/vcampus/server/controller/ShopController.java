@@ -498,5 +498,36 @@ public class ShopController {
         }
     }
 
+    /**
+     * 【新增】处理“删除订单”的请求。
+     * @param request 客户端请求，data 字段为 String 类型的订单ID。
+     * @return 包含操作结果的响应 Message。
+     */
+    public Message handleDeleteOrder(Message request) {
+        try {
+            String orderId = (String) request.getData();
+            shopService.deleteOrder(orderId);
+            return Message.success(ActionType.SHOP_DELETE_ORDER, "订单删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_DELETE_ORDER, e.getMessage());
+        }
+    }
+
+    /**
+     * 【新增】处理“为未支付订单付款”的请求。
+     * @param request 客户端请求，data 字段为 ShopTransaction 对象。
+     * @return 包含最新余额或错误信息的响应 Message。
+     */
+    public Message handlePayForUnpaidOrder(Message request) {
+        try {
+            ShopTransaction orderToPay = (ShopTransaction) request.getData();
+            Balance updatedBalance = shopService.payForUnpaidOrder(orderToPay);
+            return Message.success(ActionType.SHOP_PAY_FOR_UNPAID_ORDER, updatedBalance, "支付成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Message.failure(ActionType.SHOP_PAY_FOR_UNPAID_ORDER, e.getMessage());
+        }
+    }
 
 }
