@@ -6,8 +6,6 @@ package com.vcampus.common.enums;
  * 包含角色描述，便于日志输出和界面展示
  * 编写人：谌宣羽
  *
- * TODO：
- * 角色描述仅为管理员，以后可能会细分
  */
 public enum Role {
     STUDENT(1, "学生"),
@@ -16,7 +14,8 @@ public enum Role {
     STUDENT_ADMIN(4, "学籍管理员"),
     COURSE_ADMIN(5, "教务管理员"),
     LIBRARY_ADMIN(6, "图书馆管理员"),
-    SHOP_ADMIN(7, "商店管理员");
+    SHOP_ADMIN(7, "商店管理员"),
+    EMAIL_ADMIN(8, "邮件管理员");
 
 
     private final int code;  // 数据库存储的编码（如 "student"）

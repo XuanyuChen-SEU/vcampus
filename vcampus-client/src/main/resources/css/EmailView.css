@@ -1,0 +1,522 @@
+/* 邮件系统样式文件 */
+
+/* ==================== 主容器样式 ==================== */
+.email-background {
+    -fx-background-color: #f5f5f5;
+}
+
+.compose-background {
+    -fx-background-color: #ffffff;
+}
+
+/* ==================== 工具栏样式 ==================== */
+.email-toolbar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+}
+
+.compose-toolbar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+}
+
+.email-title {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+.compose-title {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+/* ==================== 搜索框样式 ==================== */
+.email-search-field {
+    -fx-background-color: #f8f8f8;
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+}
+
+.email-search-field:focused {
+    -fx-border-color: #4CAF50;
+    -fx-background-color: #ffffff;
+}
+
+/* ==================== 按钮样式 ==================== */
+.email-action-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.email-action-button:hover {
+    -fx-background-color: #45a049;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.compose-action-button {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.compose-action-button:hover {
+    -fx-background-color: #1976D2;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.compose-send-button {
+    -fx-background-color: #4CAF50;
+}
+
+.compose-send-button:hover {
+    -fx-background-color: #45a049;
+}
+
+.compose-cancel-button {
+    -fx-background-color: #f44336;
+}
+
+.compose-cancel-button:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* ==================== 标签页样式 ==================== */
+.email-tabs {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.email-tab-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666666;
+    -fx-border-color: transparent;
+    -fx-padding: 12 20;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.email-tab-button:hover {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: #333333;
+}
+
+.email-tab-active {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
+.email-tab-active:hover {
+    -fx-background-color: #45a049;
+}
+
+/* ==================== 表格样式 ==================== */
+.email-table {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-background-radius: 15px;
+    -fx-border-color: rgba(135, 206, 250, 0.3);
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(135, 206, 250, 0.15), 15, 0, 0, 8);
+}
+
+.email-table .column-header-background {
+    -fx-background-color: linear-gradient(to right, #e3f2fd, #bbdefb, #e3f2fd);
+    -fx-background-size: 200% 100%;
+    -fx-background-radius: 15px 15px 0 0;
+}
+
+.email-table .column-header {
+    -fx-background-color: transparent;
+}
+
+.email-table .column-header .label {
+    -fx-text-fill: #37474f;
+    /* 深蓝灰色文字 */
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+    -fx-padding: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0, 0, 1);
+}
+
+.email-table .table-row-cell {
+    -fx-text-fill: #3c1e69;
+    -fx-font-size: 12px;
+    -fx-padding: 12px 15px;
+    -fx-border-width: 1px 0 0 0;
+    -fx-border-color: rgba(147, 112, 219, 0.1);
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.email-table .table-row-cell:even {
+    -fx-background-color: rgba(248, 250, 252, 0.8);
+    /* 更淡的灰白色 */
+}
+
+.email-table .table-row-cell:odd {
+    -fx-background-color: rgba(241, 245, 249, 0.8);
+    /* 更淡的蓝灰色 */
+}
+
+.email-table .table-row-cell:hover {
+    -fx-background-color: rgba(240, 248, 255, 0.8);
+    /* 淡蓝色悬停背景 */
+    -fx-scale-x: 1.01;
+    -fx-scale-y: 1.01;
+    -fx-effect: dropshadow(gaussian, rgba(135, 206, 250, 0.2), 8, 0, 0, 2);
+}
+
+.email-table .table-row-cell:selected {
+    -fx-background-color: rgba(135, 206, 250, 0.6);
+    /* 淡蓝色背景 */
+    -fx-text-fill: #000000;
+    /* 纯黑色文字 */
+    -fx-border-color: #87ceeb;
+    -fx-border-width: 2px 0;
+    -fx-effect: dropshadow(gaussian, rgba(135, 206, 250, 0.3), 10, 0, 0, 0);
+}
+
+.email-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: #000000;
+    /* 确保单元格文字也是黑色 */
+}
+
+/* 未读邮件样式 */
+.email-table .table-row-cell.unread {
+    -fx-background-color: rgba(255, 248, 220, 0.8);
+    /* 淡黄色背景表示未读 */
+    -fx-font-weight: bold;
+    /* 未读邮件加粗 */
+}
+
+.email-table .table-row-cell.unread:even {
+    -fx-background-color: rgba(255, 248, 220, 0.8);
+    /* 未读邮件覆盖斑马纹 */
+}
+
+.email-table .table-row-cell.unread:odd {
+    -fx-background-color: rgba(255, 248, 220, 0.8);
+    /* 未读邮件覆盖斑马纹 */
+}
+
+/* 已读邮件样式 */
+.email-table .table-row-cell.read {
+    -fx-background-color: rgba(248, 250, 252, 0.8);
+    /* 淡灰色背景表示已读 */
+    -fx-font-weight: normal;
+    /* 已读邮件正常字重 */
+}
+
+.email-table .table-row-cell.read:even {
+    -fx-background-color: rgba(248, 250, 252, 0.8);
+    /* 已读邮件覆盖斑马纹 */
+}
+
+.email-table .table-row-cell.read:odd {
+    -fx-background-color: rgba(241, 245, 249, 0.8);
+    /* 已读邮件覆盖斑马纹 */
+}
+
+.email-table .table-cell {
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: rgba(147, 112, 219, 0.1);
+    -fx-border-style: dashed;
+}
+
+/* 滚动条样式 */
+.email-table .scroll-bar:horizontal .track,
+.email-table .scroll-bar:vertical .track {
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+    -fx-border-color: transparent;
+    -fx-background-radius: 10px;
+}
+
+.email-table .scroll-bar .thumb {
+    -fx-background-color: linear-gradient(to bottom, #d8bfd8, #b19cd9);
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(255, 255, 255, 0.5);
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(147, 112, 219, 0.3), 5, 0, 0, 1);
+}
+
+.email-table .scroll-bar .thumb:hover {
+    -fx-background-color: linear-gradient(to bottom, #c8a2c8, #9370db);
+}
+
+/* ==================== 分页样式 ==================== */
+.email-pagination {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 10;
+}
+
+.email-page-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #4CAF50;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 5 10;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.email-page-button:hover {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
+.email-page-button:disabled {
+    -fx-background-color: #f5f5f5;
+    -fx-text-fill: #cccccc;
+    -fx-border-color: #cccccc;
+    -fx-cursor: default;
+}
+
+.email-page-info {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+}
+
+/* ==================== 邮件详情样式 ==================== */
+.email-detail-container {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+}
+
+.email-detail-header {
+    -fx-background-color: #f8f8f8;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.email-detail-subject {
+    -fx-text-fill: #333333;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.email-detail-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #4CAF50;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 5 10;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.email-detail-button:hover {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
+.email-delete-button {
+    -fx-text-fill: #f44336;
+    -fx-border-color: #f44336;
+}
+
+.email-delete-button:hover {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+}
+
+.email-detail-scroll {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent;
+}
+
+.email-detail-content {
+    -fx-background-color: #ffffff;
+}
+
+.email-info-row {
+    -fx-spacing: 10;
+}
+
+.email-info-label {
+    -fx-text-fill: #666666;
+    -fx-font-weight: bold;
+    -fx-min-width: 80;
+}
+
+.email-info-value {
+    -fx-text-fill: #333333;
+}
+
+.email-content-label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.email-content-scroll {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+}
+
+.email-content-text {
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 3;
+    -fx-wrap-text: true;
+    -fx-max-width: infinity;
+}
+
+/* ==================== 写邮件样式 ==================== */
+.compose-content {
+    -fx-background-color: #ffffff;
+}
+
+.compose-label {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.compose-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+}
+
+.compose-field:focused {
+    -fx-border-color: #4CAF50;
+}
+
+.compose-content-scroll {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.compose-textarea {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 2;
+}
+
+.compose-textarea:focused {
+    -fx-border-color: transparent;
+}
+
+.compose-attach-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #666666;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 5 10;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.compose-attach-button:hover {
+    -fx-background-color: #f0f0f0;
+}
+
+.compose-attachment-info {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+}
+
+/* ==================== 状态栏样式 ==================== */
+.email-status-bar {
+    -fx-background-color: #f8f8f8;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+}
+
+.email-status-text {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+}
+
+.email-unread-count {
+    -fx-text-fill: #4CAF50;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.compose-char-count {
+    -fx-text-fill: #999999;
+    -fx-font-size: 12px;
+}
+
+/* ==================== 分割面板样式 ==================== */
+.email-split-pane {
+    -fx-background-color: #f5f5f5;
+}
+
+.email-split-pane .split-pane-divider {
+    -fx-background-color: #e0e0e0;
+    -fx-border-color: #d0d0d0;
+}
+
+.email-split-pane .split-pane-divider:hover {
+    -fx-background-color: #d0d0d0;
+}
+
+/* ==================== 列表容器样式 ==================== */
+.email-list-container {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 1 0 0;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 800px) {
+    .email-tab-button {
+        -fx-padding: 8 12;
+        -fx-font-size: 12px;
+    }
+
+    .email-action-button {
+        -fx-padding: 6 12;
+        -fx-font-size: 12px;
+    }
+
+    .compose-action-button {
+        -fx-padding: 6 12;
+        -fx-font-size: 12px;
+    }
+}

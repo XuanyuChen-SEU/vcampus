@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import java.net.URL?>
+
+<BorderPane fx:id="rootPane" prefHeight="600.0" prefWidth="800.0" styleClass="compose-background"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vcampus.client.controller.ComposeEmailController">
+    <stylesheets>
+        <URL value="@../../css/EmailView.css" />
+    </stylesheets>
+
+    <!-- 顶部工具栏 -->
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="15.0" styleClass="compose-toolbar">
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+            </padding>
+            <children>
+                <!-- 标题 -->
+                <Label text="✏️ 写邮件" styleClass="compose-title">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Label>
+
+                <!-- 分隔符 -->
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- 操作按钮 -->
+                <Button fx:id="saveDraftButton" onAction="#handleSaveDraft" text="💾 保存草稿" 
+                        styleClass="compose-action-button" />
+                <Button fx:id="sendButton" onAction="#handleSendEmail" text="📤 发送" 
+                        styleClass="compose-action-button, compose-send-button" />
+                <Button fx:id="cancelButton" onAction="#handleCancel" text="❌ 取消" 
+                        styleClass="compose-action-button, compose-cancel-button" />
+            </children>
+        </HBox>
+    </top>
+
+    <!-- 主要内容区域 -->
+    <center>
+        <VBox fx:id="composeContent" spacing="15.0" styleClass="compose-content">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                
+                <!-- 收件人 -->
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Label text="收件人:" styleClass="compose-label" prefWidth="80.0" />
+                        <TextField fx:id="recipientField" promptText="请输入收件人用户ID" 
+                                  styleClass="compose-field" HBox.hgrow="ALWAYS" />
+                    </children>
+                </HBox>
+
+                <!-- 主题 -->
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Label text="主题:" styleClass="compose-label" prefWidth="80.0" />
+                        <TextField fx:id="subjectField" promptText="请输入邮件主题" 
+                                  styleClass="compose-field" HBox.hgrow="ALWAYS" />
+                    </children>
+                </HBox>
+
+                <!-- 邮件内容 -->
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="内容:" styleClass="compose-label" />
+                        <ScrollPane fx:id="contentScrollPane" fitToWidth="true" 
+                                   prefHeight="400.0" styleClass="compose-content-scroll">
+                            <content>
+                                <TextArea fx:id="contentArea" promptText="请输入邮件内容..." 
+                                         styleClass="compose-textarea" wrapText="true" />
+                            </content>
+                        </ScrollPane>
+                    </children>
+                </VBox>
+
+                <!-- 附件区域（预留） -->
+                <VBox spacing="5.0" visible="false">
+                    <children>
+                        <Label text="附件:" styleClass="compose-label" />
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <Button fx:id="attachButton" text="📎 添加附件" 
+                                        styleClass="compose-attach-button" />
+                                <Label fx:id="attachmentLabel" text="暂无附件" 
+                                       styleClass="compose-attachment-info" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+            </children>
+        </VBox>
+    </center>
+
+    <!-- 底部状态栏 -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" prefHeight="30.0" styleClass="compose-status-bar">
+            <padding>
+                <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+            </padding>
+            <children>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="charCountLabel" text="字符数: 0" styleClass="compose-char-count" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

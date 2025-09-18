@@ -55,6 +55,7 @@
                 <Button fx:id="libraryButton" maxWidth="1.7976931348623157E308" onAction="#handleLibraryNav" text="📚" styleClass="nav-button" />
                 <Button fx:id="studentRecordButton" maxWidth="1.7976931348623157E308" onAction="#handleStudentRecordNav" text="📋" styleClass="nav-button" />
                 <Button fx:id="academicButton" maxWidth="1.7976931348623157E308" onAction="#handleAcademicNav" text="🎓" styleClass="nav-button" />
+                <Button fx:id="emailButton" maxWidth="1.7976931348623157E308" onAction="#handleEmailNav" text="📧" styleClass="nav-button" />
                 <Button fx:id="chatButton" maxWidth="1.7976931348623157E308" onAction="#handleShowChatView" styleClass="nav-button">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">

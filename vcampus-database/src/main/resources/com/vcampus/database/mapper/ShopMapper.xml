@@ -397,6 +397,17 @@
         UPDATE vcampus_db.tb_balance SET balance = #{balance} WHERE userId = #{userId}
     </update>
 
+    <!-- 创建余额记录 -->
+    <insert id="createBalance" parameterType="com.vcampus.common.entity.Balance">
+        INSERT INTO vcampus_db.tb_balance (userId, balance)
+        VALUES (#{userId}, #{balance})
+    </insert>
+
+    <!-- 根据用户ID删除余额记录 -->
+    <delete id="deleteBalanceByUserId">
+        DELETE FROM vcampus_db.tb_balance WHERE userId = #{userId}
+    </delete>
+
     <update id="updateOrder" parameterType="com.vcampus.common.dto.ShopTransaction">
         UPDATE vcampus_db.tb_order
         SET

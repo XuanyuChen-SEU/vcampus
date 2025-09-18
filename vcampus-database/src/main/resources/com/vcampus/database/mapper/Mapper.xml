@@ -20,8 +20,19 @@
     </update>
 
     <update id="dropTables">
-        DROP TABLE IF EXISTS vcampus_db.tb_user
-        DROP TABLE IF EXISTS vcampus_db.tb_student
+        DROP TABLE IF EXISTS vcampus_db.tb_email;
+        DROP TABLE IF EXISTS vcampus_db.tb_course_selections;
+        DROP TABLE IF EXISTS vcampus_db.tb_class_sessions;
+        DROP TABLE IF EXISTS vcampus_db.tb_courses;
+        DROP TABLE IF EXISTS vcampus_db.tb_balance;
+        DROP TABLE IF EXISTS vcampus_db.tb_favorite;
+        DROP TABLE IF EXISTS vcampus_db.tb_order;
+        DROP TABLE IF EXISTS vcampus_db.tb_product;
+        DROP TABLE IF EXISTS vcampus_db.tb_password_reset_application;
+        DROP TABLE IF EXISTS vcampus_db.tb_borrow_log;
+        DROP TABLE IF EXISTS vcampus_db.tb_book;
+        DROP TABLE IF EXISTS vcampus_db.tb_student;
+        DROP TABLE IF EXISTS vcampus_db.tb_user;
     </update>
 
     <update id="InsertTempData">
@@ -241,5 +252,28 @@
             balance DECIMAL(10,2) NOT NULL COMMENT '余额'
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='余额表';
     </update>
+
+    <!-- 创建邮件表 -->
+    <update id="createEmailTable">
+        CREATE TABLE IF NOT EXISTS vcampus_db.tb_email (
+            emailId VARCHAR(50) NOT NULL PRIMARY KEY COMMENT '邮件ID（主键）',
+            senderId VARCHAR(50) NOT NULL COMMENT '发送者用户ID',
+            recipientId VARCHAR(50) NOT NULL COMMENT '接收者用户ID',
+            subject VARCHAR(255) NOT NULL COMMENT '邮件主题',
+            content TEXT COMMENT '邮件内容',
+            sendTime DATETIME NOT NULL COMMENT '发送时间',
+            status ENUM('DRAFT', 'SENT', 'READ') NOT NULL DEFAULT 'DRAFT' COMMENT '邮件状态',
+            hasAttachment BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否有附件',
+            replyToEmailId VARCHAR(50) DEFAULT NULL COMMENT '回复的邮件ID',
+            INDEX idx_sender (senderId),
+            INDEX idx_recipient (recipientId),
+            INDEX idx_sendTime (sendTime),
+            INDEX idx_status (status),
+            FOREIGN KEY (senderId) REFERENCES tb_user(userId) ON DELETE CASCADE,
+            FOREIGN KEY (recipientId) REFERENCES tb_user(userId) ON DELETE CASCADE,
+            FOREIGN KEY (replyToEmailId) REFERENCES tb_email(emailId) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='邮件表';
+    </update>
+
 
 </mapper>
