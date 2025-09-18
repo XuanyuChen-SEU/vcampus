@@ -313,7 +313,18 @@ public class EmailController {
             }
             
             List<Email> emails = emailService.searchEmails(userId, keyword, page, pageSize);
-            return new Message(ActionType.EMAIL_SEARCH, emails != null ? emails : List.of(), true, "搜索邮件成功");
+            int totalCount = emailService.searchEmailsCount(userId, keyword);
+            
+            // 创建包含邮件列表和总数信息的响应数据
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("emails", emails != null ? emails : List.of());
+            responseData.put("totalCount", totalCount);
+            responseData.put("currentPage", page);
+            responseData.put("pageSize", pageSize);
+            responseData.put("totalPages", (int) Math.ceil((double) totalCount / pageSize));
+            responseData.put("keyword", keyword);
+            
+            return new Message(ActionType.EMAIL_SEARCH, responseData, true, "搜索邮件成功");
         } catch (Exception e) {
             return Message.failure(ActionType.EMAIL_SEARCH, "搜索邮件失败: " + e.getMessage());
         }

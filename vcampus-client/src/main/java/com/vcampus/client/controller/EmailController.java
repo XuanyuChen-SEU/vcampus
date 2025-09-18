@@ -6,8 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
-import com.vcampus.client.session.UserSession;
 import com.vcampus.client.service.EmailService;
+import com.vcampus.client.session.UserSession;
 import com.vcampus.common.dto.Email;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.enums.ActionType;
@@ -19,6 +19,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -27,7 +28,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.Parent;
 
 /**
  * 邮件系统控制器
@@ -548,7 +548,6 @@ public class EmailController implements IClientController {
                             getStyleClass().add("read");
                         } else {
                             getStyleClass().add("unread");
-                            System.out.println("添加未读样式到邮件: " + email.getSubject());
                         }
                     }
                 }

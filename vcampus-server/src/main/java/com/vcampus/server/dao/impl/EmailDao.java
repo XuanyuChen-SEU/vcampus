@@ -237,6 +237,23 @@ public class EmailDao implements IEmailDao {
         }
     }
 
+    /**
+     * 获取搜索邮件总数
+     * @param userId 用户ID
+     * @param keyword 搜索关键词
+     * @return 搜索结果总数
+     */
+    @Override
+    public int searchEmailsCount(String userId, String keyword) {
+        try (SqlSession sqlSession = MyBatisUtil.openSession()) {
+            EmailMapper mapper = sqlSession.getMapper(EmailMapper.class);
+            return mapper.searchEmailsCount(userId, keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     // ==================== 邮件状态操作 ====================
 
     /**

@@ -107,6 +107,13 @@
         LIMIT #{offset}, #{limit}
     </select>
 
+    <!-- 获取搜索邮件总数 -->
+    <select id="searchEmailsCount" resultType="int">
+        SELECT COUNT(*) FROM vcampus_db.tb_email 
+        WHERE (senderId = #{userId} OR recipientId = #{userId}) 
+        AND subject LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
     <!-- ==================== 邮件状态操作 ==================== -->
 
     <!-- 标记邮件为已读 -->

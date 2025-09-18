@@ -181,6 +181,16 @@ public class EmailService {
     }
 
     /**
+     * 获取搜索邮件总数
+     * @param userId 用户ID
+     * @param keyword 搜索关键词
+     * @return 搜索结果总数
+     */
+    public int searchEmailsCount(String userId, String keyword) {
+        return emailDao.searchEmailsCount(userId, keyword);
+    }
+
+    /**
      * 标记邮件为已读
      * @param emailId 邮件ID
      * @param userId 用户ID

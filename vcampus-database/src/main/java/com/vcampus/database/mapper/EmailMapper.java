@@ -126,6 +126,15 @@ public interface EmailMapper {
                             @Param("offset") int offset, 
                             @Param("limit") int limit);
 
+    /**
+     * 获取搜索邮件总数
+     * @param userId 用户ID
+     * @param keyword 搜索关键词
+     * @return 搜索结果总数
+     */
+    int searchEmailsCount(@Param("userId") String userId, 
+                         @Param("keyword") String keyword);
+
     // ==================== 邮件状态操作 ====================
 
     /**

@@ -112,6 +112,14 @@ public interface IEmailDao {
      */
     List<Email> searchEmails(String userId, String keyword, int page, int pageSize);
 
+    /**
+     * 获取搜索邮件总数
+     * @param userId 用户ID
+     * @param keyword 搜索关键词
+     * @return 搜索结果总数
+     */
+    int searchEmailsCount(String userId, String keyword);
+
     // ==================== 邮件状态操作 ====================
 
     /**
