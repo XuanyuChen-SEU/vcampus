@@ -401,6 +401,9 @@ public class LibraryController implements IClientController {
                 libraryService.borrowBook(currentUser.getUserId(), selectedBook.getBookId());
             }
         });
+        showAllBooksView();
+        showAllBooksView();
+        showAllBooksView();
     }
 
     /**
@@ -428,6 +431,7 @@ public class LibraryController implements IClientController {
                 libraryService.returnBook(selectedLog.getLogId(), selectedLog.getBookId());
             }
         });
+        showUserMyBorrowsView();
         showUserMyBorrowsView();
         showUserMyBorrowsView();
         showUserMyBorrowsView();
@@ -559,6 +563,10 @@ public class LibraryController implements IClientController {
             showError("无法获取用户信息。"); return;
         }
         libraryService.renewAllBooks(currentUser.getUserId());
+        showAllBooksView();
+        showAllBooksView();
+        showAllBooksView();
+
     }
 
 
