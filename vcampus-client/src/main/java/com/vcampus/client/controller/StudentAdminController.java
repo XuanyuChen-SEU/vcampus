@@ -1,11 +1,16 @@
 package com.vcampus.client.controller;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.vcampus.client.service.StudentAdminService;
 import com.vcampus.common.dto.Message;
 import com.vcampus.common.dto.Student;
 import com.vcampus.common.dto.StudentLeaveApplication;
 import com.vcampus.common.dto.Teacher;
-import com.vcampus.common.enums.ActionType;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,7 +18,21 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
@@ -21,11 +40,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class StudentAdminController implements IClientController {
 
@@ -324,6 +338,8 @@ public class StudentAdminController implements IClientController {
                     switch (status) {
                         case "已通过" -> setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
                         case "未通过" -> setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                        case "待审批" -> setStyle("-fx-text-fill: #ffc107; -fx-font-weight: bold;");
+                        case "已撤回" -> setStyle("-fx-text-fill: #6c757d; -fx-font-weight: bold;");
                         default -> setStyle("");
                     }
                 }

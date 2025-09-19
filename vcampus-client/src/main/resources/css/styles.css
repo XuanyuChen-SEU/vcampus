@@ -695,8 +695,10 @@
     -fx-border-color: #e0e0e0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-padding: 10 15 10 15;
+    -fx-padding: 12 15 12 15;
     -fx-font-size: 14px;
+    -fx-pref-height: 40px;
+    -fx-min-width: 400px;
 }
 
 .form-field:focused {
@@ -765,6 +767,102 @@
 
 .clear-button:hover {
     -fx-background-color: linear-gradient(to right, #f57c00, #ef6c00);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+/* === 商品编辑页面专用样式 === */
+.form-textarea {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12 15 12 15;
+    -fx-font-size: 14px;
+    -fx-pref-height: 100px;
+    -fx-min-width: 400px;
+}
+
+.form-textarea:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+.image-preview {
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-border-width: 2;
+    -fx-background-color: #f9f9f9;
+}
+
+.image-hint {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+.select-button {
+    -fx-background-color: linear-gradient(to right, #4CAF50, #45a049);
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-min-width: 120px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.select-button:hover {
+    -fx-background-color: linear-gradient(to right, #45a049, #3d8b40);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+/* 统一商品编辑页面按钮样式 */
+.update-button,
+.add-button,
+.reset-button,
+.cancel-button {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-min-width: 120px;
+    -fx-pref-height: 36px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.0, 0, 1);
+}
+
+.update-button,
+.add-button {
+    -fx-background-color: linear-gradient(to right, #4CAF50, #45a049);
+    -fx-text-fill: white;
+}
+
+.update-button:hover,
+.add-button:hover {
+    -fx-background-color: linear-gradient(to right, #45a049, #3d8b40);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+.reset-button {
+    -fx-background-color: linear-gradient(to right, #FF9800, #f57c00);
+    -fx-text-fill: white;
+}
+
+.reset-button:hover {
+    -fx-background-color: linear-gradient(to right, #f57c00, #ef6c00);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
+}
+
+.cancel-button {
+    -fx-background-color: linear-gradient(to right, #f44336, #d32f2f);
+    -fx-text-fill: white;
+}
+
+.cancel-button:hover {
+    -fx-background-color: linear-gradient(to right, #d32f2f, #c62828);
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.0, 0, 2);
 }
 

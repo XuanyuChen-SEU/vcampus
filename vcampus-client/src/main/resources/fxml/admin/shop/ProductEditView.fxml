@@ -28,18 +28,17 @@
             <GridPane fx:id="formContainer" alignment="CENTER" hgap="20.0" vgap="20.0" minWidth="600.0">
                 <columnConstraints>
                     <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
-                    <ColumnConstraints minWidth="300.0" prefWidth="300.0" />
+                    <ColumnConstraints minWidth="400.0" prefWidth="400.0" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="50.0" />
+                    <RowConstraints minHeight="50.0" />
+                    <RowConstraints minHeight="50.0" />
+                    <RowConstraints minHeight="50.0" />
+                    <RowConstraints minHeight="50.0" />
                     <RowConstraints minHeight="120.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="120.0" />
+                    <RowConstraints minHeight="60.0" />
                 </rowConstraints>
                 
                 <!-- 商品ID (只读) -->
@@ -64,10 +63,15 @@
                 
                 <!-- 商品图片上传 -->
                 <Label text="商品图片:" GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="form-label" />
-                <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                <HBox spacing="15.0" GridPane.columnIndex="1" GridPane.rowIndex="5" alignment="CENTER_LEFT">
                     <children>
-                        <ImageView fx:id="imagePreview" fitWidth="80.0" fitHeight="80.0" preserveRatio="true" pickOnBounds="true" />
-                        <Button fx:id="selectImageButton" text="📁 选择图片" onAction="#handleSelectImage" styleClass="select-button" />
+                        <ImageView fx:id="imagePreview" fitWidth="120.0" fitHeight="120.0" preserveRatio="true" pickOnBounds="true" styleClass="image-preview" />
+                        <VBox spacing="10.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Button fx:id="selectImageButton" text="📁 选择图片" onAction="#handleSelectImage" styleClass="select-button" />
+                                <Label text="支持PNG格式" styleClass="image-hint" />
+                            </children>
+                        </VBox>
                     </children>
                 </HBox>
                 
@@ -78,7 +82,7 @@
                 <!-- 按钮区域 -->
                 <HBox alignment="CENTER" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
                     <children>
-                        <Button fx:id="updateButton" text="💾 更新商品" onAction="#handleUpdate" styleClass="add-button" />
+                        <Button fx:id="updateButton" text="💾 更新商品" onAction="#handleUpdate" styleClass="update-button" />
                         <Button fx:id="resetButton" text="🔄 重置表单" onAction="#handleReset" styleClass="reset-button" />
                         <Button fx:id="cancelButton" text="❌ 取消" onAction="#handleCancel" styleClass="cancel-button" />
                     </children>

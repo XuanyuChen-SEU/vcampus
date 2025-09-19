@@ -5,23 +5,29 @@
 /* 1. 设置整个表头区域的背景颜色 */
 /* 我们使用一个专业且柔和的淡蓝灰色，类似您截图中的效果 */
 .tree-table-view .column-header-background {
-    -fx-background-color: #f1f3f5; /* A light, professional grey-blue */
+    -fx-background-color: #f1f3f5;
+    /* A light, professional grey-blue */
     -fx-border-color: #dee2e6;
-    -fx-border-width: 0 0 1 0; /* 只显示底部边框 */
+    -fx-border-width: 0 0 1 0;
+    /* 只显示底部边框 */
 }
 
 /* 2. 设置表头中【文字】的样式 */
 .tree-table-view .column-header .label {
-    -fx-text-fill: #343a40;      /* 深灰色文字，保证对比度和可读性 */
-    -fx-font-weight: bold;        /* 字体加粗 */
+    -fx-text-fill: #343a40;
+    /* 深灰色文字，保证对比度和可读性 */
+    -fx-font-weight: bold;
+    /* 字体加粗 */
     -fx-font-size: 13px;
-    -fx-padding: 8px;           /* 增加内边距，让表头不拥挤 */
+    -fx-padding: 8px;
+    /* 增加内边距，让表头不拥挤 */
 }
 
 /* 3. (可选) 统一设置数据单元格的样式 */
 .tree-table-view .tree-table-cell {
     -fx-padding: 8px;
-    -fx-border-color: transparent transparent #f1f3f5 transparent; /* 单元格之间的细分隔线 */
+    -fx-border-color: transparent transparent #f1f3f5 transparent;
+    /* 单元格之间的细分隔线 */
 }
 
 /* 4. (可选) 为树状箭头设置颜色 */
@@ -41,6 +47,7 @@
     -fx-text-fill: #6c757d;
     -fx-cursor: hand;
 }
+
 .add-session-button:hover {
     -fx-background-color: #f8f9fa;
 }
@@ -68,22 +75,26 @@
 
 /* --- 3. 顶部操作栏按钮样式 --- */
 .admin-toolbar-button {
-    -fx-background-color: rgba(255, 255, 255, 0.2); /* 半透明白色背景 */
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    /* 半透明白色背景 */
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 6;
 }
+
 .admin-toolbar-button:hover {
     -fx-background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* 删除按钮的特殊样式 */
 .delete-button {
-    -fx-background-color: #f44336; /* 红色 */
+    -fx-background-color: #f44336;
+    /* 红色 */
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 6;
 }
+
 .delete-button:hover {
     -fx-background-color: #d32f2f;
 }
@@ -99,7 +110,8 @@
 
 /* 课程卡片【标题行】的文字样式，淡紫色，符合您的截图 */
 .course-card .header-label {
-    -fx-text-fill: #555577; /* 深蓝紫色文字 */
+    -fx-text-fill: #555577;
+    /* 深蓝紫色文字 */
     -fx-font-weight: bold;
 }
 
@@ -114,7 +126,8 @@
 
 /* 教学班卡片内的普通文字样式 */
 .session-card .info-label {
-    -fx-text-fill: #495057; /* 深灰色文字 */
+    -fx-text-fill: #495057;
+    /* 深灰色文字 */
 }
 
 /* “添加教学班”按钮的虚线框样式 */
@@ -128,6 +141,7 @@
     -fx-text-fill: #6c757d;
     -fx-cursor: hand;
 }
+
 .add-session-button:hover {
     -fx-background-color: rgba(0, 0, 0, 0.05);
 }

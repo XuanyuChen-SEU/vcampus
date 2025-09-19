@@ -4,15 +4,31 @@
 
 /* --- 全局动态效果定义 --- */
 @keyframes pulse-glow {
-    0% { -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0); }
-    50% { -fx-effect: dropshadow(gaussian, rgba(168, 85, 247, 0.8), 15, 0.5, 0, 0); }
-    100% { -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0); }
+    0% {
+        -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0);
+    }
+
+    50% {
+        -fx-effect: dropshadow(gaussian, rgba(168, 85, 247, 0.8), 15, 0.5, 0, 0);
+    }
+
+    100% {
+        -fx-effect: dropshadow(gaussian, rgba(224, 130, 252, 0.6), 12, 0.5, 0, 0);
+    }
 }
 
 @keyframes gradient-flow {
-    0% { -fx-background-position: 0% 50%; }
-    50% { -fx-background-position: 100% 50%; }
-    100% { -fx-background-position: 0% 50%; }
+    0% {
+        -fx-background-position: 0% 50%;
+    }
+
+    50% {
+        -fx-background-position: 100% 50%;
+    }
+
+    100% {
+        -fx-background-position: 0% 50%;
+    }
 }
 
 /* --- 根节点与全局样式 --- */
@@ -32,9 +48,10 @@
     -fx-background-color: linear-gradient(to right, #9370db, #7b68ee);
     -fx-background-radius: 15px;
     -fx-effect:
-            dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
-            innershadow(gaussian, rgba(255,255,255,0.3), 5, 0, 0, 1);
-    -fx-animation: pulse-glow 3s infinite; /* 【修正】CSS中应使用-fx-animation */
+        dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
+        innershadow(gaussian, rgba(255, 255, 255, 0.3), 5, 0, 0, 1);
+    -fx-animation: pulse-glow 3s infinite;
+    /* 【修正】CSS中应使用-fx-animation */
 }
 
 .label {
@@ -65,8 +82,8 @@
     -fx-font-size: 15px;
     -fx-padding: 0 20px;
     -fx-effect:
-            innershadow(gaussian, rgba(147, 112, 219, 0.2), 15, 0, 0, 3),
-            dropshadow(gaussian, rgba(190, 137, 255, 0.1), 10, 0, 0, 5);
+        innershadow(gaussian, rgba(147, 112, 219, 0.2), 15, 0, 0, 3),
+        dropshadow(gaussian, rgba(190, 137, 255, 0.1), 10, 0, 0, 5);
     -fx-transition: all 0.3s;
 }
 
@@ -74,8 +91,8 @@
     -fx-border-color: #9370db;
     -fx-border-width: 2px;
     -fx-effect:
-            innershadow(gaussian, rgba(147, 112, 219, 0.3), 20, 0, 0, 5),
-            dropshadow(gaussian, rgba(190, 137, 255, 0.3), 15, 0, 0, 5);
+        innershadow(gaussian, rgba(147, 112, 219, 0.3), 20, 0, 0, 5),
+        dropshadow(gaussian, rgba(190, 137, 255, 0.3), 15, 0, 0, 5);
 }
 
 /* --- 所有按钮统一样式 --- */
@@ -92,8 +109,8 @@
     -fx-padding: 8 18 8 18;
     -fx-cursor: hand;
     -fx-effect:
-            dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
-            innershadow(gaussian, rgba(255,255,255,0.3), 5, 0, 0, 1);
+        dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
+        innershadow(gaussian, rgba(255, 255, 255, 0.3), 5, 0, 0, 1);
     -fx-animation: gradient-flow 4s ease infinite, pulse-glow 3s infinite alternate;
     -fx-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -130,8 +147,8 @@
     -fx-border-width: 2px;
     -fx-border-radius: 15px;
     -fx-effect:
-            dropshadow(gaussian, rgba(147, 112, 219, 0.2), 20, 0, 0, 10),
-            innershadow(gaussian, rgba(255, 255, 255, 0.5), 10, 0, 0, 5);
+        dropshadow(gaussian, rgba(147, 112, 219, 0.2), 20, 0, 0, 10),
+        innershadow(gaussian, rgba(255, 255, 255, 0.5), 10, 0, 0, 5);
 }
 
 /* 表头 */
@@ -139,25 +156,30 @@
     -fx-background-color: linear-gradient(to right, #9370db, #7b68ee, #9370db);
     -fx-background-size: 200% 100%;
     -fx-background-radius: 15px 15px 0 0;
-    -fx-background-insets: 0 0 0 0; /* 【修正】移除了内边距，避免表头和内容错位 */
+    -fx-background-insets: 0 0 0 0;
+    /* 【修正】移除了内边距，避免表头和内容错位 */
 }
+
 .table-view .column-header {
     /* 移除单独的列头背景，使其透明，显示下层背景 */
     -fx-background-color: transparent;
 }
+
 .table-view .column-header .label {
     /* 设置表头文字为白色，并加粗居中 */
     -fx-text-fill: white;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-alignment: CENTER;
-    -fx-padding: 12px; /* 调整内边距，使文字垂直居中 */
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);
+    -fx-padding: 12px;
+    /* 调整内边距，使文字垂直居中 */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 1);
 }
 
 /* 表格行 */
 .table-view .table-row-cell {
-    -fx-text-fill: #3c1e69; /* 【修正】使用深紫色文字，在浅色背景上更清晰 */
+    -fx-text-fill: #3c1e69;
+    /* 【修正】使用深紫色文字，在浅色背景上更清晰 */
     -fx-font-size: 14px;
     -fx-padding: 15px 20px;
     -fx-border-width: 1px 0 0 0;
@@ -166,23 +188,27 @@
 }
 
 .table-view .table-row-cell:even {
-    -fx-background-color: rgba(255, 240, 245, 0.7); /* 浅粉色 */
+    -fx-background-color: rgba(255, 240, 245, 0.7);
+    /* 浅粉色 */
 }
 
 .table-view .table-row-cell:odd {
-    -fx-background-color: rgba(230, 230, 250, 0.7); /* 薰衣草色 */
+    -fx-background-color: rgba(230, 230, 250, 0.7);
+    /* 薰衣草色 */
 }
 
 .table-view .table-row-cell:hover {
     -fx-background-color: rgba(255, 255, 255, 0.9);
     -fx-scale-x: 1.01;
-    -fx-scale-y: 1.01; /* 【修正】调整了 hover 缩放效果，使其更平滑 */
+    -fx-scale-y: 1.01;
+    /* 【修正】调整了 hover 缩放效果，使其更平滑 */
     -fx-effect: dropshadow(gaussian, rgba(147, 112, 219, 0.3), 10, 0, 0, 3);
 }
 
 .table-view .table-row-cell:selected {
     -fx-background-color: rgba(147, 112, 219, 0.8);
-    -fx-text-fill: white; /* 选中行文字白色 */
+    -fx-text-fill: white;
+    /* 选中行文字白色 */
     -fx-border-color: #9370db;
     -fx-border-width: 2px 0;
     -fx-effect: dropshadow(gaussian, rgba(147, 112, 219, 0.4), 15, 0, 0, 0);
@@ -235,8 +261,8 @@
     -fx-background-color: linear-gradient(to right, #9370db, #7b68ee);
     -fx-background-radius: 15px;
     -fx-effect:
-            dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
-            innershadow(gaussian, rgba(255,255,255,0.3), 5, 0, 0, 1);
+        dropshadow(gaussian, rgba(190, 137, 255, 0.8), 10, 0.5, 0, 0),
+        innershadow(gaussian, rgba(255, 255, 255, 0.3), 5, 0, 0, 1);
 }
 
 /* 【修正】移除了多余的右大括号 */

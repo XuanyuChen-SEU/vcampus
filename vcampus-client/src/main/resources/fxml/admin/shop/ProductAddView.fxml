@@ -28,17 +28,16 @@
             <GridPane fx:id="formContainer" alignment="CENTER" hgap="20.0" vgap="20.0" minWidth="600.0">
                 <columnConstraints>
                     <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
-                    <ColumnConstraints minWidth="300.0" prefWidth="300.0" />
+                    <ColumnConstraints minWidth="400.0" prefWidth="400.0" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="50.0" />
+                    <RowConstraints minHeight="50.0" />
+                    <RowConstraints minHeight="50.0" />
+                    <RowConstraints minHeight="50.0" />
                     <RowConstraints minHeight="120.0" />
-                    <RowConstraints minHeight="40.0" />
-                    <RowConstraints minHeight="40.0" />
+                    <RowConstraints minHeight="120.0" />
+                    <RowConstraints minHeight="60.0" />
                 </rowConstraints>
                 
                 <!-- 商品名称 -->
@@ -59,10 +58,15 @@
                 
                 <!-- 商品图片上传 -->
                 <Label text="商品图片:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="form-label" />
-                <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                <HBox spacing="15.0" GridPane.columnIndex="1" GridPane.rowIndex="4" alignment="CENTER_LEFT">
                     <children>
-                        <ImageView fx:id="imagePreview" fitWidth="80.0" fitHeight="80.0" preserveRatio="true" pickOnBounds="true" />
-                        <Button fx:id="selectImageButton" text="📁 选择图片" onAction="#handleSelectImage" styleClass="select-button" />
+                        <ImageView fx:id="imagePreview" fitWidth="120.0" fitHeight="120.0" preserveRatio="true" pickOnBounds="true" styleClass="image-preview" />
+                        <VBox spacing="10.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Button fx:id="selectImageButton" text="📁 选择图片" onAction="#handleSelectImage" styleClass="select-button" />
+                                <Label text="支持PNG格式" styleClass="image-hint" />
+                            </children>
+                        </VBox>
                     </children>
                 </HBox>
                 
