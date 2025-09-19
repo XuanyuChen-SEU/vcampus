@@ -200,10 +200,15 @@
     </update>
 
     <update id="updateStudents">
-        <foreach collection="list" item="s" separator=";">
-            UPDATE student
-            SET student_status = #{s.student_status}
-            WHERE student_id = #{s.student_id}
+        UPDATE vcampus_db.tb_student
+        SET student_status = CASE
+        <foreach collection="list" item="s" separator="">
+            WHEN studentId = #{s.studentId} THEN #{s.student_status}
+        </foreach>
+        END
+        WHERE studentId IN
+        <foreach collection="list" item="s" open="(" close=")" separator=",">
+            #{s.studentId}
         </foreach>
     </update>
 
