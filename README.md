@@ -88,6 +88,8 @@ SHOW GLOBAL VARIABLES LIKE 'local_infile';
 <property name="password" value="你的MySQL密码"/>
 ```
 
+如果服务器启动出现bug，可以试试自行在MySQL创建名为`vcampus_db`的库。
+
 ### 2. 网络配置
 
 **默认网络配置：**
