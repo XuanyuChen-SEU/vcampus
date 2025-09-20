@@ -46,7 +46,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 import javafx.scene.control.TableRow;
-import javafx.scene.control.TableCell;
+import java.util.ArrayList;
 import javafx.scene.text.Text;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -94,6 +94,8 @@ public class ShopController implements IClientController{
     private User currentUser;
     private boolean isViewingFavorites = false; // 【新增】状态标志位
     private List<ShopTransaction> currentFavoritesList; // 【新增】用于存储当前用户的收藏列表
+    // 1. 【新增】创建一个缓存，用于存储当前界面上所有商品的完整信息
+    private final List<Product> productDisplayCache = new ArrayList<>();
 
     @FXML
     void initialize() {
@@ -417,17 +419,28 @@ public class ShopController implements IClientController{
     }
 
 
+    /**
+     * 【已修改】更新商品展示区，并同步更新客户端缓存。
+     */
     private void updateProductDisplay(List<Product> products) {
         Platform.runLater(() -> {
             productPane.getChildren().clear();
+
+            // 2. 【核心修改】在更新UI前，先清空并填充缓存
+            this.productDisplayCache.clear();
+            if (products != null) {
+                this.productDisplayCache.addAll(products);
+            }
+
             if (products == null || products.isEmpty()) {
                 productPane.getChildren().add(new Label("没有找到任何商品。"));
                 return;
             }
+
+            // UI更新逻辑保持不变
             System.out.println("=== 客户端显示商品列表，共 " + products.size() + " 个商品 ===");
-            for (int i = 0; i < products.size(); i++) {
-                Product product = products.get(i);
-                System.out.println("  位置 " + i + ": " + product.getName() + " (ID: " + product.getId() + ")");
+            for (Product product : products) {
+                System.out.println("  位置 " + product.getId() + ": " + product.getName());
                 productPane.getChildren().add(createProductCard(product));
             }
             System.out.println("=== 商品列表显示完成 ===");
@@ -775,61 +788,63 @@ public class ShopController implements IClientController{
     }
 
     /**
-     * 【最终修正版】处理“创建订单”的异步响应。
-     * 弹出独立的 FXML 窗口，并动态传入真实的订单数据和用户余额。
-     * @param order 服务器返回的已创建的订单对象
+     * 【已修改】弹出创建订单窗口。
+     * 在显示窗口前，会检查并从客户端缓存中补全不完整的商品图片信息。
+     * @param order 服务器返回的订单对象
      */
     private void showCreateOrderWindow(ShopTransaction order) {
-        try {
-            // 1. 创建 FXMLLoader 并指定 FXML 文件路径
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/store/CreateOrderView.fxml"));
+        // --- 3. 【核心修正：数据补全逻辑】 ---
+        Product productInOrder = order.getProduct();
 
-            // 2. 加载 FXML 并创建新窗口 (Stage)
+        // a. 检查服务器返回的订单中的商品信息是否完整 (特别是图片数据)
+        if (productInOrder != null && (productInOrder.getImageData() == null || productInOrder.getImageData().length == 0)) {
+            System.out.println("警告：服务器返回的订单商品信息不完整，尝试从客户端缓存中补全...");
+
+            // b. 如果不完整，就从我们的缓存中根据ID查找那个完整的商品对象
+            final Long productIdToFind = productInOrder.getId();
+            Optional<Product> fullProductOpt = this.productDisplayCache.stream()
+                    .filter(p -> p.getId().equals(productIdToFind))
+                    .findFirst();
+
+            // c. 如果在缓存中找到了，就用它替换掉订单中那个不完整的商品对象
+            if (fullProductOpt.isPresent()) {
+                order.setProduct(fullProductOpt.get());
+                System.out.println("成功从缓存中补全了商品 [" + order.getProduct().getName() + "] 的图片信息！");
+            } else {
+                System.err.println("错误：在客户端缓存中也未能找到商品ID为 " + productIdToFind + " 的信息。");
+            }
+        }
+        // --- 修正结束 ---
+
+        // 后续的窗口显示逻辑保持不变
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/store/CreateOrderView.fxml"));
             AnchorPane page = loader.load();
             Stage dialogStage = new Stage();
             dialogStage.setTitle("创建订单");
             dialogStage.initModality(Modality.WINDOW_MODAL);
-
-            // 将新窗口的所有者设置为当前主窗口
-            Window ownerWindow = productScrollPane.getScene().getWindow();
-            dialogStage.initOwner(ownerWindow);
-
+            dialogStage.initOwner(productScrollPane.getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
-            // 3. 获取新窗口的控制器
             CreateOrderController controller = loader.getController();
 
-            // --- 【核心修正：动态获取并传递真实余额】 ---
-
-            // a. 从主界面的 balanceLabel 获取真实的余额文本 (例如 "余额: ¥ 1000.00")
             String balanceText = this.balanceLabel.getText();
-
             double realBalance = 0.0;
             try {
-                // b. 使用正则表达式移除所有非数字和非小数点的字符，得到纯数字字符串 "1000.00"
                 String numericString = balanceText.replaceAll("[^\\d.]", "");
-                // c. 将纯数字字符串转换为 double 类型
                 realBalance = Double.parseDouble(numericString);
-            } catch (NumberFormatException | NullPointerException e) {
-                // d. 如果解析失败（例如Label文本为空或格式错误），打印错误并提示用户
-                System.err.println("严重错误：从Label解析余额失败！文本内容: '" + balanceText + "'");
-                e.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("严重错误：从Label解析余额失败！");
                 showError("无法获取您的账户余额，请稍后重试。");
-                return; // 关键：如果无法获取余额，则不应打开支付窗口
+                return;
             }
 
-            // 4. 【关键】调用新窗口控制器的数据初始化方法，传入【真实的余额】
             controller.initData(order, realBalance);
-
-            // --- 修正结束 ---
-
-            // 5. 显示窗口并等待用户操作 (例如点击“确认支付”或“取消”)
             dialogStage.showAndWait();
 
         } catch (IOException | IllegalStateException e) {
-            // 捕获 IOException (文件加载失败) 和 IllegalStateException (路径错误)
-            System.err.println("无法加载订单确认页面！请检查 FXML 路径是否正确: /fxml/store/CreateOrderView.fxml");
+            System.err.println("无法加载订单确认页面！ FXML 路径: /fxml/store/CreateOrderView.fxml");
             e.printStackTrace();
             showError("无法加载订单页面: " + e.getMessage());
         }
