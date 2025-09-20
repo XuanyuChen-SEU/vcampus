@@ -723,17 +723,11 @@ public class StudentAdminController implements IClientController {
     public void handleUpdateStudentResponse(Message message) {
         Platform.runLater(() -> {
             if (message.isSuccess()) {
-                if (isBatchUpdating) {
-                    // ✅ 批量更新成功：自动刷新所有数据 + 提示结果
-                    showAlert("批量更新成功", "学生学籍状态已更新，数据已自动刷新");
-                    refreshAllData(); // 自动调用刷新方法，无需手动点击
-                } else {
-                    // 单个更新成功：仅提示（原逻辑保留）
+                if (!isBatchUpdating) { // 仅单个更新时弹窗
                     showAlert("更新成功", message.getMessage());
-                    loadAllStudent();
                 }
+                loadAllStudent();
             } else {
-                // 更新失败：统一提示
                 showAlert("更新失败", message.getMessage());
             }
         });
@@ -783,6 +777,35 @@ public class StudentAdminController implements IClientController {
         });
     }
 
+    /**
+     * 处理学生批量更新（学籍状态调整）的响应
+     * 对应 adjustSelectedStudentStatus() 方法发起的批量更新请求
+     */
+    public void handleBatchUpdateStudentsResponse(Message message) {
+        Platform.runLater(() -> {
+            // 1. 重置批量更新标记（无论成功失败，都需恢复默认状态）
+            isBatchUpdating = false;
+
+            // 2. 根据响应结果处理UI反馈
+            if (message.isSuccess()) {
+                // 批量更新成功：弹窗提示 + 刷新学生数据（确保表格显示最新状态）
+                showAlert("批量更新成功", "已成功调整选中学生的学籍状态");
+                loadAllStudent(); // 重新加载所有学生数据，同步最新状态
+            } else {
+                // 批量更新失败：弹窗提示失败原因，方便排查问题
+                String errorMsg = message.getMessage() == null || message.getMessage().isEmpty()
+                        ? "未知错误，请检查网络或服务端状态"
+                        : message.getMessage();
+                showAlert("批量更新失败", "调整学籍状态失败：" + errorMsg);
+            }
+
+            // 3. 重置表格选择状态（避免用户后续操作混淆）
+            filteredData.forEach(student -> student.setSelected(false));
+            allSelected = false; // 重置全选标记
+            btnSelectAll.setText("全选"); // 恢复全选按钮文本
+            studentTable.refresh(); // 刷新表格，显示最新选择状态
+        });
+    }
 
 
     private void loadAllApplications() {

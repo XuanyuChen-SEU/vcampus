@@ -315,6 +315,13 @@ public class MessageController {
                         System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
                     }
                     break;
+                case UPDATE_STUDENTS:
+                    if(studentadminController!=null){
+                        studentadminController.handleBatchUpdateStudentsResponse(message);
+                    }else{
+                        System.err.println("StudentAdminController未设置，无法处理学生信息获取响应");
+                    }
+                    break;
                 case GET_ALL_APPLICATIONS:
                     if(studentadminController!=null){
                         studentadminController.handleAllApplicationsResponse(message);
