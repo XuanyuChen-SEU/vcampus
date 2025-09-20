@@ -1,4 +1,4 @@
-# VCampus 虚拟校园管理系统
+# <center> VCampus 虚拟校园管理系统
 
 <div align="center">
 
