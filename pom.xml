@@ -136,4 +136,35 @@
 
         </dependencies>
     </dependencyManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <charset>UTF-8</charset>
+                    <doclint>none</doclint>
+                    <failOnError>false</failOnError>
+                    <useStandardDocletOptions>true</useStandardDocletOptions>
+                    <additionalJOptions>
+                        <!-- 兼容 JDK 21，避免模块冲突 -->
+                        <additionalJOption>--add-modules</additionalJOption>
+                        <additionalJOption>ALL-MODULE-PATH</additionalJOption>
+                        <additionalJOption>--ignore-source-errors</additionalJOption>
+                    </additionalJOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>aggregate-docs</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
 </project>

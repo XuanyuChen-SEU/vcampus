@@ -1,0 +1,13 @@
+com.vcampus.client
+com.vcampus.client.controller
+com.vcampus.client.controller.courseAdmin
+com.vcampus.client.controller.libraryAdmin
+com.vcampus.client.controller.shopAdmin
+com.vcampus.client.controller.userAdmin
+com.vcampus.client.net
+com.vcampus.client.service
+com.vcampus.client.service.courseAdmin
+com.vcampus.client.service.shopAdmin
+com.vcampus.client.service.userAdmin
+com.vcampus.client.session
+com.vcampus.client.util

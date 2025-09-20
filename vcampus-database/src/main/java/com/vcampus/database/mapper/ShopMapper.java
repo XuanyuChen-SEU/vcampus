@@ -8,10 +8,6 @@ import com.vcampus.common.entity.Balance;
 import org.apache.ibatis.annotations.Param;
 import java.math.BigDecimal;
 
-/**
- * 
- * @author 谌宣羽
- */
 public interface ShopMapper {
     
     // ==========================================================

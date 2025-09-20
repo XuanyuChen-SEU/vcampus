@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"com.vcampus.server"},{"l":"com.vcampus.server.controller"},{"l":"com.vcampus.server.dao.impl"},{"l":"com.vcampus.server.data"},{"l":"com.vcampus.server.net"},{"l":"com.vcampus.server.service"},{"l":"所有程序包","u":"allpackages-index.html"}];updateSearchResults();

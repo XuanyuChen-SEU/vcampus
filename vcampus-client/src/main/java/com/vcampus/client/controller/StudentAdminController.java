@@ -723,11 +723,17 @@ public class StudentAdminController implements IClientController {
     public void handleUpdateStudentResponse(Message message) {
         Platform.runLater(() -> {
             if (message.isSuccess()) {
-                if (!isBatchUpdating) { // 仅单个更新时弹窗
+                if (isBatchUpdating) {
+                    // ✅ 批量更新成功：自动刷新所有数据 + 提示结果
+                    showAlert("批量更新成功", "学生学籍状态已更新，数据已自动刷新");
+                    refreshAllData(); // 自动调用刷新方法，无需手动点击
+                } else {
+                    // 单个更新成功：仅提示（原逻辑保留）
                     showAlert("更新成功", message.getMessage());
+                    loadAllStudent();
                 }
-                loadAllStudent();
             } else {
+                // 更新失败：统一提示
                 showAlert("更新失败", message.getMessage());
             }
         });
@@ -761,17 +767,18 @@ public class StudentAdminController implements IClientController {
                 s.setStudent_status(status);
             }
 
-            // ✅ 一次性批量更新
+            // 批量更新标记 + 调用服务
             isBatchUpdating = true;
             studentAdminService.updateStudents(selectedStudents);
             isBatchUpdating = false;
 
-            showAlert("成功", "已将 " + selectedStudents.size() + " 名学生的学籍状态调整为：" + status);
+            // ✅ 移除手动弹窗（改由回调统一提示）
+            // ✅ 移除手动刷新（改由回调统一刷新）
 
+            // 仅重置选择状态
             filteredData.forEach(s -> s.setSelected(false));
             allSelected = false;
             btnSelectAll.setText("全选");
-
             studentTable.refresh();
         });
     }

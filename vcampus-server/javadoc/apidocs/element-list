@@ -1,0 +1,6 @@
+com.vcampus.server
+com.vcampus.server.controller
+com.vcampus.server.dao.impl
+com.vcampus.server.data
+com.vcampus.server.net
+com.vcampus.server.service

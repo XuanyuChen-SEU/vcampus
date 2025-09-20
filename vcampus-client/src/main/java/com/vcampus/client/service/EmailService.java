@@ -263,11 +263,11 @@ public class EmailService {
 
     // ==================== 响应处理方法 ====================
 
-    /**
-     * 处理服务端返回的邮件列表
-     * @param message 服务端返回消息
-     * @return List<Email>，失败返回 null
-     */
+//    /**
+//     * 处理服务端返回的邮件列表
+//     * @param message 服务端返回消息
+//     * @return List<Email>，失败返回 null
+//     */
     @SuppressWarnings("unchecked")
     public java.util.List<Email> handleEmailListResponse(Message message) {
         if (message.isSuccess() && message.getData() != null) {

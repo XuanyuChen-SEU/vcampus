@@ -1,0 +1,5 @@
+com.vcampus.common.dao
+com.vcampus.common.dto
+com.vcampus.common.entity
+com.vcampus.common.enums
+com.vcampus.common.util
