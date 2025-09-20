@@ -27,19 +27,17 @@ VCampus是一个基于Java开发的现代化虚拟校园管理系统，采用客
 - 🛡️ **安全可靠** - 密码加密、数据校验、异常处理
 - 📦 **模块化架构** - Maven多模块项目，便于维护和扩展
 
-## 🚀 快速开始
-
-### 📋 环境要求
+## 📋 环境要求
 
 - **JDK 17+** - Java开发环境
 - **Maven 3.6+** - 项目构建工具
 - **MySQL 8.0+** - 数据库服务
-- **JavaFX** - JDK 11+需要单独安装JavaFX运行时
+- **JavaFX SDK 21.0.8** - 已包含在项目中
 - **IntelliJ IDEA** - 推荐IDE（支持JavaFX）
 
-### ⚙️ 安装配置
+## ⚙️ 环境配置
 
-#### 1. 数据库配置
+### 1. 数据库配置
 
 **配置MySQL本地文件导入权限：**
 
@@ -51,6 +49,23 @@ VCampus是一个基于Java开发的现代化虚拟校园管理系统，采用客
 ```ini
 [mysqld]
 local_infile = 1
+```
+
+**重启MySQL服务：**
+
+```bash
+# Windows
+net stop mysql80
+net start mysql80
+
+# 或者使用服务管理器
+services.msc
+# 找到MySQL80服务，右键重启
+
+# Linux/Mac
+sudo systemctl restart mysql
+# 或者
+sudo service mysql restart
 ```
 
 验证配置：
@@ -71,7 +86,44 @@ SHOW GLOBAL VARIABLES LIKE 'local_infile';
 <property name="password" value="你的MySQL密码"/>
 ```
 
-#### 2. 项目构建
+### 2. 网络配置
+
+**默认网络配置：**
+
+**服务端配置：**
+- **监听端口**: 9090
+- **最大连接数**: 50
+- **连接超时**: 5秒
+- **读取超时**: 10秒
+
+**客户端配置：**
+- **默认主机**: localhost
+- **默认端口**: 9090
+- **连接超时**: 5秒
+- **读取超时**: 10秒
+
+**修改网络配置（如需要）：**
+
+**修改服务端端口：**
+在 `vcampus-server/src/main/java/com/vcampus/server/net/SocketServer.java` 中：
+```java
+public class SocketServer {
+    private static final int PORT = 9090; // 修改为其他端口，如8080
+    // ...
+}
+```
+
+**修改客户端连接配置：**
+在 `vcampus-client/src/main/java/com/vcampus/client/net/SocketClient.java` 中：
+```java
+public class SocketClient {
+    private static final String DEFAULT_HOST = "localhost"; // 修改为服务器IP
+    private static final int DEFAULT_PORT = 9090; // 修改为对应端口
+    // ...
+}
+```
+
+### 3. 项目构建
 
 ```bash
 # 克隆项目
@@ -82,23 +134,104 @@ cd vcampus
 mvn clean install
 ```
 
-#### 3. 启动系统
+## 🚀 快速启动
 
-**启动服务端：**
+### ⚡ JAR包启动（推荐）
 
+**前提条件：**
+- ✅ MySQL已配置并启动
+- ✅ 数据库连接配置已完成
+- ✅ 项目已编译打包
+
+**完整启动流程：**
+
+**步骤1：复制JAR包到项目根目录**
+```bash
+# 复制客户端JAR包到项目根目录（与start-vcampus.bat和javafx-sdk在同一目录）
+copy vcampus-client\target\vcampus-client-1.0-SNAPSHOT.jar vcampus-client-1.0-SNAPSHOT.jar
+
+# 复制服务端JAR包到项目根目录
+copy vcampus-server\target\vcampus-server-1.0-SNAPSHOT.jar vcampus-server-1.0-SNAPSHOT.jar
+```
+
+**📁 文件结构说明：**
+确保以下文件在同一目录下：
+- `vcampus-client-1.0-SNAPSHOT.jar` - 客户端JAR包
+- `vcampus-server-1.0-SNAPSHOT.jar` - 服务端JAR包
+- `start-vcampus.bat` - 启动脚本
+- `javafx-sdk-21.0.8/` - JavaFX SDK目录
+
+**步骤2：启动服务端**
+```bash
+# 使用JAR包启动服务端
+java -jar vcampus-server-1.0-SNAPSHOT.jar
+```
+
+**步骤3：启动客户端**
+```bash
+# 方式1：使用批处理脚本（推荐）
+start-vcampus.bat
+
+# 方式2：直接运行JAR包
+java --module-path "javafx-sdk-21.0.8/lib" --add-modules javafx.controls,javafx.fxml,javafx.web -jar vcampus-client-1.0-SNAPSHOT.jar
+```
+
+**脚本作用说明：**
+- 自动检测JAR文件和JavaFX SDK路径
+- 配置JavaFX模块路径和依赖模块
+- 解决JDK高版本JavaFX兼容性问题
+- 提供友好的错误提示和暂停功能
+- **注意：仅启动客户端，服务端需要单独启动**
+
+### ⚠️ JavaFX模块化说明
+
+**重要提示：JDK 11+版本变化**
+- **JDK 8**: JavaFX包含在JDK中，可直接使用
+- **JDK 11+**: JavaFX从JDK中移除，需要单独安装和配置
+- **解决方案**: 项目已包含JavaFX SDK 21.0.8，通过模块路径方式加载
+
+**为什么需要模块化配置：**
+```bash
+# JDK 11+需要显式指定JavaFX模块
+java --module-path "javafx-sdk-21.0.8/lib" --add-modules javafx.controls,javafx.fxml,javafx.web -jar vcampus-client-1.0-SNAPSHOT.jar
+```
+
+**start-vcampus.bat的作用：**
+- 自动配置JavaFX模块路径
+- 添加必要的JavaFX模块依赖
+- 简化启动流程，避免手动配置
+- 提供错误检查和友好提示
+
+### ⚙️ 开发模式启动
+
+**适用于开发调试，需要Maven环境**
+
+**步骤1：启动服务端**
 ```bash
 cd vcampus-server
 mvn exec:java
 ```
 
-**启动客户端：**
+等待服务端启动完成，看到类似以下输出：
+```
+服务端启动成功，监听端口: 9090
+等待客户端连接...
+```
 
+**步骤2：启动客户端**
 ```bash
+# 
 cd vcampus-client
 mvn javafx:run
 ```
 
-#### 4. 测试登录
+**启动顺序说明：**
+1. 先启动服务端（vcampus-server）
+2. 等待服务端完全启动
+3. 再启动客户端（vcampus-client）
+4. 客户端会自动连接到服务端
+
+### 🧪 测试登录
 
 | 角色   | 用户名      | 密码        | 说明         |
 | ------ | ----------- | ----------- | ------------ |
@@ -308,213 +441,7 @@ mvn test
 - 网络通信测试
 - 数据库操作测试
 
-## 📦 打包部署
 
-### 🚀 打包方式
-
-#### 1. 标准 Maven 打包
-
-**完整项目打包：**
-```bash
-# 在项目根目录执行
-mvn clean package
-```
-
-**单独模块打包：**
-```bash
-# 打包客户端
-cd vcampus-client
-mvn clean package
-
-# 打包服务端
-cd vcampus-server
-mvn clean package
-```
-
-#### 2. JavaFX 应用程序打包
-
-**⚠️ 重要提示：**
-- **JDK 11+**: JavaFX不再包含在JDK中，需要单独安装
-- **JDK 8**: JavaFX包含在JDK中，可以直接使用
-- **推荐方案**: 使用JavaFX Maven Plugin自动处理依赖
-
-**使用 JavaFX Maven Plugin（推荐）：**
-```bash
-cd vcampus-client
-mvn clean compile package javafx:jlink
-```
-
-**生成的文件：**
-- `target/vcampus-client/` - JLink 运行时镜像
-- `target/vcampus-client-distribution.zip` - 分发包
-
-#### 3. 独立可执行文件 (EXE)
-
-**使用提供的批处理脚本：**
-```bash
-# 在项目根目录执行
-create-standalone-exe.bat
-```
-
-**手动创建 EXE 文件：**
-```bash
-cd vcampus-client
-
-# 1. 创建 JLink 运行时镜像
-mvn clean compile package javafx:jlink
-
-# 2. 复制 JAR 文件到 lib 目录
-copy target\vcampus-client-1.0-SNAPSHOT.jar target\lib\
-
-# 3. 使用 JPackage 创建独立应用程序
-jpackage ^
-    --type app-image ^
-    --name "VCampus-Client" ^
-    --app-version "1.0.0" ^
-    --vendor "VCampus Team" ^
-    --description "VCampus 智慧校园客户端" ^
-    --main-jar "vcampus-client-1.0-SNAPSHOT.jar" ^
-    --main-class "com.vcampus.client.MainApp" ^
-    --input "target\lib" ^
-    --runtime-image "target\vcampus-client" ^
-    --dest "target\standalone"
-```
-
-### 🏃 运行方式
-
-#### 1. 运行 JAR 文件
-```bash
-# 服务端
-java -jar vcampus-server/target/vcampus-server-1.0-SNAPSHOT.jar
-```
-
-#### 2. 运行 JLink 应用程序
-```bash
-# Windows
-vcampus-client/target/vcampus-client/bin/vcampus-client
-
-# Linux/Mac
-vcampus-client/target/vcampus-client/bin/vcampus-client
-```
-
-#### 3. 运行独立 EXE 文件
-```bash
-# 直接双击运行
-target/standalone/VCampus-Client/VCampus-Client.exe
-```
-
-### 📋 打包输出说明
-
-| 打包方式 | 输出文件 | 说明 |
-|----------|----------|------|
-| Maven JAR | `vcampus-client-1.0-SNAPSHOT.jar` | 可执行JAR文件 |
-| JLink | `target/vcampus-client/` | 包含Java运行时的完整镜像 |
-| JPackage | `VCampus-Client.exe` | Windows独立可执行文件 |
-
-## 🌐 网络配置（如果是小组展示建议在一个热点内）
-
-### 🔧 默认网络配置
-
-**服务端配置：**
-- **监听端口**: 9090
-- **最大连接数**: 50
-- **连接超时**: 5秒
-- **读取超时**: 10秒
-
-**客户端配置：**
-- **默认主机**: localhost
-- **默认端口**: 9090
-- **连接超时**: 5秒
-- **读取超时**: 10秒
-
-### ⚙️ 修改网络配置
-
-#### 1. 修改服务端端口
-
-**在 `vcampus-server/src/main/java/com/vcampus/server/net/SocketServer.java` 中：**
-```java
-public class SocketServer {
-    private static final int PORT = 9090; // 修改为其他端口，如8080
-    // ...
-}
-```
-
-#### 2. 修改客户端连接配置
-
-**在 `vcampus-client/src/main/java/com/vcampus/client/net/SocketClient.java` 中：**
-```java
-public class SocketClient {
-    private static final String DEFAULT_HOST = "localhost"; // 修改为服务器IP
-    private static final int DEFAULT_PORT = 9090; // 修改为对应端口
-    private static final int CONNECTION_TIMEOUT = 5000; // 修改连接超时时间
-    private static final int READ_TIMEOUT = 10000; // 修改读取超时时间
-    // ...
-}
-```
-
-#### 3. 自定义连接参数
-
-**创建自定义SocketClient：**
-```java
-// 连接到远程服务器
-SocketClient client = new SocketClient("192.168.1.100", 8080);
-boolean connected = client.connect();
-```
-
-### 🔍 网络连接检查
-
-#### 1. 检查端口占用
-```bash
-# Windows
-netstat -ano | findstr :9090
-
-# Linux/Mac
-netstat -tulpn | grep :9090
-```
-
-#### 2. 测试网络连通性
-```bash
-# 测试端口是否开放
-telnet localhost 9090
-
-# 或使用PowerShell
-Test-NetConnection -ComputerName localhost -Port 9090
-```
-
-#### 3. 防火墙配置
-
-**Windows防火墙：**
-1. 打开"Windows Defender防火墙"
-2. 点击"允许应用通过防火墙"
-3. 添加Java应用程序或端口9090
-
-**Linux防火墙：**
-```bash
-# Ubuntu/Debian
-sudo ufw allow 9090
-
-# CentOS/RHEL
-sudo firewall-cmd --permanent --add-port=9090/tcp
-sudo firewall-cmd --reload
-```
-
-### 🚨 网络问题排查
-
-#### 1. 连接失败
-- 检查服务端是否启动
-- 确认端口未被占用
-- 检查防火墙设置
-- 验证IP地址和端口配置
-
-#### 2. 连接超时
-- 增加连接超时时间
-- 检查网络延迟
-- 确认服务器负载情况
-
-#### 3. 数据传输异常
-- 检查网络稳定性
-- 验证对象序列化
-- 查看控制台错误日志
 
 ## ❓ 常见问题
 
@@ -542,24 +469,17 @@ A: 查看控制台输出的消息日志，检查Message对象内容
 **Q: 如何添加新的业务模块？**
 A: 参考现有模块的实现，按照分层架构添加代码
 
-### 📦 打包问题
-
-**Q: JavaFX打包失败？**
-A: 确保使用正确的JavaFX Maven插件版本，检查mainClass配置
-
-**Q: JDK 11+运行JavaFX应用失败？**
-A: JDK 11+不包含JavaFX，需要使用JavaFX Maven Plugin或单独安装JavaFX运行时
-
-**Q: JPackage创建EXE失败？**
-A: 确保已安装JDK 17+，并且PATH环境变量正确配置
-
-**Q: 客户端JAR无法运行？**
-A: 客户端需要JavaFX运行时，建议使用JLink或JPackage打包
 
 ### 🌐 网络问题
 
 **Q: 客户端连接服务端失败？**
 A: 检查服务端是否启动，端口9090是否被占用，防火墙是否阻止连接
+
+**Q: 启动顺序有什么要求？**
+A: 必须先启动服务端（vcampus-server），等待服务端完全启动后再启动客户端（vcampus-client）
+
+**Q: 如何确认服务端已经启动？**
+A: 服务端启动成功后会显示"服务端启动成功，监听端口: 9090"和"等待客户端连接..."等信息
 
 **Q: 如何修改服务端端口？**
 A: 修改`SocketServer.java`中的`PORT`常量，同时修改客户端的`DEFAULT_PORT`
@@ -569,10 +489,6 @@ A: 可以增加`CONNECTION_TIMEOUT`和`READ_TIMEOUT`的值，或检查网络延�
 
 **Q: 如何部署到远程服务器？**
 A: 修改客户端的`DEFAULT_HOST`为服务器IP地址，确保防火墙开放对应端口
-
-## 📄 许可证
-
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
 <div align="center">
 Made with ❤️ by VCampus Team
